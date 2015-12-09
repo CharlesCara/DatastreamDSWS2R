@@ -1,0 +1,23 @@
+Package: DatastreamDSWS2R
+Type: Package
+Title: Provides a link between the Thomson Reuters Datastream system and R
+Version: 0.1.1
+Date: 2015-12-03
+Author: Charles Cara
+Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
+Description: Provides a set of functions and a class to connect, extract and
+    upload information from the Thomson Reuters Datastream database. This package
+    uses the DSWS API and server used by the Datastream DFO addin.
+License: GPL3
+LazyData: TRUE
+Imports:
+    RCurl,
+    stringi
+Roxygen: list(wrap = FALSE)
+RoxygenNote: 5.0.1
+Collate:
+    'DatastreamDSWS2R.R'
+    'common.R'
+    'classConstructor.R'
+    'wrapper.R'
+    'UCTSUpload.R'

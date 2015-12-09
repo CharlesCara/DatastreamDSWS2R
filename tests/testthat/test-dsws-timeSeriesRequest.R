@@ -1,0 +1,298 @@
+##############################################################################################
+
+context("classConstructor.R : test of timeSeriesRequest method")
+source("~/.RProfile")
+suppressMessages(.First())
+
+##############################################################################################
+
+test_that("test of simple timeseries request with relative dates", {
+
+
+  mydsws <- dsws$new()
+
+  xtsData <- mydsws$timeSeriesRequest(instrument = "MKS",
+                           datatype = "MV",
+                           startDate = "-30D",
+                           endDate = "-0D",
+                           frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+})
+
+##############################################################################################
+
+test_that("test of two stock timeseries request with relative dates", {
+
+
+  mydsws <- dsws$new()
+
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("MKS","RIO"),
+                                      datatype = "MV",
+                                      startDate = "-30D",
+                                      endDate = "-0D",
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+})
+
+
+##############################################################################################
+
+test_that("test of simple timeseries request with absolute dates", {
+
+  mydsws <- dsws$new()
+
+  xtsData <- mydsws$timeSeriesRequest(instrument = "MKS",
+                                      datatype = "MV",
+                                      startDate = as.Date("2014-10-31"),
+                                      endDate = as.Date("2014-11-15"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+
+##############################################################################################
+
+test_that("test of two stock timeseries request with absolute dates", {
+
+  mydsws <- dsws$new()
+
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("MKS","RIO"),
+                                      datatype = "MV",
+                                      startDate = as.Date("2014-10-31"),
+                                      endDate = as.Date("2014-11-15"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+#######################################################################################
+test_that("test of the instrument being an expression with economic data", {
+
+
+  mydsws <- dsws$new()
+
+  xtsData <- mydsws$timeSeriesRequest(instrument = "PCH#(USCONPRCF,12M)",
+                                      datatype = "",
+                                      startDate = as.Date("31/12/1960", "%d/%m/%Y"),
+                                      endDate = as.Date("31/12/2014", "%d/%m/%Y"),
+                                      frequency = "M")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+#######################################################################################
+test_that("test of the instrument being an expression with economic data but call with wrong periodicity", {
+
+
+  mydsws <- dsws$new()
+
+  xtsData <- mydsws$timeSeriesRequest(instrument = "PCH#(USCONPRCF,12M)",
+                                      datatype = "",
+                                      startDate = as.Date("31/12/1960", "%d/%m/%Y"),
+                                      endDate = as.Date("31/12/2014", "%d/%m/%Y"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+##############################################################################
+test_that("test of three stock request", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("SAB", "RIO", "MKS"),
+                                      datatype = "P",
+                                      startDate = as.Date("31/12/2011", "%d/%m/%Y"),
+                                      endDate = as.Date("31/12/2014", "%d/%m/%Y"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+##############################################################################################
+test_that("test of multi stock timeseries request with an expression as the datatype", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("SAB", "RIO", "MKS"),
+                                      expression = "PCH#(XXXX,5D)",
+                                      startDate = as.Date("31/10/2015", "%d/%m/%Y"),
+                                      endDate = as.Date("15/11/2015", "%d/%m/%Y"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+
+})
+
+#############################################################
+test_that("test of download worldscope data - this data is numeric", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("@AAPL"),
+                                      expression = "XXXX(WC01001A)",
+                                      startDate = as.Date("31/12/2011", "%d/%m/%Y"),
+                                      endDate = as.Date('24/01/2012', '%d/%m/%Y'),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+  myValues <- coredata(xtsData)
+  colnames(myValues) <- NULL
+  expect_equal(myValues[1:2,1], c(28270000, NA) )
+  rm(mydsws, xtsData)
+
+})
+
+
+
+#############################################################
+test_that("test of download worldscope data - this data is Dates", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("@AAPL"),
+                                      expression = "XXXX(WC05905A)",
+                                      startDate = as.Date("31/12/2011", "%d/%m/%Y"),
+                                      endDate = as.Date('24/01/2012', '%d/%m/%Y'),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  myValues <- coredata(xtsData)
+  colnames(myValues) <- NULL
+  expect_is(myValues[1,1], "character")
+  expect_equal(myValues[1:2,1], c("2011-10-18", NA) )  # Date to be decoded
+
+  rm(mydsws, xtsData)
+
+})
+
+#############################################################
+test_that("test of download worldscope data for multiple stocks", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("@AAPL", "MKS"),
+                                      expression = "XXXX(WC05905A)",
+                                      startDate = as.Date("31/12/2011", "%d/%m/%Y"),
+                                      endDate = as.Date('24/01/2012', '%d/%m/%Y'),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+#############################################################
+test_that("test of Datastream expression eg 045E(XXXX)", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("@AAPL", "MKS"),
+                                      expression = "045E(XXXX)",
+                                      startDate = as.Date("31/12/2011", "%d/%m/%Y"),
+                                      endDate = as.Date('24/01/2012', '%d/%m/%Y'),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+#############################################################
+
+test_that("test of selecting stocks via ISIN codes with missing (NA) codes", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("NO0010716582",NA,"SE0005999836",NA,"BMG454221059"),
+                                      expression = "(XXXX(EPS1FD12)/XXXX(EPS1TR12))-1.00",
+                                      startDate = as.Date("01/06/2015", "%d/%m/%Y"),
+                                      endDate = as.Date("01/08/2015", "%d/%m/%Y"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+#############################################################
+test_that("test of Japanese ISIN with PE", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument =  c("JP3677200002"),
+                                      expression = "XXXX(PE)",
+                                      startDate = as.Date("31/12/2011", "%d/%m/%Y"),
+                                      endDate = as.Date("01/08/2015", "%d/%m/%Y"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+##############################################################################################
+test_that("test of ISIN returns Failure, status code 2, message $$\"ER\", 0904, NO DATA AVAILABLE", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument =  c("CA54042L1004"),
+                                      expression = "XXXX(PE)",
+                                      startDate = as.Date("31/12/2011", "%d/%m/%Y"),
+                                      endDate = as.Date("01/08/2015", "%d/%m/%Y"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+##############################################################################################
+# This is a mixture of NO DATA AVAILABLE and valid data
+#
+test_that("test of ISIN returns mixture of NO DATA AVAILABLE and valid data", {
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument =  c("CA54042L1004", "JP3677200002"),
+                                      expression = "XXXX(PE)",
+                                      startDate = as.Date("31/12/2011", "%d/%m/%Y"),
+                                      endDate = as.Date("01/08/2015", "%d/%m/%Y"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
