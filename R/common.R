@@ -98,45 +98,48 @@
   }
 
 
+#-----------------------------------------------------------------------------
+#
+#' @title .getValue
+#' @details extracts and converts a JSON string (including with Timezone) from the item 'Value'
+#' in the list x.  the item is parsed from JSON into either a numeric, string, or a R Date object
+#'
+#' @description this is a modification of the function provided by 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#'
+#' @param x a list that is expected to have an item 'Value'
+#' @return the parsed result: either Date, String or numeric
+#'
+.getValue <- function(x){
+  thisValue <- .convertJSONString(x$Value)
+  if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
+    #TODO: write the response in the errorList object
+    return(NA)
+  } else {
+    return(thisValue)
+  }
+}
 
 
-# #-----------------------------------------------------------------------------
-# #'
-# #' @title .makeRequest
-# #' @details make a request
-# #' @description handles the request to the DSWS server
-# #' @param serverURL the URL
-# #' @param myRequestJSON the message to be posted
-# #' @return the data request
-# #'
-# #' @importFrom RCurl postForm
-# #' @importFrom RJSONIO toJSON
-# #' @importFrom rjson fromJSON
-# #'
-# .makeRequest <- function(serverURL, myRequestList){
+#-----------------------------------------------------------------------------
 #
-#
-#   myDataURL <- paste0(serverURL , "GetData")
-#
-#   myRequestJSON <- RJSONIO::toJSON(myRequestList)
-#
-#   httpheader <- c(Accept="application/json; charset=UTF-8",
-#                   "Content-Type"="application/json")
-#
-#   myDataResponse <- tryCatch({
-#     RCurl::postForm(myDataURL,
-#                     .opts=list(httpheader=httpheader
-#                                ,postfields=myRequestJSON))},
-#     error = function(e) {
-#       message(e)
-#       return(NULL)})
-#
-#   if(is.null(myDataResponse)){
-#     myData <- NULL
-#   } else {
-#     myData <- rjson::fromJSON(json_str = myDataResponse)
-#   }
-#
-#   return(myData)
-#
-# }
+#' @title .getValue
+#' @details extracts and converts a JSON string (including with Timezone) from the item 'Symbol'
+#' in the list x.  the item is parsed from JSON into either a numeric, string, or a R Date object
+#'
+#' @description this is a modification of the function provided by 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#'
+#' @param x a list that is expected to have an item 'Value'
+#' @return the parsed result: either Date, String or numeric
+#'
+.getSymbol <- function(x){
+  thisValue <- .convertJSONString(x$Symbol)
+  if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
+    #TODO: write the response in the errorList object
+    return(NA)
+  } else {
+    return(thisValue)
+  }
+}
+

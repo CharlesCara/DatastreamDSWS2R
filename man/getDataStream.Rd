@@ -8,19 +8,19 @@ getDataStream(dweURLwsdl = "", User = as.character("USERNAME"),
   Pass = as.character("PASSWORD"))
 }
 \arguments{
-\item{dweURLwsdl}{The URL of the server}
+\item{dweURLwsdl}{Ignored}
 
-\item{User}{The username for Datastream.  If not provided it will use the username from the windows registry}
+\item{User}{Ignored - now sourced from options()$Datastream.Username}
 
-\item{Pass}{The password for Datastream.  Also sourced from Registry}
+\item{Pass}{Ignored - now sourced from options()$Datastream.Password}
 }
 \value{
-a DWE connection object
+a dsws object
 }
 \description{
-\code{getDataStream} initialises the connection with the Datastream DWE server
+\code{getDataStream} initialises an R5 object that contains a connection with the Datastream DWE server.  This function has been provided for backward compatibility
 }
 \details{
-Initialise connection with Datastream DSWS server
+Initialise connection with Datastream DSWS server.  Provided for backwards compatibility
 }
 

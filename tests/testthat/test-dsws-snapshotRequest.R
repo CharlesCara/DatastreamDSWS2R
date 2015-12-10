@@ -17,8 +17,9 @@ test_that("test of simple snapshot request for price datatype with relative date
                                    requestDate = "0D")
 
   expect_is(myData, "data.frame")
-  expect_is(myData[1,1], "numeric")
-  expect_equal(length(myData[,1]), 3)
+  expect_is(myData[1,2], "numeric")
+  expect_equal(nrow(myData), 3)
+  expect_equal(ncol(myData), 2)
 
 })
 
@@ -33,8 +34,9 @@ test_that("test of simple snapshot request for price datatype with absolute date
                                    requestDate = as.Date("2015-12-09"))
 
   expect_is(myData, "data.frame")
-  expect_is(myData[1,1], "numeric")
-  expect_equal(length(myData[,1]), 3)
+  expect_is(myData[1,2], "numeric")
+  expect_equal(nrow(myData), 3)
+  expect_equal(ncol(myData), 2)
 
 })
 
@@ -49,8 +51,9 @@ test_that("test of simple snapshot request with single datatypes that return str
                                    requestDate = "0D")
 
   expect_is(myData, "data.frame")
-  expect_is(myData[1,1], "character")
-  expect_equal(length(myData[,1]), 3)
+  expect_is(myData[1,2], "character")
+  expect_equal(nrow(myData), 3)
+  expect_equal(ncol(myData), 2)
 
 
 })
@@ -66,7 +69,7 @@ test_that("test of simple snapshot request with datatypes that return dates", {
                                    requestDate = "0D")
 
   expect_is(myData, "data.frame")
-  expect_is(myData[1,1], "Date")
+  expect_is(myData[1,2], "Date")
   expect_equal(nrow(myData), 3)
   expect_equal(ncol(myData), 2)
 
@@ -85,7 +88,7 @@ test_that("test of simple snapshot request with two datatypes that return name a
 
   expect_is(myData, "data.frame")
   expect_is(myData[1,3], "Date")
-  expect_equal(myData[1,1], "ASSOCIATED BRIT.FOODS")
+  expect_equal(myData[1,2], "ASSOCIATED BRIT.FOODS")
 
   expect_equal(nrow(myData), 3)
   expect_equal(ncol(myData), 3)

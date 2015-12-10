@@ -3,6 +3,8 @@
 export(UCTSUpload)
 export(dsws)
 export(getDataStream)
+export(listRequest)
+export(staticRequest)
 export(timeSeriesRequest)
 importFrom(RCurl,curlPercentEncode)
 importFrom(RCurl,getURL)

@@ -18,6 +18,10 @@ Creates an R5/RC4 object for accessing the Thomson Reuters Datastream DSWS servi
   startDate, endDate, frequency = "D", kind = 0, format = "ByInstrument")}}{Return a timeSeriesRequest from Datastream dsws.  Should request either a datatype or an expression
 not both.  If a datatype is provided then anythink in Expression will be ignored}
 
+\item{\code{buildRequestList(frequency, instrument, datatype, expression, isList, startDate,
+  endDate, kind, token)}}{Internal function that builds a request list that can be then parsed to JSON and sent to the
+DSWS server}
+
 \item{\code{getToken()}}{Returns a Token from the the dsws server that gives permission to access data}
 
 \item{\code{initialize(dsws.serverURL = "", username = "", password = "",
@@ -30,7 +34,8 @@ such as 'LFTSE100'  }
 .self$requestList, parsed into JSON and sent to the DSWS server.  The JSON response
 is parsed and saved in .self$dataResponse}
 
-\item{\code{snapshotRequest(instrument, datatype = "", expression = "", requestDate)}}{Return a snapshot (static) Request from Datastream dsws}
+\item{\code{snapshotRequest(instrument, datatype = "", expression = "", requestDate)}}{Return a snapshot (static) Request from Datastream dsws.
+instrument should contain a constituent list eg "LFTSE100"}
 
 \item{\code{timeSeriesListRequest(instrument, datatype = "", expression = "", startDate,
   endDate, frequency = "D", format = c("ByInstrument", "ByDatatype"))}}{Return a timeSeriesListRequest from Datastream dsws}

@@ -22,12 +22,12 @@ NULL
 #'
 #'
 #' @title Initialise connection with Datastream DSWS server
-#' @details Initialise connection with Datastream DSWS server
-#' @description \code{getDataStream} initialises the connection with the Datastream DWE server
-#' @param dweURLwsdl The URL of the server
-#' @param User The username for Datastream.  If not provided it will use the username from the windows registry
-#' @param Pass The password for Datastream.  Also sourced from Registry
-#' @return a DWE connection object
+#' @details Initialise connection with Datastream DSWS server.  Provided for backwards compatibility
+#' @description \code{getDataStream} initialises an R5 object that contains a connection with the Datastream DWE server.  This function has been provided for backward compatibility
+#' @param dweURLwsdl Ignored
+#' @param User Ignored - now sourced from options()$Datastream.Username
+#' @param Pass Ignored - now sourced from options()$Datastream.Password
+#' @return a dsws object
 #'
 #' @export
 #'
@@ -98,4 +98,106 @@ eval.parent(substitute(sStockList <- "To be implemented"))
 eval.parent(suppressWarnings(substitute(aTimeSeries <- myxts)))
 
 return("TO BE IMPLEMENTED instrument code map")
+}
+
+
+##############################################################################################
+#' @title make a static request
+#'
+#' @details \code{staticRequest} Function that returns a the value of Expression for the array of instruments in DSCode from Datastream
+#' parameters are
+#'
+#'@param dwei - A Datastream Client Interface object created with getDataStream
+#'@param  DSCode - an array of instruments eg c("RIO","MKS")
+#'@param  Expression - the data to return eg MNEM or NAME
+#'@param  endDate - the date of the request, or the string "TODAY"
+#'@param  frequency - the frequency of the request
+#'@param   verbose - whether to give messages during the request
+#'
+#'@return   returns an array of the requested information
+#'@export
+
+staticRequest <- function (dwei=getDataStream(),
+                           DSCode,
+                           Expression="",
+                           endDate=Sys.Date(),
+                           frequency="D",
+                           verbose = FALSE,
+                           noCache = FALSE) {
+
+    myData <- dwei$snapshotRequest(instrument = DSCode,
+                                   datatype = Expression,
+                                   requestDate = endDate)
+
+    return(myData)
+
+}
+
+
+##############################################################################################
+#'
+#'
+#'@title Make a list request for static data
+#'@details Make a list request for static data
+#'@description \code{listRequest} Function that returns a the value of Expression for the instrument list in DSCode from Datastream
+#'
+#'@param dwei - A Datastream Client Interface object created with getDataStream
+#'@param  DSCode - the constituent list for the request eg LDJSTOXX
+#'@param  Expression - the data to return eg MNEM or NAME.  If NULL or "" then we
+#'will return the code that has been loaded into the User Created List.
+#'@param   startDate - the date of the request, or the string "TODAY"
+#'@param  endDate - Ignored
+#'@param  frequency - the frequency of the request
+#'@param   verbose - whether to give messages during the request
+#'
+#'@return   returns an array of the requested information
+#'@export
+#'
+
+listRequest <- function (dwei=getDataStream(),
+                         DSCode,
+                         Expression="",
+                         startDate = Sys.Date(),
+                         endDate=Sys.Date(),
+                         frequency="D",
+                         verbose=FALSE) {
+
+  myData <- dwei$listRequest(instrument = DSCode,
+                                 datatype = Expression,
+                                 expression = "",
+                                 requestDate = endDate)
+
+}
+
+
+
+##############################################################################################
+#' @title make a timeSeries request for a list
+#'\code{timeSeriesListRequest} Function that returns a timeseries from Datastream constituent list
+#' parameters are
+#'@param   dwei - A Datastream Client Interface object created with getDataStream
+#'@param   DSCode - the constituent list requested eg 'LFTSE100'
+#'@param    Instrument - the expression to return for each member of constituent list
+#'@param    startDate - the start date of the timeseries
+#'@param    endDate - the end date of the timeseries
+#'@param    frequency - the frequency of the request
+#'@param sStockList - variable that is returned with list of of the stocks
+#'@param aTimeSeries - variable that is returned with the set of timeseries
+#'@param    verbose - whether to give messages during the request
+#'
+#'@return   whether the request has been successful
+#'    , but also
+#'    in sStockList: a list a two element vector of the displayname and symbol for each timeseries
+#'    in aTimeseries: a list of class xts with the requested timeseries information
+#' @export
+timeSeriesListRequest <- function (dwei=getDataStream(),
+                                   DSCode,
+                                   Instrument,
+                                   startDate,
+                                   endDate=Sys.Date(),
+                                   frequency="D",
+                                   sStockList,
+                                   aTimeSeries,
+                                   verbose=FALSE) {
+  return("NOT IMPLEMENTED YET")
 }

@@ -19,7 +19,9 @@ dsws <- setRefClass(Class="dsws",
                                   requestList = "ANY",
                                   dataResponse = "ANY",
                                   myValues = "ANY",
-                                  logging = "numeric"))
+                                  logging = "numeric",
+                                  numDatatype = "numeric",
+                                  numInstrument = "numeric"))
 
 #-----------------------------------------------------------------------------
 
@@ -172,9 +174,9 @@ dsws$methods(listRequest = function(instrument,
                             isList = TRUE,
                             startDate = "",
                             endDate = requestDate,
-                            frequency = "",
+                            frequency = "D",
                             kind = 0,
-                            format = format))
+                            format = "SnapshotList"))
 })
 
 
@@ -183,7 +185,9 @@ dsws$methods(snapshotRequest = function(instrument,
                                         datatype = "",
                                         expression = "",
                                         requestDate){
-  "Return a snapshot (static) Request from Datastream dsws"
+  "Return a snapshot (static) Request from Datastream dsws.
+  instrument should contain a constituent list eg \"LFTSE100\"
+  "
 
   return(.self$basicRequest(instrument = instrument,
                             datatype = datatype,
@@ -259,17 +263,168 @@ dsws$methods(basicRequest = function(instrument,
 
   .self$setErrorlist(NULL)
 
+  .self$requestList <- .self$buildRequestList(frequency = frequency,
+                   instrument = instrument,
+                   datatype = datatype,
+                   expression = expression,
+                   isList = isList,
+                   startDate = startDate,
+                   endDate = endDate,
+                   kind = kind,
+                   token = .self$getToken())
+
+
+  ret <- .self$makeRequest()
+
+  if(!ret){
+    # There has been an error.  Return NULL.  Error is stored in .self$errors
+    return(NULL)
+  }
+
+  # Now to parse the timeseries data in myData into an xts
+  # If we have more than one dimension then it is returned as a list of wide xts
+
+  # Get the dates - these are provided separately
+  myDates <- .convert_JSON_Date(dataResponse$DataResponse$Dates)
+
+  if(length(.convert_JSON_Date(dataResponse$DataResponse$Dates)) == 0 ){
+    # If the length of the Dates object is 0 then no data has been returned
+    # return a NULL xts
+    return(xts(NULL))
+  }
+
+  xtsData <- list()
+
+  if(format[1] == "ByInstrument"){
+    # If the format is byInstrument, then we are going to create a list of wide xts, one for each datatype
+
+    #    if(isDatatype){
+    # We have sent the request as multiple instruments and multiple datatypes so
+    # response has a single item in DataTypeValues
+    for(iDatatype in 1:.self$numDatatype){
+
+      # Create a dataframe to hold the results
+      .self$myValues <- data.frame(matrix(NA, nrow = length(myDates), ncol = .self$numInstrument))
+
+      # Place the returned data into columns of the dataframe and name the column
+      for(iInstrument in 1:.self$numInstrument){
+        .self$parseBranch(iInstrument,
+                          iDatatype,
+                          formatType = "ByInstrument")
+      }
+
+      # Turn it into a xts and if more than one datatype was requested put it into a list
+      # We could in future save the xts into an environment as well  - a la Quantmod package
+      if(.self$numDatatype == 1){
+        xtsData <- xts(.self$myValues, order.by = myDates)
+      } else {
+        xtsData[[iDatatype]] <- xts(.self$myValues, order.by = myDates)
+      }
+    }
+
+  } else if(format == "ByDatatype"){
+    # If the format is byDatatype, then we are going to create a list of wide xts, one for each instrument
+    # this is closer to the getSymbols function of the quantmod package and so might be a springboard
+    # for extending to that package
+    for(iInstrument in 1:.self$numInstrument){
+
+      # Create a dataframe to hold the results
+      .self$myValues <- data.frame(matrix(NA, nrow = length(myDates), ncol = .self$numDatatype))
+
+      # Place the returned data into columns of the dataframe and name the column
+      for(iDatatype in 1:.self$numDatatype){
+        .self$parseBranch(iInstrument,
+                          iDatatype,
+                          formatType = "ByInstrument")
+      }
+
+      # Turn it into a xts and if more than one datatype was requested put it into a list
+      if(.self$numInstrument == 1){
+        xtsData <- xts(.self$myValues, order.by = myDates)
+      } else {
+        xtsData[[iInstrument]] <- xts(.self$myValues, order.by = myDates)
+      }
+    }
+
+  } else if(format == "Snapshot" | format == "SnapshotList") {
+
+    if(format == "SnapshotList") {
+      # If a list request then take the number of instruments from the response
+      .self$numInstrument <- length(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues)
+    }
+
+    # Process the response into a dataframe, one row per instrument, with a column for each datatype
+    # Create a dataframe to hold the results
+    .self$myValues <- data.frame(matrix(NA, nrow = .self$numInstrument, ncol = .self$numDatatype + 1))
+
+    # Process the column for the instruments
+    colnames(.self$myValues)[1] <- "Instrument"
+
+    .self$myValues[, 1] <-
+      sapply(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues,
+             FUN = .getSymbol)
+
+    # Process the columns of data
+    for(iDatatype in 1:.self$numDatatype){
+      # Put a title on the column
+      colnames(.self$myValues)[iDatatype + 1] <-
+        .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType
+        # Can use sapply or unlist directly as they strip the Date attributes.
+        # solution is to apply c to the list.
+        # http://stackoverflow.com/questions/15659783/why-does-unlist-kill-dates-in-r
+        dd <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
+               FUN = .getValue,
+               simplify = FALSE)
+        .self$myValues[, iDatatype + 1] <- do.call("c", dd)
+
+
+    }
+    return(.self$myValues)
+
+  } else {
+    stop("Output format is not ByDatatype or ByInstrument")
+  }
+  return(xtsData)
+})
+
+
+dsws$methods(parseBranch = function(iInstrument, iDatatype, formatType){
+
+  # we are using eval to avoid copying what might be a big table of in myValues
+  myValuesList <- .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Value
+
+  myValuesList[sapply(myValuesList, is.null)] <- NA
+
+  if(!(TRUE %in% grepl("[$$ER:]", myValuesList[[1]]) )){
+    .self$myValues[,iInstrument] <- t(data.frame(lapply(myValuesList, FUN = .convertJSONString)))
+  }
+
+  # Add column names
+  colnames(.self$myValues)[iInstrument] <-
+    .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Symbol
+  # Replace errors with NA
+  .self$myValues[which(myValues[,iDatatype] == "$$ER: 0904,NO DATA AVAILABLE"),iDatatype] <- NA
+
+  return(NULL)
+
+})
+
+#--------------------------------------------------------------------------------------------
+dsws$methods(buildRequestList = function (frequency, instrument, datatype, expression, isList, startDate, endDate, kind, token) {
+  "Internal function that builds a request list that can be then parsed to JSON and sent to the
+  DSWS server"
+
   # Check inputs
   if(!frequency %in% c("D", "W", "M", "Q", "Y")){
     stop("frequency must be one of D, W, M, Q or Y")
   }
 
   # Only use expressions if datatype is blank.  Expression has to be substituted into instrument
-  numInstrument <- length(instrument)
+  .self$numInstrument <- length(instrument)
   instrument<-toupper(instrument)
 
   if(datatype == "" && expression != ""){
-    numDatatype <- 1
+    .self$numDatatype <- 1
     isDatatype <- FALSE
     if( grepl(pattern="XXXX", x=expression, fixed=TRUE) == FALSE){
       # Expression does not contain XXXX so we cannot do a replace
@@ -284,13 +439,13 @@ dsws$methods(basicRequest = function(instrument,
     myDataType <- list()
 
   } else {
-    numDatatype <- length(datatype)
+    .self$numDatatype <- length(datatype)
     isDatatype <- TRUE
     myDataType <- lapply(datatype, FUN = function(x) return(list(Properties= NULL, Value = x)))
   }
 
   # Limit of size of requests
-  if(numInstrument * numDatatype >= 2000) {
+  if(.self$numInstrument * .self$numDatatype >= 2000) {
     stop("Maximum number of dataitems is in excess of 2000.  Chunked requests not yet implmented")
   }
 
@@ -303,7 +458,7 @@ dsws$methods(basicRequest = function(instrument,
 
 
   # If more than one instrument then we have to pass IsSymbolSet=TRUE to wsds
-  if(numInstrument > 1){
+  if(.self$numInstrument > 1){
     myInstrument <- list(Properties = list(list(Key = "IsSymbolSet",
                                                 Value  = TRUE)),
                          Value = paste0(instrument, collapse=","))
@@ -337,152 +492,14 @@ dsws$methods(basicRequest = function(instrument,
                   Start = sStartDate)
 
   # Combine all these elements to create the request (in list form)
-  .self$requestList <- list(DataRequest = list(DataTypes = myDataType,
+  return(list(DataRequest = list(DataTypes = myDataType,
                                                Date = myDates,
                                                Instrument = myInstrument,
                                                Tag = NULL),
                             Properties = list(Properties=NULL),
-                            TokenValue = .self$getToken())
-
-
-  ret <- .self$makeRequest()
-
-  if(!ret){
-    # There has been an error.  Return NULL.  Error is stored in .self$errors
-    return(NULL)
-  }
-
-  # Now to parse the timeseries data in myData into an xts
-  # If we have more than one dimension then it is returned as a list of wide xts
-
-  # Get the dates - these are provided separately
-  myDates <- .convert_JSON_Date(dataResponse$DataResponse$Dates)
-
-  if(length(.convert_JSON_Date(dataResponse$DataResponse$Dates)) == 0 ){
-    # If the length of the Dates object is 0 then no data has been returned
-    # return a NULL xts
-    return(xts(NULL))
-  }
-
-  xtsData <- list()
-
-  if(format[1] == "ByInstrument"){
-    # If the format is byInstrument, then we are going to create a list of wide xts, one for each datatype
-
-    #    if(isDatatype){
-    # We have sent the request as multiple instruments and multiple datatypes so
-    # response has a single item in DataTypeValues
-    for(iDatatype in 1:numDatatype){
-
-      # Create a dataframe to hold the results
-      .self$myValues <- data.frame(matrix(NA, nrow = length(myDates), ncol = numInstrument))
-
-      # Place the returned data into columns of the dataframe and name the column
-      for(iInstrument in 1:numInstrument){
-        .self$parseBranch(iInstrument,
-                          iDatatype,
-                          formatType = "ByInstrument")
-      }
-
-      # Turn it into a xts and if more than one datatype was requested put it into a list
-      # We could in future save the xts into an environment as well  - a la Quantmod package
-      if(numDatatype == 1){
-        xtsData <- xts(.self$myValues, order.by = myDates)
-      } else {
-        xtsData[[iDatatype]] <- xts(.self$myValues, order.by = myDates)
-      }
-    }
-
-  } else if(format == "ByDatatype"){
-    # If the format is byDatatype, then we are going to create a list of wide xts, one for each instrument
-    # this is closer to the getSymbols function of the quantmod package and so might be a springboard
-    # for extending to that package
-    for(iInstrument in 1:numInstrument){
-
-      # Create a dataframe to hold the results
-      .self$myValues <- data.frame(matrix(NA, nrow = length(myDates), ncol = numDatatype))
-
-      # Place the returned data into columns of the dataframe and name the column
-      for(iDatatype in 1:numDatatype){
-        .self$parseBranch(iInstrument,
-                          iDatatype,
-                          formatType = "ByInstrument")
-      }
-
-      # Turn it into a xts and if more than one datatype was requested put it into a list
-      if(numInstrument == 1){
-        xtsData <- xts(.self$myValues, order.by = myDates)
-      } else {
-        xtsData[[iInstrument]] <- xts(.self$myValues, order.by = myDates)
-      }
-    }
-
-  } else if(format == "Snapshot") {
-    # Process the response into a dataframe, one row per instrument, with a column for each datatype
-    # Create a dataframe to hold the results
-    .self$myValues <- data.frame(matrix(NA, nrow = numInstrument, ncol = numDatatype + 1))
-    colnames(.self$myValues)[1] <- "Instrument"
-    for(iDatatype in 1:numDatatype){
-      # Put a title on the column
-      colnames(.self$myValues)[iDatatype + 1] <-
-        .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType
-      for(iInstrument in 1:numInstrument){
-      .self$parseSnapshotBranch(iInstrument,
-                                iDatatype)
-        }
-      }
-      return(.self$myValues)
-  } else {
-    stop("Output format is not ByDatatype or ByInstrument")
-  }
-  return(xtsData)
+                            TokenValue = token)
+         )
 })
-
-
-dsws$methods(parseBranch = function(iInstrument, iDatatype, formatType){
-
-  # we are using eval to avoid copying what might be a big table of in myValues
-  myValuesList <- .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Value
-
-  myValuesList[sapply(myValuesList, is.null)] <- NA
-
-  if(!(TRUE %in% grepl("[$$ER:]", myValuesList[[1]]) )){
-      .self$myValues[,iInstrument] <- t(data.frame(lapply(myValuesList, FUN = .convertJSONString)))
-  }
-
-  # Add column names
-    colnames(.self$myValues)[iInstrument] <-
-      .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Symbol
-  # Replace errors with NA
-    .self$myValues[which(myValues[,iDatatype] == "$$ER: 0904,NO DATA AVAILABLE"),iDatatype] <- NA
-
-  return(NULL)
-
-})
-
-
-dsws$methods(parseSnapshotBranch = function(iInstrument, iDatatype){
-
-  # we are using eval to avoid copying what might be a big table of in myValues
-  myValuesList <- .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Value
-
-  myValuesList[sapply(myValuesList, is.null)] <- NA
-
-  if(!(TRUE %in% grepl("[$$ER:]", myValuesList[[1]]) )){
-    .self$myValues[iInstrument, iDatatype + 1] <- .convertJSONString(myValuesList)
-  }
-
-  # Add row names
-  .self$myValues[iInstrument, 1] <-
-    .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Symbol
-  # Replace errors with NA
-  .self$myValues[which(myValues[,iDatatype + 1] == "$$ER: 0904,NO DATA AVAILABLE"), iDatatype + 1] <- NA
-
-  return(NULL)
-
-})
-
-
 
 
 
