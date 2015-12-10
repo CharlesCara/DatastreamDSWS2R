@@ -1,7 +1,7 @@
 # DatastreamDSWS2R
 Functions and a R5 class that allows data to be downloaded and uploaded to the Thomson Reuters Datastream database via the DSWS server.  Thomson Reuters Datastream is a rich database of financial information.  You need to have a Datastream subscription and a username/password to use this package.
 
-This package is still in development and subject to change.
+This package is still in alpha stage development and testing.  It is subject to change.
 
 The package can be installed using:
 
@@ -36,4 +36,4 @@ and for a timeseries request
 
 
 
-In addition, for backwards com
+In addition, this package has been built with backwards compatibilty with the Datastream2R package.  You just need to replace require(Datastream2R) with require(DatastreamDSWS2R)
