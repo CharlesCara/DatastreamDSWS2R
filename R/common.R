@@ -98,6 +98,43 @@
   }
 
 
+
+#-----------------------------------------------------------------------------
+#
+#' @title .getValueTyped
+#' @details extracts and converts a JSON string (including with Timezone) from the item 'Value'
+#' in the list x.  the item is parsed from JSON into either a numeric, string, or a R Date object
+#' according to the rules in item 'Type'
+#'
+#' @description this is a modification of the function provided by 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#'
+#' @param x a list that is expected to have an item 'Value' and item 'Type'
+#' @return the parsed result: either Date, String or numeric
+#'
+.getValueTyped <- function(x, myType){
+  thisValue <- .convertJSONString(x$Value)
+
+  if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
+    #TODO: write the response in the errorList object
+    return(NA)
+  } else {
+    if(myType == 4){
+      if(class(thisValue) != "Date" && thisValue == "NA"){
+        return(as.Date(NA))
+      } else {
+        return(as.Date(thisValue))
+      }
+
+    }
+    #TODO: do we need to hard type the rest
+    return(thisValue)
+  }
+}
+
+
+
+
 #-----------------------------------------------------------------------------
 #
 #' @title .getValue
@@ -123,7 +160,7 @@
 
 #-----------------------------------------------------------------------------
 #
-#' @title .getValue
+#' @title .getSymbol
 #' @details extracts and converts a JSON string (including with Timezone) from the item 'Symbol'
 #' in the list x.  the item is parsed from JSON into either a numeric, string, or a R Date object
 #'
@@ -143,3 +180,25 @@
   }
 }
 
+
+#-----------------------------------------------------------------------------
+#
+#' @title .getType
+#' @details extracts and converts a JSON string (including with Timezone) from the item 'Type'
+#' in the list x.  the item is parsed from JSON into either a numeric, string, or a R Date object
+#'
+#' @description this is a modification of the function provided by 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#'
+#' @param x a list that is expected to have an item 'Type'
+#' @return the parsed result: either Date, String or numeric
+#'
+.getType <- function(x){
+  thisValue <- .convertJSONString(x$Type)
+  if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
+    #TODO: write the response in the errorList object
+    return(NaN)
+  } else {
+    return(as.integer(thisValue))
+  }
+}

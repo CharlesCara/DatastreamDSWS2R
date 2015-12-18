@@ -171,9 +171,9 @@ UCTSUpload <- function(tsData,
   # Add Start Date for values - make sure it is in DD/MM/YY format
   #CMC actually the function returns a dd/MM/yyyy format post Y2K
   # convert to xts object
-  xtsData <- as.xts(tsData)
-  startDate <- zoo::index(first(xtsData))
-  endDate <- zoo::index(last(xtsData))
+  myXtsData <- as.xts(tsData)
+  startDate <- zoo::index(first(myXtsData))
+  endDate <- zoo::index(last(myXtsData))
 
   # Now create the URL to post the form to
   dsURL <- paste0(strServerName , strServerPage , "?UserID=" , strUsername)
@@ -201,7 +201,7 @@ UCTSUpload <- function(tsData,
                    ForceUpdateFlag2 = "Y",                   # We have ignored some logic in the original UCTS VBA code
                    TSValsStart = format(startDate,format="%d/%m/%Y"),  #TODO adjust this date according to the frequency of the data VBA function AdjustDateTo1st
                    NAValue = NA_VALUE,
-                   TSValues = .getTimeseries(xtsData,
+                   TSValues = .getTimeseries(myXtsData,
                                           freq= freq,
                                           digits=Decimals,
                                           NA_VALUE),           #Now add the datapoints - the date element of the series is discarded here, with obvious risks

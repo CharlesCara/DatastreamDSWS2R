@@ -54,7 +54,11 @@ Instrument <- c("PCH#(USCONPRCF,12M)")
 startDate <- as.Date("31/12/1960", "%d/%m/%Y")
 endDate <- as.Date('24/01/2012', '%d/%m/%Y')
 
-a <- timeSeriesRequest(dwei = dwei, DSCode = Instrument,
-                       startDate = startDate, frequency = "M", sStockList = stn, aTimeSeries = stpr)
+a <- timeSeriesRequest(dwei = dwei,
+                       DSCode = Instrument,
+                       startDate = startDate,
+                       frequency = "M",
+                       sStockList = stn,
+                       aTimeSeries = stpr)
 })
 

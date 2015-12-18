@@ -296,3 +296,43 @@ test_that("test of ISIN returns mixture of NO DATA AVAILABLE and valid data", {
 
 })
 
+##############################################################################################
+# This is a test of chunked requests - first make an unchunked one, and then a chunked one
+#
+test_that("test of chunked timeSeriesRequests", {
+
+
+  mydsws <- dsws$new()
+
+  symbolList <- mydsws$listRequest(instrument = "LFTSE100",
+                                    datatype = "MNEM",
+                                    requestDate = "0D")
+
+  # Get the unchunked data
+
+  xtsTestData <- mydsws$timeSeriesRequest(instrument =  symbolList[,2],
+                                      expression = "XXXX(PE)",
+                                      startDate = as.Date("2011-08-31"),
+                                      endDate = as.Date("2011-11-30"),
+                                      frequency = "W")
+  expect_is(xtsTestData, "xts")
+  # Get the same data with chunking
+
+  mydsws <- dsws$new()
+  mydsws$chunkLimit <- 25L
+  browser()
+  xtsDataChunked <- mydsws$timeSeriesRequest(instrument =  symbolList[,2],
+                                      expression = "XXXX(PE)",
+                                      startDate = as.Date("2011-08-31"),
+                                      endDate = as.Date("2011-11-30"),
+                                      frequency = "W")
+
+  expect_is(xtsDataChunked, "xts")
+  expect_identical(xtsTestData, xtsDataChunked)
+
+  rm(mydsws, xtsData, xtsDataChunked, symbolList)
+})
+
+
+
+

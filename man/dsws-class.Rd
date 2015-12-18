@@ -15,8 +15,18 @@ Creates an R5/RC4 object for accessing the Thomson Reuters Datastream DSWS servi
 
 \describe{
 \item{\code{basicRequest(instrument, datatype = "", expression = "", isList = FALSE,
-  startDate, endDate, frequency = "D", kind = 0, format = "ByInstrument")}}{Return a timeSeriesRequest from Datastream dsws.  Should request either a datatype or an expression
-not both.  If a datatype is provided then anythink in Expression will be ignored}
+  startDate, endDate, frequency = "D", kind = 0, format = "ByInstrument")}}{Internal method.  This is not intended to be called directly.  Return a request from Datastream dsws.
+ Should request either a datatype or an expression not both.  If a datatype is provided then anything
+ in Expression will be ignored.
+ Datatype can be a vector with length > 1, but expression should only be of length 1.
+ This method will chunk the requests to dsws if necessary.}
+
+\item{\code{basicRequestChunk(instrument, datatype = "", expression = "",
+  isList = FALSE, startDate, endDate, frequency = "D", kind = 0,
+  format = "ByInstrument", isChunked = FALSE, chunkNumber = 0,
+  chunkItems = NULL)}}{Return a timeSeriesRequest from Datastream dsws.  Should request either a datatype or an expression
+not both.  If a datatype is provided then anything in Expression will be ignored.
+isChunked - Boolean about whether the request is part of a chunked request}
 
 \item{\code{buildRequestList(frequency, instrument, datatype, expression, isList, startDate,
   endDate, kind, token)}}{Internal function that builds a request list that can be then parsed to JSON and sent to the
@@ -38,10 +48,10 @@ is parsed and saved in .self$dataResponse}
 instrument should contain a constituent list eg "LFTSE100"}
 
 \item{\code{timeSeriesListRequest(instrument, datatype = "", expression = "", startDate,
-  endDate, frequency = "D", format = c("ByInstrument", "ByDatatype"))}}{Return a timeSeriesListRequest from Datastream dsws}
+  endDate, frequency = "D", format = "ByInstrument")}}{Return a timeSeriesListRequest from Datastream dsws}
 
 \item{\code{timeSeriesRequest(instrument, datatype = "", expression = "", startDate,
-  endDate, frequency = "D", format = c("ByInstrument", "ByDatatype"))}}{Return a timeSeriesRequest from Datastream dsws.  Should request either a datatype or an expression
+  endDate, frequency = "D", format = "ByInstrument")}}{Return a timeSeriesRequest from Datastream dsws.  Should request either a datatype or an expression
 not both.  If a datatype is provided then anythink in Expression will be ignored}
 }}
 

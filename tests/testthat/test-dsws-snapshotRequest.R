@@ -96,4 +96,29 @@ test_that("test of simple snapshot request with two datatypes that return name a
 })
 
 
+##############################################################################################
+
+test_that("test of chunked snapshot request with two datatypes that return name and dates", {
+
+  mydsws <- dsws$new()
+
+  symbolList <- mydsws$listRequest(instrument = "LFTSE100",
+                                   datatype = "MNEM",
+                                   requestDate = "0D")
+
+
+  myData <- mydsws$snapshotRequest(instrument = symbolList[,2],
+                                   datatype = c("NAME", "EPSFD"),
+                                   requestDate = "0D")
+
+  # Get the same data with chunking
+  mydsws <- dsws$new()
+  mydsws$chunkLimit <- 25L
+  myDataChunked <- mydsws$snapshotRequest(instrument = symbolList[,2],
+                                   datatype = c("NAME", "EPSFD"),
+                                   requestDate = "0D")
+
+  expect_identical(myData, myDataChunked)
+})
+
 

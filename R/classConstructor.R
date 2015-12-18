@@ -18,10 +18,13 @@ dsws <- setRefClass(Class="dsws",
                                   errorlist = "ANY",
                                   requestList = "ANY",
                                   dataResponse = "ANY",
+                                  symbolList = "ANY",
                                   myValues = "ANY",
+                                  myTypes = "ANY",
                                   logging = "numeric",
                                   numDatatype = "numeric",
-                                  numInstrument = "numeric"))
+                                  numInstrument = "numeric",
+                                  chunkLimit = "numeric"))
 
 #-----------------------------------------------------------------------------
 
@@ -30,7 +33,8 @@ dsws$accessors(c("serverURL",
                  "password",
                  "errorlist",
                  "requestList",
-                 "dataResponse"))
+                 "dataResponse",
+                 "symbolList"))
 
 
 #-----------------------------------------------------------------------------
@@ -39,7 +43,8 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   "initialises the class and unless noConnect is TRUE connects to the Datastream dsws server "
 
   .self$initialised <<- FALSE
-  .self$errorlist <<- NULL
+  .self$errorlist <<- list()
+  .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
 
   if(dsws.serverURL == ""){
     .self$serverURL <<- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
@@ -208,7 +213,7 @@ dsws$methods(timeSeriesRequest = function(instrument,
                                           startDate,
                                           endDate,
                                           frequency = "D",
-                                          format = c("ByInstrument","ByDatatype")){
+                                          format = "ByInstrument"){
   "Return a timeSeriesRequest from Datastream dsws.  Should request either a datatype or an expression
   not both.  If a datatype is provided then anythink in Expression will be ignored"
 
@@ -233,10 +238,23 @@ dsws$methods(timeSeriesListRequest = function(instrument,
                                               startDate,
                                               endDate,
                                               frequency = "D",
-                                              format = c("ByInstrument","ByDatatype")){
+                                              format = "ByInstrument"){
   "Return a timeSeriesListRequest from Datastream dsws"
 
-  return(.self$basicRequest(instrument = instrument,
+  # First return a list of mnemonics
+
+  symbolList <<- .self$basicRequest(instrument = instrument,
+                                    datatype = "MNEM",
+                                    expression = "",
+                                    isList = TRUE,
+                                    startDate = "",
+                                    endDate = endDate,
+                                    frequency = frequency,
+                                    kind = 0,
+                                    format = "SnapshotList")
+
+
+  return(.self$basicRequest(instrument = symbolList[,1],
                             datatype = datatype,
                             expression = expression,
                             isList = FALSE,
@@ -258,22 +276,177 @@ dsws$methods(basicRequest = function(instrument,
                                      kind = 0,
                                      format = "ByInstrument"){
 
+  "Internal method.  This is not intended to be called directly.  Return a request from Datastream dsws.
+   Should request either a datatype or an expression not both.  If a datatype is provided then anything
+   in Expression will be ignored.
+   Datatype can be a vector with length > 1, but expression should only be of length 1.
+   This method will chunk the requests to dsws if necessary.
+  "
+
+  if(length(expression) > 1) expression <- expression[1]
+  .self$setErrorlist(list())
+
+
+  # Setting a limit on the number of datatypes means that we will always split instrument up into chunks
+  # simplifying the chunking and stitching process.
+  if(length(datatype) >= .self$chunkLimit) {
+    stop(paste0("The number of datatypes request must be less than the limit of ", .self$chunkLimit))
+  }
+
+
+
+  #TODO calc num instrument and num Datatype
+
+  if(format == "Snapshot"){
+    # Set the holder for the results here
+    # Process the response into a dataframe, one row per instrument, with a column for each datatype
+    .self$myValues <- data.frame(matrix(NA, nrow = length(instrument), ncol = length(datatype) + 1))
+  } else if(format == "ByInstrument"){
+    xtsValues <- NULL
+  }
+
+  # Holder for the type (ie Date, string) for each of the datatypes
+  .self$myTypes <- rep(NA, length(datatype))
+
+  # if we are using expressions then length(datatype) will be 1L and so will not affect the test
+  if(length(instrument) * length(datatype) < .self$chunkLimit) {
+    # Chunking not required so just pass through the request
+    return(.self$basicRequestChunk(instrument = instrument,
+                                   datatype = datatype,
+                                   expression = expression,
+                                   isList = isList,
+                                   startDate = startDate,
+                                   endDate = endDate,
+                                   frequency = frequency,
+                                   kind = kind,
+                                   format = format,
+                                   chunkNumber = 1,
+                                   isChunked = FALSE))
+
+  }
+
+  # Chunking required which will to split instrument into chunks
+
+  maxRequest <- .self$chunkLimit
+  numCodes <- length(instrument)
+  maxRequest <- floor(.self$chunkLimit / length(datatype))
+  numChunks <- ceiling(numCodes / maxRequest )
+
+
+  for(i in 1:numChunks){
+    # get the the list of instruments for each request
+    startIndex <- ((i - 1) * maxRequest) + 1
+    endIndex <- ifelse((i * maxRequest) < numCodes, (i * maxRequest), numCodes )
+    chunkInstrument <- instrument[startIndex:endIndex]
+    resRows <- seq(from = startIndex, to = endIndex)
+
+    # make a request for the chunk of instruments
+    ret <- .self$basicRequestChunk(instrument = chunkInstrument,
+                                   datatype = datatype,
+                                   expression = expression,
+                                   isList = isList,
+                                   startDate = startDate,
+                                   endDate = endDate,
+                                   frequency = frequency,
+                                   kind = kind,
+                                   format = format,
+                                   isChunked = TRUE,
+                                   chunkNumber = i,
+                                   chunkItems = resRows)
+
+    # How we join the results together depends of the nature of the format
+    if(format[1] == "ByInstrument"){
+      # If the format is by instrument then we have a wide xts, one for each datatype.
+      # each of these individual xts will need to be merged with the master
+
+      if(is.null(ret)) {
+        .self$setErrorlist(c(.self$getErrorlist(),
+                             paste0("Chunk number ", i, " returned a null response")))
+        next
+      }
+
+      if(length(datatype) == 1){
+        # If we have only one datatype then merging is simple
+        if(is.null(xtsValues)){
+          xtsValues <- ret
+        } else {
+          xtsValues <- cbind(xtsValues, ret)
+        }
+      } else {
+        # If multiple datatypes then the xts for each datatype has to be merged individually
+        for(i in 1: length(datatype)){
+          if(is.null(xtsValues[[i]])){
+            xtsValues[[i]] <- ret[[i]]
+          } else {
+            xtsValues[[i]] <- cbind(xtsValues[[i]], ret[[i]])
+          }
+        }
+      }
+
+    } else if(format == "ByDatatype") {
+      # ByDatatype might be a simple implementation unless we have too many datatypes.
+      # should simply set a limit on the number of datatypes of less than chunk limit.
+      stop("chunking of ByDatatype not implemented")
+    } else if(format == "Snapshot" | format == "SnapshotList"){
+      # Nothing to do :-)
+    } else (
+      stop("Unknown format type")
+    )
+  }
+
+
+  #Finished the chunking loop, so need to return according to the request type
+
+  if(format[1] == "ByInstrument" | format == "ByDatatype"){
+    return(myxtsData)
+  } else if(format == "Snapshot"){
+    return(.self$myValues)
+  }
+
+  # should not get here
+  return(NULL)
+
+
+})
+
+
+#-----------------------------------------------------------------------------
+dsws$methods(basicRequestChunk = function(instrument,
+                                          datatype = "",
+                                          expression = "",
+                                          isList = FALSE,
+                                          startDate,
+                                          endDate,
+                                          frequency = "D",
+                                          kind = 0,
+                                          format = "ByInstrument",
+                                          isChunked = FALSE,
+                                          chunkNumber = 0,
+                                          chunkItems = NULL){
+
   "Return a timeSeriesRequest from Datastream dsws.  Should request either a datatype or an expression
-  not both.  If a datatype is provided then anythink in Expression will be ignored"
+  not both.  If a datatype is provided then anything in Expression will be ignored.
+  isChunked - Boolean about whether the request is part of a chunked request"
 
-  .self$setErrorlist(NULL)
+  if(isChunked && format == "SnapshotList") {
+    stop("SnapshotList format cannot be chunked.")
+  }
 
-  .self$requestList <- .self$buildRequestList(frequency = frequency,
-                   instrument = instrument,
-                   datatype = datatype,
-                   expression = expression,
-                   isList = isList,
-                   startDate = startDate,
-                   endDate = endDate,
-                   kind = kind,
-                   token = .self$getToken())
+  myReq <- .self$buildRequestList(frequency = frequency,
+                                  instrument = instrument,
+                                  datatype = datatype,
+                                  expression = expression,
+                                  isList = isList,
+                                  startDate = startDate,
+                                  endDate = endDate,
+                                  kind = kind,
+                                  token = .self$getToken())
 
+  .self$requestList <- myReq$requestList
+  myNumDatatype <- myReq$numDatatype
+  myNumInstrument <- myReq$numInstrument
 
+  # Make the request to the server
   ret <- .self$makeRequest()
 
   if(!ret){
@@ -293,7 +466,7 @@ dsws$methods(basicRequest = function(instrument,
     return(xts(NULL))
   }
 
-  xtsData <- list()
+  myxtsData <- list()
 
   if(format[1] == "ByInstrument"){
     # If the format is byInstrument, then we are going to create a list of wide xts, one for each datatype
@@ -301,13 +474,13 @@ dsws$methods(basicRequest = function(instrument,
     #    if(isDatatype){
     # We have sent the request as multiple instruments and multiple datatypes so
     # response has a single item in DataTypeValues
-    for(iDatatype in 1:.self$numDatatype){
+    for(iDatatype in 1:myNumDatatype){
 
       # Create a dataframe to hold the results
-      .self$myValues <- data.frame(matrix(NA, nrow = length(myDates), ncol = .self$numInstrument))
+      .self$myValues <- data.frame(matrix(NA, nrow = length(myDates), ncol = myNumInstrument))
 
       # Place the returned data into columns of the dataframe and name the column
-      for(iInstrument in 1:.self$numInstrument){
+      for(iInstrument in 1:myNumInstrument){
         .self$parseBranch(iInstrument,
                           iDatatype,
                           formatType = "ByInstrument")
@@ -315,67 +488,108 @@ dsws$methods(basicRequest = function(instrument,
 
       # Turn it into a xts and if more than one datatype was requested put it into a list
       # We could in future save the xts into an environment as well  - a la Quantmod package
-      if(.self$numDatatype == 1){
-        xtsData <- xts(.self$myValues, order.by = myDates)
+      if(myNumDatatype == 1){
+        myxtsData <- xts(.self$myValues, order.by = myDates)
       } else {
-        xtsData[[iDatatype]] <- xts(.self$myValues, order.by = myDates)
+        myxtsData[[iDatatype]] <- xts(.self$myValues, order.by = myDates)
       }
     }
+    return(myxtsData)
 
   } else if(format == "ByDatatype"){
     # If the format is byDatatype, then we are going to create a list of wide xts, one for each instrument
     # this is closer to the getSymbols function of the quantmod package and so might be a springboard
     # for extending to that package
-    for(iInstrument in 1:.self$numInstrument){
+    for(iInstrument in 1:myNumInstrument){
 
       # Create a dataframe to hold the results
-      .self$myValues <- data.frame(matrix(NA, nrow = length(myDates), ncol = .self$numDatatype))
+      .self$myValues <- data.frame(matrix(NA, nrow = length(myDates), ncol = myNumDatatype))
 
       # Place the returned data into columns of the dataframe and name the column
-      for(iDatatype in 1:.self$numDatatype){
+      for(iDatatype in 1:myNumDatatype){
         .self$parseBranch(iInstrument,
                           iDatatype,
                           formatType = "ByInstrument")
       }
 
       # Turn it into a xts and if more than one datatype was requested put it into a list
-      if(.self$numInstrument == 1){
-        xtsData <- xts(.self$myValues, order.by = myDates)
+      if(myNumInstrument == 1){
+        myxtsData <- xts(.self$myValues, order.by = myDates)
       } else {
-        xtsData[[iInstrument]] <- xts(.self$myValues, order.by = myDates)
+        myxtsData[[iInstrument]] <- xts(.self$myValues, order.by = myDates)
       }
     }
+    return(myxtsData)
 
   } else if(format == "Snapshot" | format == "SnapshotList") {
 
     if(format == "SnapshotList") {
       # If a list request then take the number of instruments from the response
       .self$numInstrument <- length(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues)
+      .self$myValues <- data.frame(matrix(NA, nrow = .self$numInstrument, ncol = myNumDatatype + 1))
     }
-
-    # Process the response into a dataframe, one row per instrument, with a column for each datatype
-    # Create a dataframe to hold the results
-    .self$myValues <- data.frame(matrix(NA, nrow = .self$numInstrument, ncol = .self$numDatatype + 1))
 
     # Process the column for the instruments
     colnames(.self$myValues)[1] <- "Instrument"
 
-    .self$myValues[, 1] <-
-      sapply(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues,
-             FUN = .getSymbol)
+    if(isChunked){
+      .self$myValues[chunkItems, 1] <-
+        sapply(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues,
+               FUN = .getSymbol)
+    } else {
+      .self$myValues[, 1] <-
+        sapply(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues,
+               FUN = .getSymbol)
+    }
+
+
 
     # Process the columns of data
-    for(iDatatype in 1:.self$numDatatype){
+    for(iDatatype in 1:myNumDatatype){
+
       # Put a title on the column
       colnames(.self$myValues)[iDatatype + 1] <-
         .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType
-        # Can use sapply or unlist directly as they strip the Date attributes.
-        # solution is to apply c to the list.
-        # http://stackoverflow.com/questions/15659783/why-does-unlist-kill-dates-in-r
-        dd <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
-               FUN = .getValue,
-               simplify = FALSE)
-        .self$myValues[, iDatatype + 1] <- do.call("c", dd)
+
+
+      # On the first run get the type of each datatype and store in an array.  We
+      # pick the typical (median) type of the column
+      if(chunkNumber == 1) {
+        myType <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
+                         FUN = .getType,
+                         simplify = TRUE)
+        .self$myTypes[iDatatype] <- round(median(as.numeric(myType)))
+
+        # On the first loop, we need to check what the type of data is, and if a Date
+        # then we need to pre-format the column of the data.frame as a Date
+
+        if(.self$myTypes[iDatatype] == 4) {
+          .self$myValues[, iDatatype + 1] <- as.Date((NA))
+        }
+      }
+
+
+      # Can't use sapply with simplify or unlist directly as they strip any Date attributes.
+      dd <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
+                   FUN = .getValueTyped,
+                   myType = myTypes[iDatatype],
+                   simplify = FALSE)
+
+      if(myTypes[iDatatype] == 4) {
+        # as we have a date in the column
+        if(isChunked){
+          .self$myValues[chunkItems, iDatatype + 1] <- suppressWarnings(as.Date(do.call("c",dd)))
+        } else {
+          .self$myValues[, iDatatype + 1] <- suppressWarnings(as.Date(do.call("c",dd)))
+        }
+      } else {
+        # as we do not have a Date in this column
+        if(isChunked){
+          .self$myValues[chunkItems, iDatatype + 1] <- unlist(dd)
+        } else {
+          .self$myValues[, iDatatype + 1] <- unlist(dd)
+        }
+      }
 
 
     }
@@ -384,10 +598,12 @@ dsws$methods(basicRequest = function(instrument,
   } else {
     stop("Output format is not ByDatatype or ByInstrument")
   }
-  return(xtsData)
+  # should not get here
+  return(NULL)
 })
 
 
+#-----------------------------------------------------------------------------
 dsws$methods(parseBranch = function(iInstrument, iDatatype, formatType){
 
   # we are using eval to avoid copying what might be a big table of in myValues
@@ -420,11 +636,11 @@ dsws$methods(buildRequestList = function (frequency, instrument, datatype, expre
   }
 
   # Only use expressions if datatype is blank.  Expression has to be substituted into instrument
-  .self$numInstrument <- length(instrument)
+  myNumInstrument <- length(instrument)
   instrument<-toupper(instrument)
 
   if(datatype == "" && expression != ""){
-    .self$numDatatype <- 1
+    myNumDatatype <- 1
     isDatatype <- FALSE
     if( grepl(pattern="XXXX", x=expression, fixed=TRUE) == FALSE){
       # Expression does not contain XXXX so we cannot do a replace
@@ -439,14 +655,16 @@ dsws$methods(buildRequestList = function (frequency, instrument, datatype, expre
     myDataType <- list()
 
   } else {
-    .self$numDatatype <- length(datatype)
+    myNumDatatype <- length(datatype)
     isDatatype <- TRUE
     myDataType <- lapply(datatype, FUN = function(x) return(list(Properties= NULL, Value = x)))
   }
 
   # Limit of size of requests
-  if(.self$numInstrument * .self$numDatatype >= 2000) {
-    stop("Maximum number of dataitems is in excess of 2000.  Chunked requests not yet implmented")
+  if(myNumInstrument * myNumDatatype > .self$chunkLimit) {
+    stop(paste0("Maximum number of dataitems is in excess of ",
+                .self$chunkLimit,
+                ".  Internal package error with how requests have been chunked"))
   }
 
   # If we are making a list request then need to set IsList to be TRUE
@@ -458,7 +676,7 @@ dsws$methods(buildRequestList = function (frequency, instrument, datatype, expre
 
 
   # If more than one instrument then we have to pass IsSymbolSet=TRUE to wsds
-  if(.self$numInstrument > 1){
+  if(myNumInstrument > 1){
     myInstrument <- list(Properties = list(list(Key = "IsSymbolSet",
                                                 Value  = TRUE)),
                          Value = paste0(instrument, collapse=","))
@@ -491,14 +709,18 @@ dsws$methods(buildRequestList = function (frequency, instrument, datatype, expre
                   Kind = kind,
                   Start = sStartDate)
 
-  # Combine all these elements to create the request (in list form)
-  return(list(DataRequest = list(DataTypes = myDataType,
-                                               Date = myDates,
-                                               Instrument = myInstrument,
-                                               Tag = NULL),
-                            Properties = list(Properties=NULL),
-                            TokenValue = token)
-         )
+  # Combine all these elements to create the request (in list form),
+  # but also return the number of datatypes and instruments being requested for
+  # use when processing the response
+  return(list(numDatatype = myNumDatatype,
+              numInstrument = myNumInstrument,
+              requestList = list(DataRequest = list(DataTypes = myDataType,
+                                                    Date = myDates,
+                                                    Instrument = myInstrument,
+                                                    Tag = NULL),
+                                 Properties = list(Properties=NULL),
+                                 TokenValue = token))
+  )
 })
 
 

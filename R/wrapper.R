@@ -37,7 +37,7 @@ getDataStream <- function(dweURLwsdl = "",
 ){
 
   return(dsws$new())
-  }
+}
 
 
 ###############################################################################################
@@ -76,28 +76,30 @@ timeSeriesRequest <- function (dwei=getDataStream(),
                                myType = "numeric",
                                verbose=FALSE) {
 
-if(grepl(pattern="XXXX", x=Instrument, fixed=TRUE) == FALSE){
-  # Instrument is not an expression if it does not contain 'XXXX
-  myDataType <- Instrument
-  myExpression <- ""
-} else {
-  myDataType <- ""
-  myExpression <- Instrument
-}
+  if(grepl(pattern="XXXX", x=Instrument, fixed=TRUE) == FALSE){
+    # Instrument is not an expression if it does not contain 'XXXX
+    myDataType <- Instrument
+    myExpression <- ""
+  } else {
+    myDataType <- ""
+    myExpression <- Instrument
+  }
 
 
-myxts <- dwei$timeSeriesRequest(instrument = DSCodes,
-                                datatype = myDataType,
-                                expression = myExpression,
-                                startDate = startDate,
-                                endDate = endDate,
-                                frequency = frequency,
-                                format = "ByInstrument")
+  myxts <- dwei$timeSeriesRequest(instrument = DSCodes,
+                                  datatype = myDataType,
+                                  expression = myExpression,
+                                  startDate = startDate,
+                                  endDate = endDate,
+                                  frequency = frequency,
+                                  format = "ByInstrument")
 
-eval.parent(substitute(sStockList <- "To be implemented"))
-eval.parent(suppressWarnings(substitute(aTimeSeries <- myxts)))
+#   myStockMap <- dwei$getSymbolList()
+#   colnames(myStockMap) <- c("displayname", "symbol")
+#   eval.parent(substitute(sStockList <- myStockMap$displayname))
+  eval.parent(suppressWarnings(substitute(aTimeSeries <- myxts)))
 
-return("TO BE IMPLEMENTED instrument code map")
+  return(myStockMap)
 }
 
 
@@ -125,11 +127,11 @@ staticRequest <- function (dwei=getDataStream(),
                            verbose = FALSE,
                            noCache = FALSE) {
 
-    myData <- dwei$snapshotRequest(instrument = DSCode,
-                                   datatype = Expression,
-                                   requestDate = endDate)
+  myData <- dwei$snapshotRequest(instrument = DSCode,
+                                 datatype = Expression,
+                                 requestDate = endDate)
 
-    return(myData)
+  return(myData)
 
 }
 
@@ -163,10 +165,11 @@ listRequest <- function (dwei=getDataStream(),
                          verbose=FALSE) {
 
   myData <- dwei$listRequest(instrument = DSCode,
-                                 datatype = Expression,
-                                 expression = "",
-                                 requestDate = endDate)
+                             datatype = Expression,
+                             expression = "",
+                             requestDate = endDate)
 
+  return(myData[ ,2:ncol(myData)])
 }
 
 
@@ -175,29 +178,54 @@ listRequest <- function (dwei=getDataStream(),
 #' @title make a timeSeries request for a list
 #'\code{timeSeriesListRequest} Function that returns a timeseries from Datastream constituent list
 #' parameters are
-#'@param   dwei - A Datastream Client Interface object created with getDataStream
-#'@param   DSCode - the constituent list requested eg 'LFTSE100'
-#'@param    Instrument - the expression to return for each member of constituent list
-#'@param    startDate - the start date of the timeseries
-#'@param    endDate - the end date of the timeseries
-#'@param    frequency - the frequency of the request
-#'@param sStockList - variable that is returned with list of of the stocks
-#'@param aTimeSeries - variable that is returned with the set of timeseries
-#'@param    verbose - whether to give messages during the request
+#' @param dwei - A Datastream Client Interface object created with getDataStream
+#' @param DSCode - the constituent list requested eg 'LFTSE100'
+#' @param Instrument - the expression to return for each member of constituent list
+#' @param startDate - the start date of the timeseries
+#' @param endDate - the end date of the timeseries
+#' @param frequency - the frequency of the request
+#' @param sStockList - variable that is returned with list of of the stocks
+#' @param aTimeSeries - variable that is returned with the set of timeseries
+#' @param verbose - whether to give messages during the request
 #'
-#'@return   whether the request has been successful
+#' @return   whether the request has been successful
 #'    , but also
 #'    in sStockList: a list a two element vector of the displayname and symbol for each timeseries
 #'    in aTimeseries: a list of class xts with the requested timeseries information
 #' @export
-timeSeriesListRequest <- function (dwei=getDataStream(),
+timeSeriesListRequest <- function (dwei = getDataStream(),
                                    DSCode,
                                    Instrument,
                                    startDate,
                                    endDate=Sys.Date(),
-                                   frequency="D",
+                                   frequency = "D",
                                    sStockList,
                                    aTimeSeries,
                                    verbose=FALSE) {
-  return("NOT IMPLEMENTED YET")
+
+
+  if(grepl(pattern="XXXX", x=Instrument, fixed=TRUE) == FALSE){
+    # Instrument is not an expression if it does not contain 'XXXX
+    myDataType <- Instrument
+    myExpression <- ""
+  } else {
+    myDataType <- ""
+    myExpression <- Instrument
+  }
+
+  myxts <- dwei$timeSeriesListRequest(instrument = DSCode,
+                                  datatype = myDataType,
+                                  expression = myExpression,
+                                  startDate = startDate,
+                                  endDate = endDate,
+                                  frequency = frequency,
+                                  format = "ByInstrument")
+
+  myStockMap <- dwei$getSymbolList()
+  colnames(myStockMap) <- c("displayname", "symbol")
+  eval.parent(substitute(sStockList <- myStockMap$displayname))
+  eval.parent(suppressWarnings(substitute(aTimeSeries <- myxts)))
+
+  return(myStockMap)
+
 }
