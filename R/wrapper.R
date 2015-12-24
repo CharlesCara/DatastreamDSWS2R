@@ -94,9 +94,8 @@ timeSeriesRequest <- function (dwei=getDataStream(),
                                   frequency = frequency,
                                   format = "ByInstrument")
 
-#   myStockMap <- dwei$getSymbolList()
-#   colnames(myStockMap) <- c("displayname", "symbol")
-#   eval.parent(substitute(sStockList <- myStockMap$displayname))
+   myStockMap <- data.frame(displayname = DSCodes, symbol = colnames(myxts))
+   eval.parent(substitute(sStockList <- myStockMap$displayname))
   eval.parent(suppressWarnings(substitute(aTimeSeries <- myxts)))
 
   return(myStockMap)

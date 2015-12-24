@@ -398,7 +398,7 @@ dsws$methods(basicRequest = function(instrument,
   #Finished the chunking loop, so need to return according to the request type
 
   if(format[1] == "ByInstrument" | format == "ByDatatype"){
-    return(myxtsData)
+    return(xtsValues)
   } else if(format == "Snapshot"){
     return(.self$myValues)
   }
@@ -549,7 +549,7 @@ dsws$methods(basicRequestChunk = function(instrument,
 
       # Put a title on the column
       colnames(.self$myValues)[iDatatype + 1] <-
-        .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType
+        make.names(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType)
 
 
       # On the first run get the type of each datatype and store in an array.  We
@@ -617,7 +617,7 @@ dsws$methods(parseBranch = function(iInstrument, iDatatype, formatType){
 
   # Add column names
   colnames(.self$myValues)[iInstrument] <-
-    .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Symbol
+    make.names(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Symbol)
   # Replace errors with NA
   .self$myValues[which(myValues[,iDatatype] == "$$ER: 0904,NO DATA AVAILABLE"),iDatatype] <- NA
 

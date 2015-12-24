@@ -1,8 +1,7 @@
 ##############################################################################################
 
 context("classConstructor.R : test of timeSeriesRequest method")
-source("~/.RProfile")
-suppressMessages(.First())
+
 
 ##############################################################################################
 
@@ -317,10 +316,10 @@ test_that("test of chunked timeSeriesRequests", {
                                       frequency = "W")
   expect_is(xtsTestData, "xts")
   # Get the same data with chunking
-
+  rm(mydsws)
   mydsws <- dsws$new()
   mydsws$chunkLimit <- 25L
-  browser()
+
   xtsDataChunked <- mydsws$timeSeriesRequest(instrument =  symbolList[,2],
                                       expression = "XXXX(PE)",
                                       startDate = as.Date("2011-08-31"),
