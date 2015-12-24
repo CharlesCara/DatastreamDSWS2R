@@ -36,7 +36,6 @@ test_that("test of creating a dsws object wrong server location", {
 
   expect_error(dsws$new(dsws.serverURL = "http://www.bbc.co.uk"))
 
-  rm(mydsws)
 
 })
 

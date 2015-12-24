@@ -411,6 +411,7 @@ dsws$methods(basicRequest = function(instrument,
 
 
 #-----------------------------------------------------------------------------
+#' @importFrom xts xts
 dsws$methods(basicRequestChunk = function(instrument,
                                           datatype = "",
                                           expression = "",
@@ -463,7 +464,7 @@ dsws$methods(basicRequestChunk = function(instrument,
   if(length(.convert_JSON_Date(dataResponse$DataResponse$Dates)) == 0 ){
     # If the length of the Dates object is 0 then no data has been returned
     # return a NULL xts
-    return(xts(NULL))
+    return(xts::xts(NULL))
   }
 
   myxtsData <- list()
@@ -489,9 +490,9 @@ dsws$methods(basicRequestChunk = function(instrument,
       # Turn it into a xts and if more than one datatype was requested put it into a list
       # We could in future save the xts into an environment as well  - a la Quantmod package
       if(myNumDatatype == 1){
-        myxtsData <- xts(.self$myValues, order.by = myDates)
+        myxtsData <- xts::xts(.self$myValues, order.by = myDates)
       } else {
-        myxtsData[[iDatatype]] <- xts(.self$myValues, order.by = myDates)
+        myxtsData[[iDatatype]] <- xts::xts(.self$myValues, order.by = myDates)
       }
     }
     return(myxtsData)
@@ -514,9 +515,9 @@ dsws$methods(basicRequestChunk = function(instrument,
 
       # Turn it into a xts and if more than one datatype was requested put it into a list
       if(myNumInstrument == 1){
-        myxtsData <- xts(.self$myValues, order.by = myDates)
+        myxtsData <- xts::xts(.self$myValues, order.by = myDates)
       } else {
-        myxtsData[[iInstrument]] <- xts(.self$myValues, order.by = myDates)
+        myxtsData[[iInstrument]] <- xts::xts(.self$myValues, order.by = myDates)
       }
     }
     return(myxtsData)
