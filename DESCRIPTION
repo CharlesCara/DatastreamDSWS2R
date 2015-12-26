@@ -6,8 +6,8 @@ Date: 2015-12-24
 Author: Charles Cara
 Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
 Description: Provides a set of functions and a class to connect, extract and
-    upload information from the Thomson Reuters Datastream database. This package
-    uses the DSWS API and server used by the Datastream DFO addin.
+    upload information from the Thomson Reuters Datastream database. This
+    package uses the DSWS API and server used by the Datastream DFO addin.
 License: GPL3
 LazyData: TRUE
 Imports:
