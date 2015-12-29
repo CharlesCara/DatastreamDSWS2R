@@ -26,7 +26,7 @@ dsws <- setRefClass(Class="dsws",
                                   numInstrument = "numeric",
                                   chunkLimit = "numeric"))
 
-#-----------------------------------------------------------------------------
+#-----Accessors----------------------------------------------------------------
 
 dsws$accessors(c("serverURL",
                  "username",
@@ -37,10 +37,17 @@ dsws$accessors(c("serverURL",
                  "symbolList"))
 
 
-#-----------------------------------------------------------------------------
+#------Initialisation-----------------------------------------------------------------------
 
 dsws$methods(initialize = function(dsws.serverURL = "", username = "", password = "", connect = TRUE){
-  "initialises the class and unless noConnect is TRUE connects to the Datastream dsws server "
+  "
+  initialises the class and unless noConnect is TRUE connects to the Datastream dsws server.  If the username
+  and password are not provided, then they are sourced from /n
+      options()$Datastream.Username and/n
+      options()$Datastream.Password /n
+  /n
+    This allows the password to be stored in .RProfile rather than in the source code.
+  "
 
   .self$initialised <<- FALSE
   .self$errorlist <<- list()
@@ -78,7 +85,7 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$initialised <<- TRUE
 
   if(connect){
-    .self$getToken()
+    .self$.getToken()
   }
 
   return(invisible(.self))
@@ -88,11 +95,11 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
 
 
 
-#-----------------------------------------------------------------------------
+#------getToken-----------------------------------------------------------------------
 #' @importFrom rjson fromJSON
 #' @importFrom RCurl getURL
-dsws$methods(getToken = function(){
-  "Returns a Token from the the dsws server that gives permission to access data"
+dsws$methods(.getToken = function(){
+  "Internal function:  Returns a Token from the the dsws server that gives permission to access data."
   if(!.self$initialised) {
     message("dsws has not been properly initialised.  Check serverURL, username and password")
     return(NULL)
@@ -130,8 +137,8 @@ dsws$methods(getToken = function(){
 #-----------------------------------------------------------------------------
 #' @importFrom rjson toJSON
 #' @importFrom rjson fromJSON
-dsws$methods(makeRequest = function(){
-  "make a request from the DSWS server.  The request (in a R list form) is taken from
+dsws$methods(.makeRequest = function(){
+  "Internal function: make a request from the DSWS server.  The request (in a R list form) is taken from
   .self$requestList, parsed into JSON and sent to the DSWS server.  The JSON response
   is parsed and saved in .self$dataResponse"
 
@@ -170,10 +177,24 @@ dsws$methods(listRequest = function(instrument,
                                     datatype = "",
                                     expression = "",
                                     requestDate){
-  "Return a listRequest from Datastream dsws.  instrument should contain a list mnemonic,
-  such as 'LFTSE100'  "
+  "
+  Make a listRequest from Datastream DSWS.  This is the equivalent to the Excel static request for a list.\n
+  Parameters are: \n
+      instrument -- should contain a list mnemonic, such as 'LFTSE100'\n.  Can be a user created list or index.  The UCL can contain expressions.
+      datatype -- array of datatypes eg NAME, MNEM, P, PE etc\n
+      expression -- if datatype is null or '' then an expression eg PCH#(XXXX,3M)\n
+      requestDate -- either a Date or a string with a datastream relative date eg '-3M'\n
 
-  return(.self$basicRequest(instrument = instrument,
+  Returns a data.frame with the requested data.\n
+
+  Examples:\n
+
+      mydsws$listRequest(instrument = \"LFTSE100\", datatype = c(\"NAME\",\"P\"), requestDate = \"-0D\")
+
+      mydsws$listRequest(instrument = \"LFTSE100\", expression = \"PCH#(XXXX,3M)\", requestDate = Sys.Date())
+
+  "
+  return(.self$.basicRequest(instrument = instrument,
                             datatype = datatype,
                             expression = expression,
                             isList = TRUE,
@@ -190,11 +211,26 @@ dsws$methods(snapshotRequest = function(instrument,
                                         datatype = "",
                                         expression = "",
                                         requestDate){
-  "Return a snapshot (static) Request from Datastream dsws.
-  instrument should contain a constituent list eg \"LFTSE100\"
+  "
+  Make a snapshotRequest from Datastream DSWS.  This is the equivalent to the Excel static request for an array of instruments.\n
+  Parameters are: \n
+  instrument -- should one or more instruments eg \"MKS\" or c(\"MKS\",\"@AAPL\").  The array can contain
+      Economics codes and Expressions.
+  datatype -- array of datatypes eg NAME, MNEM, P, PE etc\n
+  expression -- if datatype is null or '' then an expression eg PCH#(XXXX,3M)\n
+  requestDate -- either a Date or a string with a datastream relative date eg '-3M'\n
+
+  Returns a data.frame with the requested data.\n
+
+  Examples:\n
+
+  mydsws$snapshotRequest(instrument = c(\"MKS\",\"@AAPL\"), datatype = c(\"NAME\",\"P\"), requestDate = \"-0D\")
+
+  mydsws$snapshotRequest(instrument = c(\"MKS\",\"@AAPL\"), expression = \"PCH#(XXXX,3M)\", requestDate = \"-0D\")
+
   "
 
-  return(.self$basicRequest(instrument = instrument,
+  return(.self$.basicRequest(instrument = instrument,
                             datatype = datatype,
                             expression = expression,
                             isList = FALSE,
@@ -214,10 +250,36 @@ dsws$methods(timeSeriesRequest = function(instrument,
                                           endDate,
                                           frequency = "D",
                                           format = "ByInstrument"){
+
   "Return a timeSeriesRequest from Datastream dsws.  Should request either a datatype or an expression
   not both.  If a datatype is provided then anythink in Expression will be ignored"
+  "
+  Make a timeSeriesRequest from Datastream DSWS.  This is the equivalent to the Excel timeseries request for an array of instruments.\n
+  Parameters are: \n
+  instrument -- should one or more instruments eg \"MKS\" or c(\"MKS\",\"@AAPL\").  The array can contain Economics codes and Expressions.
+  datatype -- array of datatypes eg P, PE etc\n
+  expression -- if datatype is null or '' then an expression eg PCH#(XXXX,3M)\n
+  startDate -- either a Date or a string with a datastream relative date eg '-3M'\n
+  endDate -- either a Date or a string with a datastream relative date eg '-0D'\n
+  frequency -- one of the standard Datastream frequencies - D, W, M, Q, or Y
+  format -- can be either  \"ByInstrument\" or \"ByDatatype\".
 
-  myData <- .self$basicRequest(instrument = instrument,
+  Returns either a single xts or a list of xts a data.frame with the requested data.  If \"ByInstrument\" then
+  the data is returned as one or more (ie a list) wide xts with one column per instrument.  If \"ByDatatype\"
+  then the data is returned as one or more (ie a list) of wide xts with one column per Datatype.  This format
+  is more compatible with the quantmod package.
+
+  Examples:\n
+
+  mydsws$timeSeriesRequest(instrument = c(\"MKS\",\"@AAPL\"), datatype = \"P\", startDate = \"-30D\",endDate = \"-0D\", frequency = \"D\")
+
+  mydsws$timeSeriesRequest(instrument = c(\"MKS\"), expression = \"PCH#(XXXX,3M)\", startDate = \"-30D\",endDate = \"-0D\", frequency = \"D\")
+
+  mydsws$timeSeriesRequest(instrument = c(\"MKS\",\"@AAPL\"), datatype = (\"P\",\"UP\"), startDate = \"-30D\",endDate = \"-0D\", frequency = \"D\", format = \"ByDatatype\")
+
+  "
+
+  myData <- .self$.basicRequest(instrument = instrument,
                                datatype = datatype,
                                expression = expression,
                                isList = FALSE,
@@ -239,11 +301,38 @@ dsws$methods(timeSeriesListRequest = function(instrument,
                                               endDate,
                                               frequency = "D",
                                               format = "ByInstrument"){
-  "Return a timeSeriesListRequest from Datastream dsws"
+
+  "
+  Make a timeSeriesListRequest from Datastream DSWS.  This is the equivalent to the Excel timeseries request
+  for an array of instruments. Should request either a datatype or an expression not both.  If a datatype is
+  provided then anything in Expression will be ignored.\n
+  Parameters are: \n
+  instrument -- should contain a list mnemonic, such as \"LFTSE100\"\n.  Can be a user created list or index.  The UCL can contain expressions.
+  datatype -- array of datatypes eg P, PE etc\n
+  expression -- if datatype is null or '' then an expression eg PCH#(XXXX,3M)\n
+  startDate -- either a Date or a string with a datastream relative date eg '-3M'\n
+  endDate -- either a Date or a string with a datastream relative date eg '-0D'\n
+  frequency -- one of the standard Datastream frequencies - D, W, M, Q, or Y
+  format -- can be either  \"ByInstrument\" or \"ByDatatype\".
+
+  Returns either a single xts or a list of xts a data.frame with the requested data.  If \"ByInstrument\" then
+  the data is returned as one or more (ie a list) wide xts with one column per instrument.  If \"ByDatatype\"
+  then the data is returned as one or more (ie a list) of wide xts with one column per Datatype.  This format
+  is more compatible with the quantmod package.
+
+  Examples:\n
+
+  mydsws$timeSeriesListRequest(instrument = \"LFTSE100\", datatype = \"P\", startDate = \"-30D\",endDate = \"-0D\", frequency = \"D\")
+
+  mydsws$timeSeriesListRequest(instrument = \"LFTSE100\", expression = \"PCH#(XXXX,3M)\", startDate = \"-30D\",endDate = \"-0D\", frequency = \"D\")
+
+  mydsws$timeSeriesListRequest(instrument = \"LFTSE100\", datatype = (\"P\",\"UP\"), startDate = \"-30D\",endDate = \"-0D\", frequency = \"D\", format = \"ByDatatype\")
+
+  "
 
   # First return a list of mnemonics
 
-  symbolList <<- .self$basicRequest(instrument = instrument,
+  symbolList <<- .self$.basicRequest(instrument = instrument,
                                     datatype = "MNEM",
                                     expression = "",
                                     isList = TRUE,
@@ -254,7 +343,7 @@ dsws$methods(timeSeriesListRequest = function(instrument,
                                     format = "SnapshotList")
 
 
-  return(.self$basicRequest(instrument = symbolList[,1],
+  return(.self$.basicRequest(instrument = symbolList[,1],
                             datatype = datatype,
                             expression = expression,
                             isList = FALSE,
@@ -266,7 +355,7 @@ dsws$methods(timeSeriesListRequest = function(instrument,
 })
 
 #-----------------------------------------------------------------------------
-dsws$methods(basicRequest = function(instrument,
+dsws$methods(.basicRequest = function(instrument,
                                      datatype = "",
                                      expression = "",
                                      isList = FALSE,
@@ -311,7 +400,7 @@ dsws$methods(basicRequest = function(instrument,
   # if we are using expressions then length(datatype) will be 1L and so will not affect the test
   if(length(instrument) * length(datatype) < .self$chunkLimit) {
     # Chunking not required so just pass through the request
-    return(.self$basicRequestChunk(instrument = instrument,
+    return(.self$.basicRequestChunk(instrument = instrument,
                                    datatype = datatype,
                                    expression = expression,
                                    isList = isList,
@@ -341,7 +430,7 @@ dsws$methods(basicRequest = function(instrument,
     resRows <- seq(from = startIndex, to = endIndex)
 
     # make a request for the chunk of instruments
-    ret <- .self$basicRequestChunk(instrument = chunkInstrument,
+    ret <- .self$.basicRequestChunk(instrument = chunkInstrument,
                                    datatype = datatype,
                                    expression = expression,
                                    isList = isList,
@@ -412,7 +501,7 @@ dsws$methods(basicRequest = function(instrument,
 
 #-----------------------------------------------------------------------------
 #' @importFrom xts xts
-dsws$methods(basicRequestChunk = function(instrument,
+dsws$methods(.basicRequestChunk = function(instrument,
                                           datatype = "",
                                           expression = "",
                                           isList = FALSE,
@@ -433,7 +522,7 @@ dsws$methods(basicRequestChunk = function(instrument,
     stop("SnapshotList format cannot be chunked.")
   }
 
-  myReq <- .self$buildRequestList(frequency = frequency,
+  myReq <- .self$.buildRequestList(frequency = frequency,
                                   instrument = instrument,
                                   datatype = datatype,
                                   expression = expression,
@@ -441,14 +530,14 @@ dsws$methods(basicRequestChunk = function(instrument,
                                   startDate = startDate,
                                   endDate = endDate,
                                   kind = kind,
-                                  token = .self$getToken())
+                                  token = .self$.getToken())
 
   .self$requestList <- myReq$requestList
   myNumDatatype <- myReq$numDatatype
   myNumInstrument <- myReq$numInstrument
 
   # Make the request to the server
-  ret <- .self$makeRequest()
+  ret <- .self$.makeRequest()
 
   if(!ret){
     # There has been an error.  Return NULL.  Error is stored in .self$errors
@@ -482,7 +571,7 @@ dsws$methods(basicRequestChunk = function(instrument,
 
       # Place the returned data into columns of the dataframe and name the column
       for(iInstrument in 1:myNumInstrument){
-        .self$parseBranch(iInstrument,
+        .self$.parseBranch(iInstrument,
                           iDatatype,
                           formatType = "ByInstrument")
       }
@@ -508,7 +597,7 @@ dsws$methods(basicRequestChunk = function(instrument,
 
       # Place the returned data into columns of the dataframe and name the column
       for(iDatatype in 1:myNumDatatype){
-        .self$parseBranch(iInstrument,
+        .self$.parseBranch(iInstrument,
                           iDatatype,
                           formatType = "ByInstrument")
       }
@@ -605,7 +694,7 @@ dsws$methods(basicRequestChunk = function(instrument,
 
 
 #-----------------------------------------------------------------------------
-dsws$methods(parseBranch = function(iInstrument, iDatatype, formatType){
+dsws$methods(.parseBranch = function(iInstrument, iDatatype, formatType){
 
   # we are using eval to avoid copying what might be a big table of in myValues
   myValuesList <- .self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Value
@@ -627,7 +716,7 @@ dsws$methods(parseBranch = function(iInstrument, iDatatype, formatType){
 })
 
 #--------------------------------------------------------------------------------------------
-dsws$methods(buildRequestList = function (frequency, instrument, datatype, expression, isList, startDate, endDate, kind, token) {
+dsws$methods(.buildRequestList = function (frequency, instrument, datatype, expression, isList, startDate, endDate, kind, token) {
   "Internal function that builds a request list that can be then parsed to JSON and sent to the
   DSWS server"
 

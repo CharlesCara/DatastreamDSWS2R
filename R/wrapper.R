@@ -114,6 +114,7 @@ timeSeriesRequest <- function (dwei=getDataStream(),
 #'@param  endDate - the date of the request, or the string "TODAY"
 #'@param  frequency - the frequency of the request
 #'@param   verbose - whether to give messages during the request
+#'@param noCache - no longer used
 #'
 #'@return   returns an array of the requested information
 #'@export
@@ -146,22 +147,22 @@ staticRequest <- function (dwei=getDataStream(),
 #'@param  DSCode - the constituent list for the request eg LDJSTOXX
 #'@param  Expression - the data to return eg MNEM or NAME.  If NULL or "" then we
 #'will return the code that has been loaded into the User Created List.
-#'@param   startDate - the date of the request, or the string "TODAY"
+#'@param  startDate - the date of the request, or the string "TODAY"
 #'@param  endDate - Ignored
 #'@param  frequency - the frequency of the request
-#'@param   verbose - whether to give messages during the request
+#'@param  verbose - whether to give messages during the request
 #'
-#'@return   returns an array of the requested information
+#'@return  returns an array of the requested information
 #'@export
 #'
 
 listRequest <- function (dwei=getDataStream(),
                          DSCode,
-                         Expression="",
+                         Expression = "",
                          startDate = Sys.Date(),
-                         endDate=Sys.Date(),
-                         frequency="D",
-                         verbose=FALSE) {
+                         endDate = Sys.Date(),
+                         frequency = "D",
+                         verbose = FALSE) {
 
   myData <- dwei$listRequest(instrument = DSCode,
                              datatype = Expression,
@@ -196,7 +197,7 @@ timeSeriesListRequest <- function (dwei = getDataStream(),
                                    DSCode,
                                    Instrument,
                                    startDate,
-                                   endDate=Sys.Date(),
+                                   endDate = Sys.Date(),
                                    frequency = "D",
                                    sStockList,
                                    aTimeSeries,

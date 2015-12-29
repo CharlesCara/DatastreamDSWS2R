@@ -20,6 +20,8 @@ staticRequest(dwei = getDataStream(), DSCode, Expression = "",
 \item{frequency}{- the frequency of the request}
 
 \item{verbose}{- whether to give messages during the request}
+
+\item{noCache}{- no longer used}
 }
 \value{
 returns an array of the requested information
