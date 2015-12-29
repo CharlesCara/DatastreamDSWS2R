@@ -2,7 +2,7 @@
 
 context("classConstructor.R : test of timeSeriesRequest method")
 
-
+suppressPackageStartupMessages(require(xts))
 ##############################################################################################
 
 test_that("test of simple timeseries request with relative dates", {
@@ -329,7 +329,7 @@ test_that("test of chunked timeSeriesRequests", {
   expect_is(xtsDataChunked, "xts")
   expect_identical(xtsTestData, xtsDataChunked)
 
-  rm(mydsws, xtsData, xtsDataChunked, symbolList)
+  rm(mydsws, xtsTestData, xtsDataChunked, symbolList)
 })
 
 

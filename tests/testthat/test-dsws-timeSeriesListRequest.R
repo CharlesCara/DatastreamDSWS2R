@@ -3,7 +3,7 @@
 context("classConstructor.R : test of timeSeriesListRequest method")
 source("~/.RProfile")
 suppressMessages(.First())
-
+suppressPackageStartupMessages(require(xts))
 ##############################################################################################
 
 test_that("test of timeseries list request for price datatype with relative dates", {
