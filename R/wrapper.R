@@ -43,6 +43,7 @@ getDataStream <- function(dweURLwsdl = "",
 ###############################################################################################
 #' @title make a timeseries request
 #'
+#' @description make a timeseries request from the Datastream DSWS server
 #' @details \code{timeSeriesRequest} Function that obtains a timeseries from Datastream
 #' parameters are
 #'
@@ -105,6 +106,7 @@ timeSeriesRequest <- function (dwei=getDataStream(),
 ##############################################################################################
 #' @title make a static request
 #'
+#' @description makes a static (or snapshot request) from the Datastream DSWS server
 #' @details \code{staticRequest} Function that returns a the value of Expression for the array of instruments in DSCode from Datastream
 #' parameters are
 #'
@@ -176,6 +178,7 @@ listRequest <- function (dwei=getDataStream(),
 
 ##############################################################################################
 #' @title make a timeSeries request for a list
+#' @description  make a timeseries request for a constituent list from Datastream DSWS
 #'\code{timeSeriesListRequest} Function that returns a timeseries from Datastream constituent list
 #' parameters are
 #' @param dwei - A Datastream Client Interface object created with getDataStream

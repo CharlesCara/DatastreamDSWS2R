@@ -8,11 +8,17 @@ Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
 Description: Provides a set of functions and a class to connect, extract and
     upload information from the Thomson Reuters Datastream database. This
     package uses the DSWS API and server used by the Datastream DFO addin.
-License: GPL3
+License: GPL2 | GPL3
 LazyData: TRUE
 Imports:
     RCurl,
-    stringi
+    stringi,
+    rjson,
+    stringr,
+    xts,
+    zoo,
+    methods
+Suggests: testthat
 Roxygen: list(wrap = FALSE)
 RoxygenNote: 5.0.1
 Collate:

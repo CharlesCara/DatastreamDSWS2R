@@ -2,9 +2,7 @@
 % Please edit documentation in R/wrapper.R
 \name{timeSeriesListRequest}
 \alias{timeSeriesListRequest}
-\title{make a timeSeries request for a list
-\code{timeSeriesListRequest} Function that returns a timeseries from Datastream constituent list
-parameters are}
+\title{make a timeSeries request for a list}
 \usage{
 timeSeriesListRequest(dwei = getDataStream(), DSCode, Instrument, startDate,
   endDate = Sys.Date(), frequency = "D", sStockList, aTimeSeries,
@@ -34,5 +32,10 @@ whether the request has been successful
    , but also
    in sStockList: a list a two element vector of the displayname and symbol for each timeseries
    in aTimeseries: a list of class xts with the requested timeseries information
+}
+\description{
+make a timeseries request for a constituent list from Datastream DSWS
+\code{timeSeriesListRequest} Function that returns a timeseries from Datastream constituent list
+parameters are
 }
 

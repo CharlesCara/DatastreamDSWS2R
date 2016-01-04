@@ -91,6 +91,9 @@
 
 #' @title Upload a UCTS timeseries into Datastream
 #'
+#' @description Uploads an xts into a UCTS in the Datastream Database
+#' @details Note this function does not check to see if there is a pre-existing timeseries
+#' already in Datastream.  It will just overwrite any existing UCTS.
 #' @param tsData - an xts (or timeseries object that can be converted to one) to be uploaded.
 #' @param TSCode  The mnemonic of the target UCTS
 #' @param MGMTGroup Must have managment group.  Only the first characters will be used.

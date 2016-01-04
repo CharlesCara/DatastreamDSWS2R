@@ -35,6 +35,9 @@ whether the request has been successful
    in sStockList: a list a two element vector of the displayname and symbol for each timeseries
    in aTimeseries: a list of class xts with the requested timeseries information
 }
+\description{
+make a timeseries request from the Datastream DSWS server
+}
 \details{
 \code{timeSeriesRequest} Function that obtains a timeseries from Datastream
 parameters are

@@ -26,6 +26,9 @@ staticRequest(dwei = getDataStream(), DSCode, Expression = "",
 \value{
 returns an array of the requested information
 }
+\description{
+makes a static (or snapshot request) from the Datastream DSWS server
+}
 \details{
 \code{staticRequest} Function that returns a the value of Expression for the array of instruments in DSCode from Datastream
 parameters are

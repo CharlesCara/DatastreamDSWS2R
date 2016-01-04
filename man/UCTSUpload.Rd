@@ -49,4 +49,11 @@ UCTSUpload(tsData, TSCode = "", MGMTGroup = "ABC", freq = c("D", "W", "M",
 \value{
 TRUE if the upload has been a success, otherwise an error message
 }
+\description{
+Uploads an xts into a UCTS in the Datastream Database
+}
+\details{
+Note this function does not check to see if there is a pre-existing timeseries
+already in Datastream.  It will just overwrite any existing UCTS.
+}
 
