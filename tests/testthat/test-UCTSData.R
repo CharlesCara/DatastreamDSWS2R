@@ -1,6 +1,6 @@
+##############################################################################################
+skip_on_cran()
 context("UCTSUpload.R : test of uploading timeSeries")
-source("~/.RProfile")
-suppressMessages(.First())
 
 
 

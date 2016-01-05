@@ -1,8 +1,7 @@
 ##############################################################################################
-
+skip_on_cran()
 context("classConstructor.R : test of timeSeriesListRequest method")
-source("~/.RProfile")
-suppressMessages(.First())
+
 suppressPackageStartupMessages(require(xts))
 ##############################################################################################
 

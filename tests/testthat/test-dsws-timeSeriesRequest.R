@@ -1,5 +1,5 @@
 ##############################################################################################
-
+skip_on_cran()
 context("classConstructor.R : test of timeSeriesRequest method")
 
 suppressPackageStartupMessages(require(xts))

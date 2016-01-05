@@ -1,8 +1,6 @@
 ##############################################################################################
-
+skip_on_cran()
 context("classConstructor.R : test of timeSeriesRequest function")
-source("~/.RProfile")
-suppressMessages(.First())
 
 ##############################################################################################
 

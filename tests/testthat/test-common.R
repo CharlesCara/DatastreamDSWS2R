@@ -1,6 +1,4 @@
 context("common.R : test of common functions")
-source("~/.RProfile")
-suppressMessages(.First())
 #
 
 test_that("jsonConvertdatetime is works for simple, single date", {
