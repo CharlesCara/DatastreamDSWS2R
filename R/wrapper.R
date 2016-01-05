@@ -22,8 +22,11 @@ NULL
 #'
 #'
 #' @title Initialise connection with Datastream DSWS server
-#' @details Initialise connection with Datastream DSWS server.  Provided for backwards compatibility
-#' @description \code{getDataStream} initialises an R5 object that contains a connection with the Datastream DWE server.  This function has been provided for backward compatibility
+#' @details Initialise connection with Datastream DSWS server.  Provided
+#' for backwards compatibility
+#' @description \code{getDataStream} initialises an R5 object that contains
+#'  a connection with the Datastream DWE server.  This function has been
+#'   provided for backward compatibility
 #' @param dweURLwsdl Ignored
 #' @param User Ignored - now sourced from options()$Datastream.Username
 #' @param Pass Ignored - now sourced from options()$Datastream.Password
@@ -44,25 +47,32 @@ getDataStream <- function(dweURLwsdl = "",
 #' @title make a timeseries request
 #'
 #' @description make a timeseries request from the Datastream DSWS server
-#' @details \code{timeSeriesRequest} Function that obtains a timeseries from Datastream
-#' parameters are
+#' @details \code{timeSeriesRequest} Function that obtains a timeseries
+#' from Datastream parameters are
 #'
-#' @param    dwei - A Datastream Client Interface object created with getDataStream
-#' @param    DSCodes - one or more codes to return, eg "MKS" or c("MKS","SAB")
-#' @param    Instrument - the instrument or expression to return eg PCH#(XXXX,1M)
+#' @param    dwei - A Datastream Client Interface object created with
+#'  getDataStream
+#' @param    DSCodes - one or more codes to return, eg "MKS" or
+#' c("MKS","SAB")
+#' @param    Instrument - the instrument or expression to return
+#' eg PCH#(XXXX,1M)
 #' @param    startDate - the start date of the timeseries
 #' @param    endDate - the end date of the timeseries
 #' @param    frequency - the frequency of the request
-#' @param    sStockList - variable that is returned with list of of the stocks
-#' @param    aTimeSeries - variable that is returned with the set of timeseries.  This is a list that is not
+#' @param    sStockList - variable that is returned with list of the stocks
+#' @param    aTimeSeries - variable that is returned with the set of
+#'  timeseries.  This is a list that is not
 #' guaranteed to be in the same order as sStockList
-#' @param    myType - the type of the return values eg numeric (default), Date or Character
+#' @param    myType - the type of the return values eg numeric
+#' (default), Date or Character
 #' @param    verbose - whether to give messages during the request
 #'
 
 #' @return    whether the request has been successful
-#'    in sStockList: a list a two element vector of the displayname and symbol for each timeseries
-#'    in aTimeseries: a list of class xts with the requested timeseries information
+#'    in sStockList: a list a two element vector of the displayname and
+#'     symbol for each timeseries
+#'    in aTimeseries: a list of class xts with the requested timeseries
+#'     information
 #'
 #'
 #' @export
@@ -106,11 +116,14 @@ timeSeriesRequest <- function (dwei=getDataStream(),
 ##############################################################################################
 #' @title make a static request
 #'
-#' @description makes a static (or snapshot request) from the Datastream DSWS server
-#' @details \code{staticRequest} Function that returns a the value of Expression for the array of instruments in DSCode from Datastream
+#' @description makes a static (or snapshot request) from the
+#' Datastream DSWS server
+#' @details \code{staticRequest} Function that returns a the value of
+#'  Expression for the array of instruments in DSCode from Datastream
 #' parameters are
 #'
-#'@param dwei - A Datastream Client Interface object created with getDataStream
+#'@param dwei - A Datastream Client Interface object created with
+#'  getDataStream
 #'@param  DSCode - an array of instruments eg c("RIO","MKS")
 #'@param  Expression - the data to return eg MNEM or NAME
 #'@param  endDate - the date of the request, or the string "TODAY"
@@ -143,12 +156,15 @@ staticRequest <- function (dwei=getDataStream(),
 #'
 #'@title Make a list request for static data
 #'@details Make a list request for static data
-#'@description \code{listRequest} Function that returns a the value of Expression for the instrument list in DSCode from Datastream
+#'@description \code{listRequest} Function that returns a the value of
+#' Expression for the instrument list in DSCode from Datastream
 #'
-#'@param dwei - A Datastream Client Interface object created with getDataStream
+#'@param dwei - A Datastream Client Interface object created with
+#' getDataStream
 #'@param  DSCode - the constituent list for the request eg LDJSTOXX
-#'@param  Expression - the data to return eg MNEM or NAME.  If NULL or "" then we
-#'will return the code that has been loaded into the User Created List.
+#'@param  Expression - the data to return eg MNEM or NAME.
+#' If NULL or "" then we will return the code that has been loaded
+#' into the User Created List.
 #'@param  startDate - the date of the request, or the string "TODAY"
 #'@param  endDate - Ignored
 #'@param  frequency - the frequency of the request
@@ -178,12 +194,15 @@ listRequest <- function (dwei=getDataStream(),
 
 ##############################################################################################
 #' @title make a timeSeries request for a list
-#' @description  make a timeseries request for a constituent list from Datastream DSWS
-#'\code{timeSeriesListRequest} Function that returns a timeseries from Datastream constituent list
-#' parameters are
-#' @param dwei - A Datastream Client Interface object created with getDataStream
+#' @description  make a timeseries request for a constituent list from
+#'  Datastream DSWS
+#'\code{timeSeriesListRequest} Function that returns a timeseries from
+#' Datastream constituent list parameters are
+#' @param dwei - A Datastream Client Interface object created with
+#'  getDataStream
 #' @param DSCode - the constituent list requested eg 'LFTSE100'
-#' @param Instrument - the expression to return for each member of constituent list
+#' @param Instrument - the expression to return for each member
+#' of constituent list
 #' @param startDate - the start date of the timeseries
 #' @param endDate - the end date of the timeseries
 #' @param frequency - the frequency of the request
@@ -193,8 +212,10 @@ listRequest <- function (dwei=getDataStream(),
 #'
 #' @return   whether the request has been successful
 #'    , but also
-#'    in sStockList: a list a two element vector of the displayname and symbol for each timeseries
-#'    in aTimeseries: a list of class xts with the requested timeseries information
+#'    in sStockList: a list a two element vector of the displayname
+#'     and symbol for each timeseries
+#'    in aTimeseries: a list of class xts with the requested
+#'     timeseries information
 #' @export
 timeSeriesListRequest <- function (dwei = getDataStream(),
                                    DSCode,

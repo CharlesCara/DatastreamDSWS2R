@@ -9,11 +9,13 @@ timeSeriesListRequest(dwei = getDataStream(), DSCode, Instrument, startDate,
   verbose = FALSE)
 }
 \arguments{
-\item{dwei}{- A Datastream Client Interface object created with getDataStream}
+\item{dwei}{- A Datastream Client Interface object created with
+getDataStream}
 
 \item{DSCode}{- the constituent list requested eg 'LFTSE100'}
 
-\item{Instrument}{- the expression to return for each member of constituent list}
+\item{Instrument}{- the expression to return for each member
+of constituent list}
 
 \item{startDate}{- the start date of the timeseries}
 
@@ -30,12 +32,15 @@ timeSeriesListRequest(dwei = getDataStream(), DSCode, Instrument, startDate,
 \value{
 whether the request has been successful
    , but also
-   in sStockList: a list a two element vector of the displayname and symbol for each timeseries
-   in aTimeseries: a list of class xts with the requested timeseries information
+   in sStockList: a list a two element vector of the displayname
+    and symbol for each timeseries
+   in aTimeseries: a list of class xts with the requested
+    timeseries information
 }
 \description{
-make a timeseries request for a constituent list from Datastream DSWS
-\code{timeSeriesListRequest} Function that returns a timeseries from Datastream constituent list
-parameters are
+make a timeseries request for a constituent list from
+ Datastream DSWS
+\code{timeSeriesListRequest} Function that returns a timeseries from
+Datastream constituent list parameters are
 }
 

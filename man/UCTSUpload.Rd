@@ -14,21 +14,26 @@ UCTSUpload(tsData, TSCode = "", MGMTGroup = "ABC", freq = c("D", "W", "M",
   strServerPage = "/UCTS/UCTSMaint.asp")
 }
 \arguments{
-\item{tsData}{- an xts (or timeseries object that can be converted to one) to be uploaded.}
+\item{tsData}{- an xts (or timeseries object that can be converted to
+one) to be uploaded.}
 
 \item{TSCode}{The mnemonic of the target UCTS}
 
-\item{MGMTGroup}{Must have managment group.  Only the first characters will be used.}
+\item{MGMTGroup}{Must have managment group.  Only the first
+characters will be used.}
 
 \item{freq}{The frequency of the data to be uploaded}
 
 \item{seriesName}{the name of the series}
 
-\item{Units}{Units of the data - can be no more than 12 characters - excess will be trimmed to that length}
+\item{Units}{Units of the data - can be no more than 12 characters -
+excess will be trimmed to that length}
 
-\item{Decimals}{Number of Decimals in the data - a number between 0 and 9 - if outside that range then trimmed}
+\item{Decimals}{Number of Decimals in the data - a number between 0 and
+9 - if outside that range then trimmed}
 
-\item{ActPer}{Whether the values are percentages ("N") or actual numbers ("Y")}
+\item{ActPer}{Whether the values are percentages ("N") or actual
+numbers ("Y")}
 
 \item{freqConversion}{How to do any FX conversions}
 
@@ -53,7 +58,8 @@ TRUE if the upload has been a success, otherwise an error message
 Uploads an xts into a UCTS in the Datastream Database
 }
 \details{
-Note this function does not check to see if there is a pre-existing timeseries
-already in Datastream.  It will just overwrite any existing UCTS.
+Note this function does not check to see if there is
+ a pre-existing timeseries already in Datastream.  It will just overwrite
+  any existing UCTS.
 }
 

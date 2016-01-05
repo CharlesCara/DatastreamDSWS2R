@@ -30,7 +30,8 @@
 
 
 
-#' @title convert xts timeseries into a string that can be sent to the Datastream server
+#' @title convert xts timeseries into a string that can be sent to
+#' the Datastream server
 #'
 #' @param Data the xts timeseries to be converted
 #' @param freq the frequency of the data
@@ -92,16 +93,22 @@
 #' @title Upload a UCTS timeseries into Datastream
 #'
 #' @description Uploads an xts into a UCTS in the Datastream Database
-#' @details Note this function does not check to see if there is a pre-existing timeseries
-#' already in Datastream.  It will just overwrite any existing UCTS.
-#' @param tsData - an xts (or timeseries object that can be converted to one) to be uploaded.
+#' @details Note this function does not check to see if there is
+#'  a pre-existing timeseries already in Datastream.  It will just overwrite
+#'   any existing UCTS.
+#' @param tsData - an xts (or timeseries object that can be converted to
+#' one) to be uploaded.
 #' @param TSCode  The mnemonic of the target UCTS
-#' @param MGMTGroup Must have managment group.  Only the first characters will be used.
+#' @param MGMTGroup Must have managment group.  Only the first
+#' characters will be used.
 #' @param freq The frequency of the data to be uploaded
 #' @param seriesName the name of the series
-#' @param Units Units of the data - can be no more than 12 characters - excess will be trimmed to that length
-#' @param Decimals Number of Decimals in the data - a number between 0 and 9 - if outside that range then trimmed
-#' @param ActPer Whether the values are percentages ("N") or actual numbers ("Y")
+#' @param Units Units of the data - can be no more than 12 characters -
+#'  excess will be trimmed to that length
+#' @param Decimals Number of Decimals in the data - a number between 0 and
+#'  9 - if outside that range then trimmed
+#' @param ActPer Whether the values are percentages ("N") or actual
+#' numbers ("Y")
 #' @param freqConversion How to do any FX conversions
 #' @param Alignment Alignment of the data within periods
 #' @param Carry whether to carry data over missing dates

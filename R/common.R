@@ -1,8 +1,11 @@
 #' @title .convert_JSON_Date
-#' @details converts a JSON Date string (including with Timezone) to a R Date object
+#' @details converts a JSON Date string (including with Timezone) to a R
+#'  Date object
 #'
-#' @description this is a modification of the function provided by 'phiver' on
-#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#' @description this is a modification of the function provided by
+#'  'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when-
+#' transforming-json-date
 #'
 #' @param Input_Strings a JSON Date string (or an array)
 #' @return an array of Dates
@@ -30,10 +33,13 @@
 #-----------------------------------------------------------------------------
 #
 #' @title .convert_JSON_Datetime
-#' @details converts a JSON Date string (including with Timezone) to a POSIXct/POSIXt object
+#' @details converts a JSON Date string (including with Timezone) to a
+#'  POSIXct/POSIXt object
 #'
-#' @description this is a modification of the function provided by 'phiver' on
-#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#' @description this is a modification of the function provided by
+#' 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when
+#' -transforming-json-date
 #'
 #' @param Input_Strings a JSON Date string (or an array)
 #' @return an array POSIXct/POSIXt object
@@ -59,8 +65,10 @@
 #' @details converts a JSON string (including with Timezone) into either a
 #' numeric, string, or a R Date object
 #'
-#' @description this is a modification of the function provided by 'phiver' on
-#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#' @description this is a modification of the function provided by
+#' 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when
+#' -transforming-json-date
 #'
 #' @param x the JSON string
 #' @return the parsed result: either Date, String or numeric
@@ -102,12 +110,16 @@
 #-----------------------------------------------------------------------------
 #
 #' @title .getValueTyped
-#' @details extracts and converts a JSON string (including with Timezone) from the item 'Value'
-#' in the list x.  the item is parsed from JSON into either a numeric, string, or a R Date object
+#' @details extracts and converts a JSON string (including with Timezone)
+#'  from the item 'Value'
+#' in the list x.  the item is parsed from JSON into either a numeric,
+#' string, or a R Date object
 #' according to the rules in item 'Type'
 #'
-#' @description this is a modification of the function provided by 'phiver' on
-#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#' @description this is a modification of the function provided by
+#' 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when
+#' -transforming-json-date
 #'
 #' @param x a list that is expected to have an item 'Value' and item 'Type'
 #' @return the parsed result: either Date, String or numeric
@@ -138,11 +150,15 @@
 #-----------------------------------------------------------------------------
 #
 #' @title .getValue
-#' @details extracts and converts a JSON string (including with Timezone) from the item 'Value'
-#' in the list x.  the item is parsed from JSON into either a numeric, string, or a R Date object
+#' @details extracts and converts a JSON string (including with Timezone)
+#'  from the item 'Value'
+#' in the list x.  the item is parsed from JSON into either a numeric,
+#' string, or a R Date object
 #'
-#' @description this is a modification of the function provided by 'phiver' on
-#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#' @description this is a modification of the function provided
+#'  by 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when
+#' -transforming-json-date
 #'
 #' @param x a list that is expected to have an item 'Value'
 #' @return the parsed result: either Date, String or numeric
@@ -161,11 +177,15 @@
 #-----------------------------------------------------------------------------
 #
 #' @title .getSymbol
-#' @details extracts and converts a JSON string (including with Timezone) from the item 'Symbol'
-#' in the list x.  the item is parsed from JSON into either a numeric, string, or a R Date object
+#' @details extracts and converts a JSON string (including with Timezone)
+#'  from the item 'Symbol'
+#' in the list x.  the item is parsed from JSON into either a numeric,
+#'  string, or a R Date object
 #'
-#' @description this is a modification of the function provided by 'phiver' on
-#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#' @description this is a modification of the function provided
+#' by 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when
+#' -transforming-json-date
 #'
 #' @param x a list that is expected to have an item 'Value'
 #' @return the parsed result: either Date, String or numeric
@@ -184,11 +204,15 @@
 #-----------------------------------------------------------------------------
 #
 #' @title .getType
-#' @details extracts and converts a JSON string (including with Timezone) from the item 'Type'
-#' in the list x.  the item is parsed from JSON into either a numeric, string, or a R Date object
+#' @details extracts and converts a JSON string (including with Timezone)
+#'  from the item 'Type'
+#' in the list x.  the item is parsed from JSON into either a numeric,
+#'  string, or a R Date object
 #'
-#' @description this is a modification of the function provided by 'phiver' on
-#' http://stackoverflow.com/questions/32076957/nas-introduced-when-transforming-json-date
+#' @description this is a modification of the function provided
+#'  by 'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when
+#' -transforming-json-date
 #'
 #' @param x a list that is expected to have an item 'Type'
 #' @return the parsed result: either Date, String or numeric

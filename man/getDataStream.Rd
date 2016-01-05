@@ -18,9 +18,12 @@ getDataStream(dweURLwsdl = "", User = as.character("USERNAME"),
 a dsws object
 }
 \description{
-\code{getDataStream} initialises an R5 object that contains a connection with the Datastream DWE server.  This function has been provided for backward compatibility
+\code{getDataStream} initialises an R5 object that contains
+ a connection with the Datastream DWE server.  This function has been
+  provided for backward compatibility
 }
 \details{
-Initialise connection with Datastream DSWS server.  Provided for backwards compatibility
+Initialise connection with Datastream DSWS server.  Provided
+for backwards compatibility
 }
 

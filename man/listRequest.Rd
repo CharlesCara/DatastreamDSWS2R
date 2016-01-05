@@ -9,12 +9,14 @@ listRequest(dwei = getDataStream(), DSCode, Expression = "",
   verbose = FALSE)
 }
 \arguments{
-\item{dwei}{- A Datastream Client Interface object created with getDataStream}
+\item{dwei}{- A Datastream Client Interface object created with
+getDataStream}
 
 \item{DSCode}{- the constituent list for the request eg LDJSTOXX}
 
-\item{Expression}{- the data to return eg MNEM or NAME.  If NULL or "" then we
-will return the code that has been loaded into the User Created List.}
+\item{Expression}{- the data to return eg MNEM or NAME.
+If NULL or "" then we will return the code that has been loaded
+into the User Created List.}
 
 \item{startDate}{- the date of the request, or the string "TODAY"}
 
@@ -28,7 +30,8 @@ will return the code that has been loaded into the User Created List.}
 returns an array of the requested information
 }
 \description{
-\code{listRequest} Function that returns a the value of Expression for the instrument list in DSCode from Datastream
+\code{listRequest} Function that returns a the value of
+Expression for the instrument list in DSCode from Datastream
 }
 \details{
 Make a list request for static data

@@ -1,20 +1,24 @@
 ##############################################################################################
-skip_on_cran()
+
 context("classConstructor.R : test of timeSeriesRequest method")
 
 suppressPackageStartupMessages(require(xts))
 ##############################################################################################
 
 test_that("test of simple timeseries request with relative dates", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
 
   xtsData <- mydsws$timeSeriesRequest(instrument = "MKS",
-                           datatype = "MV",
-                           startDate = "-30D",
-                           endDate = "-0D",
-                           frequency = "D")
+                                      datatype = "MV",
+                                      startDate = "-30D",
+                                      endDate = "-0D",
+                                      frequency = "D")
 
   expect_is(xtsData, "xts")
 
@@ -24,6 +28,10 @@ test_that("test of simple timeseries request with relative dates", {
 ##############################################################################################
 
 test_that("test of two stock timeseries request with relative dates", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -43,6 +51,10 @@ test_that("test of two stock timeseries request with relative dates", {
 ##############################################################################################
 
 test_that("test of simple timeseries request with absolute dates", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   mydsws <- dsws$new()
 
@@ -62,6 +74,10 @@ test_that("test of simple timeseries request with absolute dates", {
 ##############################################################################################
 
 test_that("test of two stock timeseries request with absolute dates", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   mydsws <- dsws$new()
 
@@ -79,6 +95,10 @@ test_that("test of two stock timeseries request with absolute dates", {
 
 #######################################################################################
 test_that("test of the instrument being an expression with economic data", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -96,6 +116,10 @@ test_that("test of the instrument being an expression with economic data", {
 })
 #######################################################################################
 test_that("test of the instrument being an expression with economic data but call with wrong periodicity", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -114,6 +138,10 @@ test_that("test of the instrument being an expression with economic data but cal
 
 ##############################################################################
 test_that("test of three stock request", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -131,6 +159,10 @@ test_that("test of three stock request", {
 
 ##############################################################################################
 test_that("test of multi stock timeseries request with an expression as the datatype", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -149,6 +181,10 @@ test_that("test of multi stock timeseries request with an expression as the data
 
 #############################################################
 test_that("test of download worldscope data - this data is numeric", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -170,6 +206,10 @@ test_that("test of download worldscope data - this data is numeric", {
 
 #############################################################
 test_that("test of download worldscope data - this data is Dates", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -192,6 +232,10 @@ test_that("test of download worldscope data - this data is Dates", {
 
 #############################################################
 test_that("test of download worldscope data for multiple stocks", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -209,6 +253,10 @@ test_that("test of download worldscope data for multiple stocks", {
 
 #############################################################
 test_that("test of Datastream expression eg 045E(XXXX)", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -227,6 +275,10 @@ test_that("test of Datastream expression eg 045E(XXXX)", {
 #############################################################
 
 test_that("test of selecting stocks via ISIN codes with missing (NA) codes", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -244,6 +296,10 @@ test_that("test of selecting stocks via ISIN codes with missing (NA) codes", {
 
 #############################################################
 test_that("test of Japanese ISIN with PE", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -261,6 +317,10 @@ test_that("test of Japanese ISIN with PE", {
 
 ##############################################################################################
 test_that("test of ISIN returns Failure, status code 2, message $$\"ER\", 0904, NO DATA AVAILABLE", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -280,6 +340,10 @@ test_that("test of ISIN returns Failure, status code 2, message $$\"ER\", 0904, 
 # This is a mixture of NO DATA AVAILABLE and valid data
 #
 test_that("test of ISIN returns mixture of NO DATA AVAILABLE and valid data", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
@@ -299,21 +363,25 @@ test_that("test of ISIN returns mixture of NO DATA AVAILABLE and valid data", {
 # This is a test of chunked requests - first make an unchunked one, and then a chunked one
 #
 test_that("test of chunked timeSeriesRequests", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
   mydsws <- dsws$new()
 
   symbolList <- mydsws$listRequest(instrument = "LFTSE100",
-                                    datatype = "MNEM",
-                                    requestDate = "0D")
+                                   datatype = "MNEM",
+                                   requestDate = "0D")
 
   # Get the unchunked data
 
   xtsTestData <- mydsws$timeSeriesRequest(instrument =  symbolList[,2],
-                                      expression = "XXXX(PE)",
-                                      startDate = as.Date("2011-08-31"),
-                                      endDate = as.Date("2011-11-30"),
-                                      frequency = "W")
+                                          expression = "XXXX(PE)",
+                                          startDate = as.Date("2011-08-31"),
+                                          endDate = as.Date("2011-11-30"),
+                                          frequency = "W")
   expect_is(xtsTestData, "xts")
   # Get the same data with chunking
   rm(mydsws)
@@ -321,10 +389,10 @@ test_that("test of chunked timeSeriesRequests", {
   mydsws$chunkLimit <- 25L
 
   xtsDataChunked <- mydsws$timeSeriesRequest(instrument =  symbolList[,2],
-                                      expression = "XXXX(PE)",
-                                      startDate = as.Date("2011-08-31"),
-                                      endDate = as.Date("2011-11-30"),
-                                      frequency = "W")
+                                             expression = "XXXX(PE)",
+                                             startDate = as.Date("2011-08-31"),
+                                             endDate = as.Date("2011-11-30"),
+                                             frequency = "W")
 
   expect_is(xtsDataChunked, "xts")
   expect_identical(xtsTestData, xtsDataChunked)

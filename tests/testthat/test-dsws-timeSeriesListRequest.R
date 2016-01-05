@@ -1,11 +1,15 @@
 ##############################################################################################
-skip_on_cran()
+
 context("classConstructor.R : test of timeSeriesListRequest method")
 
 suppressPackageStartupMessages(require(xts))
 ##############################################################################################
 
 test_that("test of timeseries list request for price datatype with relative dates", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
 
@@ -25,6 +29,10 @@ test_that("test of timeseries list request for price datatype with relative date
 })
 
 test_that("test of timeseries list request for default datatype with relative dates", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
 
@@ -45,6 +53,10 @@ test_that("test of timeseries list request for default datatype with relative da
 
 
 test_that("test of timeseries list request for price datatype with absolute dates", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
 
@@ -65,6 +77,10 @@ test_that("test of timeseries list request for price datatype with absolute date
 
 
 test_that("test of timeseries list request for expression with relative date", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   mydsws <- dsws$new()
 
@@ -84,6 +100,10 @@ test_that("test of timeseries list request for expression with relative date", {
 
 
 test_that("test of timeseries list request for user created list that has a mixture of indices and expressions", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   mydsws <- dsws$new()
 

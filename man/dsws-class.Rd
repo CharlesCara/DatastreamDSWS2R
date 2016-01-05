@@ -6,33 +6,45 @@
 \alias{dsws-class}
 \title{dsws}
 \description{
-An R5/RC object for accessing the Thomson Reuters Datastream DSWS service.
+An R5/RC object for accessing the Thomson Reuters Datastream
+  DSWS service.
 }
 \details{
-Creates an R5/RC4 object for accessing the Thomson Reuters Datastream DSWS service
+Creates an R5/RC4 object for accessing the Thomson Reuters
+  Datastream DSWS service
 }
 \section{Methods}{
 
 \describe{
 \item{\code{initialize(dsws.serverURL = "", username = "", password = "",
-  connect = TRUE)}}{initialises the class and unless noConnect is TRUE connects to the Datastream dsws server.  If the username
-and password are not provided, then they are sourced from /n
-    options()$Datastream.Username and/n
-    options()$Datastream.Password /n
-/n
-  This allows the password to be stored in .RProfile rather than in the source code.}
+  connect = TRUE)}}{  initialises the class.
+  Unless noConnect is TRUE also connects to the
+  Datastream dsws server.  If the username and password are not
+  provided, then they are sourced from
+      options()$Datastream.Username and
+      options()$Datastream.Password
 
-\item{\code{listRequest(instrument, datatype = "", expression = "", requestDate)}}{  Make a listRequest from Datastream DSWS.  This is the equivalent to the Excel static request for a list.
+    This allows the password to be stored in .RProfile rather
+  than in the source code.
+  }
+
+\item{\code{listRequest(instrument, datatype = "", expression = "", requestDate)}}{  Make a listRequest from Datastream DSWS.
+  This is the equivalent to
+  the Excel static request for a list.
 
   Parameters are: 
 
       instrument -- should contain a list mnemonic, such as 'LFTSE100'
-.  Can be a user created list or index.  The UCL can contain expressions.
+      Can be a user created list or index.  The UCL can contain
+      expressions.
+
       datatype -- array of datatypes eg NAME, MNEM, P, PE etc
 
-      expression -- if datatype is null or '' then an expression eg PCH#(XXXX,3M)
+      expression -- if datatype is null or '' then an expression
+      eg PCH#(XXXX,3M)
 
-      requestDate -- either a Date or a string with a datastream relative date eg '-3M'
+      requestDate -- either a Date or a string with a datastream
+      relative date eg '-3M'
 
 
   Returns a data.frame with the requested data.
@@ -41,23 +53,36 @@ and password are not provided, then they are sourced from /n
   Examples:
 
 
-      mydsws$listRequest(instrument = "LFTSE100", datatype = c("NAME","P"), requestDate = "-0D")
+      mydsws$listRequest(instrument = "LFTSE100", 
 
-      mydsws$listRequest(instrument = "LFTSE100", expression = "PCH#(XXXX,3M)", requestDate = Sys.Date())
+      datatype = c("NAME","P"), 
+requestDate = "-0D")
+
+      mydsws$listRequest(instrument = "LFTSE100", 
+
+      expression = "PCH#(XXXX,3M)", requestDate = Sys.Date())
 
   }
 
-\item{\code{snapshotRequest(instrument, datatype = "", expression = "", requestDate)}}{  Make a snapshotRequest from Datastream DSWS.  This is the equivalent to the Excel static request for an array of instruments.
+\item{\code{snapshotRequest(instrument, datatype = "", expression = "", requestDate)}}{  Make a snapshotRequest from Datastream DSWS.
+  This is the equivalent
+  to the Excel static request for an array of instruments.
 
   Parameters are: 
 
-  instrument -- should one or more instruments eg "MKS" or c("MKS","@AAPL").  The array can contain
+  instrument -- should one or more instruments eg "MKS" or
+
+      c("MKS","@AAPL").  The array can contain
       Economics codes and Expressions.
   datatype -- array of datatypes eg NAME, MNEM, P, PE etc
 
-  expression -- if datatype is null or '' then an expression eg PCH#(XXXX,3M)
+  expression -- if datatype is null or '' then an expression 
 
-  requestDate -- either a Date or a string with a datastream relative date eg '-3M'
+      eg PCH#(XXXX,3M)
+
+  requestDate -- either a Date or a string with a datastream relative
+
+      date eg '-3M'
 
 
   Returns a data.frame with the requested data.
@@ -66,50 +91,141 @@ and password are not provided, then they are sourced from /n
   Examples:
 
 
-  mydsws$snapshotRequest(instrument = c("MKS","@AAPL"), datatype = c("NAME","P"), requestDate = "-0D")
+  mydsws$snapshotRequest(instrument = c("MKS","@AAPL"), 
 
-  mydsws$snapshotRequest(instrument = c("MKS","@AAPL"), expression = "PCH#(XXXX,3M)", requestDate = "-0D")
+   datatype = c("NAME","P"), requestDate = "-0D")
+
+  mydsws$snapshotRequest(instrument = c("MKS","@AAPL"), 
+
+   expression = "PCH#(XXXX,3M)", requestDate = "-0D")
 
   }
 
 \item{\code{timeSeriesListRequest(instrument, datatype = "", expression = "", startDate,
-  endDate, frequency = "D", format = "ByInstrument")}}{  Make a timeSeriesListRequest from Datastream DSWS.  This is the equivalent to the Excel timeseries request
-  for an array of instruments. Should request either a datatype or an expression not both.  If a datatype is
-  provided then anything in Expression will be ignored.
+  endDate, frequency = "D", format = "ByInstrument")}}{  Make a timeSeriesListRequest from Datastream DSWS.
+  This is the
+  equivalent to the Excel timeseries request for an array of instruments.
+  Should request either a datatype or an expression not both.  If a
+  datatype is provided then anything in Expression will be ignored.
 
   Parameters are: 
 
   instrument -- should contain a list mnemonic, such as "LFTSE100"
-.  Can be a user created list or index.  The UCL can contain expressions.
+.
+  Can be a user created list or index.  The UCL can contain expressions.
   datatype -- array of datatypes eg P, PE etc
 
-  expression -- if datatype is null or '' then an expression eg PCH#(XXXX,3M)
+  expression -- if datatype is null or '' then an expression 
 
-  startDate -- either a Date or a string with a datastream relative date eg '-3M'
+    eg PCH#(XXXX,3M)
 
-  endDate -- either a Date or a string with a datastream relative date eg '-0D'
+  startDate -- either a Date or a string with a datastream relative date
+
+    eg '-3M'
+
+  endDate -- either a Date or a string with a datastream relative date 
+
+    eg '-0D'
 
   frequency -- one of the standard Datastream frequencies - D, W, M, Q, or Y
   format -- can be either  "ByInstrument" or "ByDatatype".
 
-  Returns either a single xts or a list of xts a data.frame with the requested data.  If "ByInstrument" then
-  the data is returned as one or more (ie a list) wide xts with one column per instrument.  If "ByDatatype"
-  then the data is returned as one or more (ie a list) of wide xts with one column per Datatype.  This format
+  Returns either a single xts or a list of xts a data.frame with
+  the requested data.  If "ByInstrument" then the data is returned as
+  one or more (ie a list) wide xts with one column per instrument.
+  If "ByDatatype" then the data is returned as one or more (ie a list)
+  of wide xts with one column per Datatype.  This format is more compatible
+  with the quantmod package.
+
+  Examples:
+
+
+  mydsws$timeSeriesListRequest(instrument = "LFTSE100",
+
+    datatype = "P", startDate = "-30D",
+
+    endDate = "-0D", frequency = "D")
+
+  mydsws$timeSeriesListRequest(instrument = "LFTSE100", 
+
+    expression = "PCH#(XXXX,3M)", 
+
+    startDate = "-30D",
+
+    endDate = "-0D", 
+
+    frequency = "D")
+
+  mydsws$timeSeriesListRequest(instrument = "LFTSE100", 
+
+    datatype = ("P","UP"), startDate = "-30D",
+
+    endDate = "-0D", 
+
+    frequency = "D", format = "ByDatatype")
+
+  }
+
+\item{\code{timeSeriesRequest(instrument, datatype = "", expression = "", startDate,
+  endDate, frequency = "D", format = "ByInstrument")}}{  Return a timeSeriesRequest from Datastream dsws.
+  Should request either
+  a datatype or an expression
+  not both.  If a datatype is provided then anythink in Expression
+  will be ignored
+
+  Make a timeSeriesRequest from Datastream DSWS.  This is the equivalent
+  to the Excel timeseries request for an array of instruments.
+
+  Parameters are: 
+
+  instrument -- should one or more instruments eg "MKS" or 
+
+   c("MKS","@AAPL").  The array can contain Economics codes and
+     Expressions.
+  datatype -- array of datatypes eg P, PE etc
+
+  expression -- if datatype is null or '' then an expression
+  eg PCH#(XXXX,3M)
+
+  startDate -- either a Date or a string with a datastream relative
+  date eg '-3M'
+
+  endDate -- either a Date or a string with a datastream relative
+  date eg '-0D'
+
+  frequency -- one of the standard Datastream
+    frequencies - D, W, M, Q, or Y
+  format -- can be either  "ByInstrument" or "ByDatatype".
+
+  Returns either a single xts or a list of xts a data.frame with
+  the requested data.  If "ByInstrument" then
+  the data is returned as one or more (ie a list) wide xts with one
+  column per instrument.  If "ByDatatype"
+  then the data is returned as one or more (ie a list) of wide xts with
+  one column per Datatype.  This format
   is more compatible with the quantmod package.
 
   Examples:
 
 
-  mydsws$timeSeriesListRequest(instrument = "LFTSE100", datatype = "P", startDate = "-30D",endDate = "-0D", frequency = "D")
+  mydsws$timeSeriesRequest(instrument = c("MKS","@AAPL"),
 
-  mydsws$timeSeriesListRequest(instrument = "LFTSE100", expression = "PCH#(XXXX,3M)", startDate = "-30D",endDate = "-0D", frequency = "D")
+      datatype = "P", startDate = "-30D",
 
-  mydsws$timeSeriesListRequest(instrument = "LFTSE100", datatype = ("P","UP"), startDate = "-30D",endDate = "-0D", frequency = "D", format = "ByDatatype")
+      endDate = "-0D", frequency = "D")
+
+  mydsws$timeSeriesRequest(instrument = c("MKS"), 
+
+      expression = "PCH#(XXXX,3M)", startDate = "-30D",
+
+      endDate = "-0D", frequency = "D")
+
+  mydsws$timeSeriesRequest(instrument = c("MKS","@AAPL"), 
+
+      datatype = ("P","UP"), startDate = "-30D",
+
+      endDate = "-0D", frequency = "D", format = "ByDatatype")
 
   }
-
-\item{\code{timeSeriesRequest(instrument, datatype = "", expression = "", startDate,
-  endDate, frequency = "D", format = "ByInstrument")}}{Return a timeSeriesRequest from Datastream dsws.  Should request either a datatype or an expression
-not both.  If a datatype is provided then anythink in Expression will be ignored}
 }}
 

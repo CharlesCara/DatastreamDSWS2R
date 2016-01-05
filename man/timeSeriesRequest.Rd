@@ -9,11 +9,14 @@ timeSeriesRequest(dwei = getDataStream(), DSCodes = "", Instrument = "",
   sStockList, aTimeSeries, myType = "numeric", verbose = FALSE)
 }
 \arguments{
-\item{dwei}{- A Datastream Client Interface object created with getDataStream}
+\item{dwei}{- A Datastream Client Interface object created with
+getDataStream}
 
-\item{DSCodes}{- one or more codes to return, eg "MKS" or c("MKS","SAB")}
+\item{DSCodes}{- one or more codes to return, eg "MKS" or
+c("MKS","SAB")}
 
-\item{Instrument}{- the instrument or expression to return eg PCH#(XXXX,1M)}
+\item{Instrument}{- the instrument or expression to return
+eg PCH#(XXXX,1M)}
 
 \item{startDate}{- the start date of the timeseries}
 
@@ -21,25 +24,29 @@ timeSeriesRequest(dwei = getDataStream(), DSCodes = "", Instrument = "",
 
 \item{frequency}{- the frequency of the request}
 
-\item{sStockList}{- variable that is returned with list of of the stocks}
+\item{sStockList}{- variable that is returned with list of the stocks}
 
-\item{aTimeSeries}{- variable that is returned with the set of timeseries.  This is a list that is not
+\item{aTimeSeries}{- variable that is returned with the set of
+ timeseries.  This is a list that is not
 guaranteed to be in the same order as sStockList}
 
-\item{myType}{- the type of the return values eg numeric (default), Date or Character}
+\item{myType}{- the type of the return values eg numeric
+(default), Date or Character}
 
 \item{verbose}{- whether to give messages during the request}
 }
 \value{
 whether the request has been successful
-   in sStockList: a list a two element vector of the displayname and symbol for each timeseries
-   in aTimeseries: a list of class xts with the requested timeseries information
+   in sStockList: a list a two element vector of the displayname and
+    symbol for each timeseries
+   in aTimeseries: a list of class xts with the requested timeseries
+    information
 }
 \description{
 make a timeseries request from the Datastream DSWS server
 }
 \details{
-\code{timeSeriesRequest} Function that obtains a timeseries from Datastream
-parameters are
+\code{timeSeriesRequest} Function that obtains a timeseries
+from Datastream parameters are
 }
 
