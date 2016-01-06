@@ -33,6 +33,7 @@ dsws <- setRefClass(Class="dsws",
 dsws$accessors(c("serverURL",
                  "username",
                  "password",
+                 "logging",
                  "errorlist",
                  "requestList",
                  "dataResponse",
@@ -57,6 +58,7 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$initialised <<- FALSE
   .self$errorlist <<- list()
   .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
+  .self$logging <<- 0L
 
   if(dsws.serverURL == ""){
     .self$serverURL <<- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
@@ -158,22 +160,49 @@ dsws$methods(.makeRequest = function(){
   httpheader <- c(Accept="application/json; charset=UTF-8",
                   "Content-Type"="application/json")
 
+  if(.self$logging >=3 ){
+    startTime <- Sys.time()
+  }
+
+  if(.self$logging >=5 ){
+    message(paste0("JSON request to DSWS server response is:\n", myRequestJSON))
+  }
+
   myDataResponse <- tryCatch({
     RCurl::postForm(myDataURL,
                     .opts=list(httpheader=httpheader
-                               ,postfields=myRequestJSON))},
-    error = function(e) {
-      message(e)
-      .self$errors <<- e
-      return(FALSE)})
+                               ,postfields=myRequestJSON))
+  },
+  error = function(e) {
+    message(e)
+    .self$errors <<- e
+    return(FALSE)})
 
-  if(is.null(myDataResponse)){
-    myData <- NULL
-  } else {
-    myData <- rjson::fromJSON(json_str = myDataResponse)
+  if(.self$logging >=3 ){
+    message(paste0("DSWS server request took ", Sys.time() - startTime))
   }
 
-  .self$dataResponse <- myData
+  if(.self$logging >=5 ){
+    message(paste0("DSWS server response is:\n", myDataResponse))
+  }
+
+  if(is.null(myDataResponse)){
+    .self$dataResponse <-  NULL
+  } else {
+    if(.self$logging >=3 ){
+      startTime <- Sys.time()
+    }
+    .self$dataResponse <- rjson::fromJSON(json_str = myDataResponse)
+
+    if(.self$logging >=3 ){
+      message(paste0("Processing response into JSON took ", Sys.time() - startTime))
+    }
+
+  }
+
+  if(.self$logging >= 4 ){
+    message(paste0("JSON returned by DSWS server response is:\n", .self$dataResponse))
+  }
 
   return(TRUE)
 
@@ -211,14 +240,14 @@ dsws$methods(listRequest = function(instrument,
 
   "
   return(.self$.basicRequest(instrument = instrument,
-                            datatype = datatype,
-                            expression = expression,
-                            isList = TRUE,
-                            startDate = "",
-                            endDate = requestDate,
-                            frequency = "D",
-                            kind = 0,
-                            format = "SnapshotList"))
+                             datatype = datatype,
+                             expression = expression,
+                             isList = TRUE,
+                             startDate = "",
+                             endDate = requestDate,
+                             frequency = "D",
+                             kind = 0,
+                             format = "SnapshotList"))
 })
 
 
@@ -254,14 +283,14 @@ dsws$methods(snapshotRequest = function(instrument,
   "
 
   return(.self$.basicRequest(instrument = instrument,
-                            datatype = datatype,
-                            expression = expression,
-                            isList = FALSE,
-                            startDate = "",
-                            endDate = requestDate,
-                            frequency = "D",
-                            kind = 0,
-                            format = "Snapshot"))
+                             datatype = datatype,
+                             expression = expression,
+                             isList = FALSE,
+                             startDate = "",
+                             endDate = requestDate,
+                             frequency = "D",
+                             kind = 0,
+                             format = "Snapshot"))
 })
 
 
@@ -321,16 +350,21 @@ dsws$methods(timeSeriesRequest = function(instrument,
       endDate = \"-0D\", frequency = \"D\", format = \"ByDatatype\")
 
   "
-
+  if(.self$logging >=3 ){
+    overallStartTime <- Sys.time()
+  }
   myData <- .self$.basicRequest(instrument = instrument,
-                               datatype = datatype,
-                               expression = expression,
-                               isList = FALSE,
-                               startDate = startDate,
-                               endDate = endDate,
-                               frequency = frequency,
-                               kind = 1,
-                               format = format)
+                                datatype = datatype,
+                                expression = expression,
+                                isList = FALSE,
+                                startDate = startDate,
+                                endDate = endDate,
+                                frequency = frequency,
+                                kind = 1,
+                                format = format)
+  if(.self$logging >=3 ){
+    message(paste0("Processing request took ", Sys.time() - overallStartTime))
+  }
   return(myData)
 
 })
@@ -393,37 +427,37 @@ dsws$methods(timeSeriesListRequest = function(instrument,
   # First return a list of mnemonics
 
   symbolList <<- .self$.basicRequest(instrument = instrument,
-                                    datatype = "MNEM",
-                                    expression = "",
-                                    isList = TRUE,
-                                    startDate = "",
-                                    endDate = endDate,
-                                    frequency = frequency,
-                                    kind = 0,
-                                    format = "SnapshotList")
+                                     datatype = "MNEM",
+                                     expression = "",
+                                     isList = TRUE,
+                                     startDate = "",
+                                     endDate = endDate,
+                                     frequency = frequency,
+                                     kind = 0,
+                                     format = "SnapshotList")
 
 
   return(.self$.basicRequest(instrument = symbolList[,1],
-                            datatype = datatype,
-                            expression = expression,
-                            isList = FALSE,
-                            startDate = startDate,
-                            endDate = endDate,
-                            frequency = frequency,
-                            kind = 1,
-                            format = format))
+                             datatype = datatype,
+                             expression = expression,
+                             isList = FALSE,
+                             startDate = startDate,
+                             endDate = endDate,
+                             frequency = frequency,
+                             kind = 1,
+                             format = format))
 })
 
 #-----------------------------------------------------------------------------
 dsws$methods(.basicRequest = function(instrument,
-                                     datatype = "",
-                                     expression = "",
-                                     isList = FALSE,
-                                     startDate,
-                                     endDate,
-                                     frequency = "D",
-                                     kind = 0,
-                                     format = "ByInstrument"){
+                                      datatype = "",
+                                      expression = "",
+                                      isList = FALSE,
+                                      startDate,
+                                      endDate,
+                                      frequency = "D",
+                                      kind = 0,
+                                      format = "ByInstrument"){
 
   "
    Internal method.
@@ -466,16 +500,16 @@ dsws$methods(.basicRequest = function(instrument,
   if(length(instrument) * length(datatype) < .self$chunkLimit) {
     # Chunking not required so just pass through the request
     return(.self$.basicRequestChunk(instrument = instrument,
-                                   datatype = datatype,
-                                   expression = expression,
-                                   isList = isList,
-                                   startDate = startDate,
-                                   endDate = endDate,
-                                   frequency = frequency,
-                                   kind = kind,
-                                   format = format,
-                                   chunkNumber = 1,
-                                   isChunked = FALSE))
+                                    datatype = datatype,
+                                    expression = expression,
+                                    isList = isList,
+                                    startDate = startDate,
+                                    endDate = endDate,
+                                    frequency = frequency,
+                                    kind = kind,
+                                    format = format,
+                                    chunkNumber = 1,
+                                    isChunked = FALSE))
 
   }
 
@@ -496,17 +530,17 @@ dsws$methods(.basicRequest = function(instrument,
 
     # make a request for the chunk of instruments
     ret <- .self$.basicRequestChunk(instrument = chunkInstrument,
-                                   datatype = datatype,
-                                   expression = expression,
-                                   isList = isList,
-                                   startDate = startDate,
-                                   endDate = endDate,
-                                   frequency = frequency,
-                                   kind = kind,
-                                   format = format,
-                                   isChunked = TRUE,
-                                   chunkNumber = i,
-                                   chunkItems = resRows)
+                                    datatype = datatype,
+                                    expression = expression,
+                                    isList = isList,
+                                    startDate = startDate,
+                                    endDate = endDate,
+                                    frequency = frequency,
+                                    kind = kind,
+                                    format = format,
+                                    isChunked = TRUE,
+                                    chunkNumber = i,
+                                    chunkItems = resRows)
 
     # How we join the results together depends of the nature of the format
     if(format[1] == "ByInstrument"){
@@ -567,17 +601,17 @@ dsws$methods(.basicRequest = function(instrument,
 #-----------------------------------------------------------------------------
 #' @importFrom xts xts
 dsws$methods(.basicRequestChunk = function(instrument,
-                                          datatype = "",
-                                          expression = "",
-                                          isList = FALSE,
-                                          startDate,
-                                          endDate,
-                                          frequency = "D",
-                                          kind = 0,
-                                          format = "ByInstrument",
-                                          isChunked = FALSE,
-                                          chunkNumber = 0,
-                                          chunkItems = NULL){
+                                           datatype = "",
+                                           expression = "",
+                                           isList = FALSE,
+                                           startDate,
+                                           endDate,
+                                           frequency = "D",
+                                           kind = 0,
+                                           format = "ByInstrument",
+                                           isChunked = FALSE,
+                                           chunkNumber = 0,
+                                           chunkItems = NULL){
 
   "
    Return a timeSeriesRequest from Datastream dsws.  Should request
@@ -592,14 +626,14 @@ dsws$methods(.basicRequestChunk = function(instrument,
   }
 
   myReq <- .self$.buildRequestList(frequency = frequency,
-                                  instrument = instrument,
-                                  datatype = datatype,
-                                  expression = expression,
-                                  isList = isList,
-                                  startDate = startDate,
-                                  endDate = endDate,
-                                  kind = kind,
-                                  token = .self$.getToken())
+                                   instrument = instrument,
+                                   datatype = datatype,
+                                   expression = expression,
+                                   isList = isList,
+                                   startDate = startDate,
+                                   endDate = endDate,
+                                   kind = kind,
+                                   token = .self$.getToken())
 
   .self$requestList <- myReq$requestList
   myNumDatatype <- myReq$numDatatype
@@ -607,6 +641,10 @@ dsws$methods(.basicRequestChunk = function(instrument,
 
   # Make the request to the server
   ret <- .self$.makeRequest()
+
+  if(.self$logging >=3 ){
+    startTime <- Sys.time()
+  }
 
   if(!ret){
     # There has been an error.  Return NULL.  Error is stored in .self$errors
@@ -641,8 +679,8 @@ dsws$methods(.basicRequestChunk = function(instrument,
       # Place the returned data into columns of the dataframe and name the column
       for(iInstrument in 1:myNumInstrument){
         .self$.parseBranch(iInstrument,
-                          iDatatype,
-                          formatType = "ByInstrument")
+                           iDatatype,
+                           formatType = "ByInstrument")
       }
 
       # Turn it into a xts and if more than one datatype was requested put it into a list
@@ -652,6 +690,9 @@ dsws$methods(.basicRequestChunk = function(instrument,
       } else {
         myxtsData[[iDatatype]] <- xts::xts(.self$myValues, order.by = myDates)
       }
+    }
+    if(.self$logging >=3 ){
+      message(paste0("Processing from JSON to R took ", Sys.time() - startTime))
     }
     return(myxtsData)
 
@@ -667,8 +708,8 @@ dsws$methods(.basicRequestChunk = function(instrument,
       # Place the returned data into columns of the dataframe and name the column
       for(iDatatype in 1:myNumDatatype){
         .self$.parseBranch(iInstrument,
-                          iDatatype,
-                          formatType = "ByInstrument")
+                           iDatatype,
+                           formatType = "ByInstrument")
       }
 
       # Turn it into a xts and if more than one datatype was requested put it into a list
@@ -677,6 +718,9 @@ dsws$methods(.basicRequestChunk = function(instrument,
       } else {
         myxtsData[[iInstrument]] <- xts::xts(.self$myValues, order.by = myDates)
       }
+    }
+    if(.self$logging >=3 ){
+      message(paste0("Processing from JSON to R took ", Sys.time() - startTime))
     }
     return(myxtsData)
 
@@ -751,6 +795,9 @@ dsws$methods(.basicRequestChunk = function(instrument,
       }
 
 
+    }
+    if(.self$logging >=3 ){
+      message(paste0("Processing from JSON to R took ", Sys.time() - startTime))
     }
     return(.self$myValues)
 

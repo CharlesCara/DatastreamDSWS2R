@@ -274,7 +274,27 @@ test_that("test of Datastream expression eg 045E(XXXX)", {
 
 #############################################################
 
-test_that("test of selecting stocks via ISIN codes with missing (NA) codes", {
+test_that("test of selecting stocks via ISIN codes with missing (NA) codes and expressions", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("NO0010716582",NA,"SE0005999836",NA,"BMG454221059"),
+                                      datatype = "P",
+                                      startDate = as.Date("01/06/2015", "%d/%m/%Y"),
+                                      endDate = as.Date("01/08/2015", "%d/%m/%Y"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+#############################################################
+
+test_that("test of selecting stocks via ISIN codes with missing (NA) codes and expressions", {
   if(is.null(options()$Datastream.Username)){
     skip("Username not available")
   }
