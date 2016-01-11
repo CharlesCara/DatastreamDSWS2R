@@ -36,7 +36,10 @@ xtsValues <- mydsws$timeSeriesRequest(instrument = myDSCodes[50:60],
 })
 print(ncol(xtsValues))
 
-step <- 10
+#-------------------------------------------------------------------
+require(DatastreamDSWS2R)
+step <- 25
+myDSCodes <- readRDS(file = "~/FT100DSCodes.RDS")
 
 for(i in 0:(100/step)){
   mydsws <- dsws$new()

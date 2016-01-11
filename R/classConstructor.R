@@ -61,7 +61,7 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$logging <<- 0L
 
   if(dsws.serverURL == ""){
-    .self$serverURL <<- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
+    .self$serverURL <<- "http://datastream.thomsonreuters.com/DSWSClient/V1/DSService.svc/rest/"
   } else {
     .self$serverURL <<- dsws.serverURL
   }
@@ -175,7 +175,7 @@ dsws$methods(.makeRequest = function(){
   },
   error = function(e) {
     message(e)
-    .self$errors <<- e
+    .self$errorlist <<- c(.self$errorlist, list(request = myRequestJSON, error = e))
     return(FALSE)})
 
   if(.self$logging >=3 ){
@@ -549,7 +549,7 @@ dsws$methods(.basicRequest = function(instrument,
 
       if(is.null(ret)) {
         .self$setErrorlist(c(.self$getErrorlist(),
-                             paste0("Chunk number ", i, " returned a null response")))
+                             list(message = paste0("Chunk number ", i, " returned a null response"))))
         next
       }
 
@@ -647,7 +647,7 @@ dsws$methods(.basicRequestChunk = function(instrument,
   }
 
   if(!ret){
-    # There has been an error.  Return NULL.  Error is stored in .self$errors
+    # There has been an error.  Return NULL.  Error is stored in .self$errorlist
     return(NULL)
   }
 
