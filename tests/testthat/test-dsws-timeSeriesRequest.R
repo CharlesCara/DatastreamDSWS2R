@@ -384,7 +384,48 @@ test_that("test of ISIN returns mixture of NO DATA AVAILABLE and valid data", {
 ##############################################################################################
 # This is a test of chunked requests - first make an unchunked one, and then a chunked one
 #
-test_that("test of chunked timeSeriesRequests", {
+test_that("test of chunked timeSeriesRequests with a datatype", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+
+  symbolList <- mydsws$listRequest(instrument = "LFTSE100",
+                                   datatype = "MNEM",
+                                   requestDate = "0D")
+
+  # Get the unchunked data
+
+  xtsTestData <- mydsws$timeSeriesRequest(instrument =  symbolList[,2],
+                                          datatype = "PE",
+                                          startDate = as.Date("2011-08-31"),
+                                          endDate = as.Date("2011-11-30"),
+                                          frequency = "W")
+  expect_is(xtsTestData, "xts")
+  # Get the same data with chunking
+  rm(mydsws)
+  mydsws <- dsws$new()
+  mydsws$chunkLimit <- 25L
+
+  xtsDataChunked <- mydsws$timeSeriesRequest(instrument =  symbolList[,2],
+                                             datatype = "PE",
+                                             startDate = as.Date("2011-08-31"),
+                                             endDate = as.Date("2011-11-30"),
+                                             frequency = "W")
+
+  expect_is(xtsDataChunked, "xts")
+  expect_identical(xtsTestData, xtsDataChunked)
+
+  rm(mydsws, xtsTestData, xtsDataChunked, symbolList)
+})
+
+##############################################################################################
+# This is a test of chunked requests - first make an unchunked one, and then a chunked one
+#
+test_that("test of chunked timeSeriesRequests with an expression", {
   if(is.null(options()$Datastream.Username)){
     skip("Username not available")
   }
@@ -422,6 +463,75 @@ test_that("test of chunked timeSeriesRequests", {
   rm(mydsws, xtsTestData, xtsDataChunked, symbolList)
 })
 
+##############################################################################################
+# This is a test of chunked requests - This is test that large requests strings are chunked correctly
+#
+
+test_that("test of chunking timeSeriesRequests due to request string length", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 
+  mydsws <- dsws$new()
 
+  symbolList <- mydsws$listRequest(instrument = "LFTSE100",
+                                   datatype = "MNEM",
+                                   requestDate = "0D")
+
+  # Get the unchunked data
+
+  xtsTestData <- mydsws$timeSeriesRequest(instrument =  symbolList[,2],
+                                          expression = "XXXX(PE)",
+                                          startDate = as.Date("2011-08-31"),
+                                          endDate = as.Date("2011-11-30"),
+                                          frequency = "W")
+  expect_is(xtsTestData, "xts")
+  # Get the same data with chunking
+  rm(mydsws)
+  mydsws <- dsws$new()
+  mydsws$requestStringLimit <- 300L
+
+  xtsDataChunked <- mydsws$timeSeriesRequest(instrument =  symbolList[,2],
+                                             expression = "XXXX(PE)",
+                                             startDate = as.Date("2011-08-31"),
+                                             endDate = as.Date("2011-11-30"),
+                                             frequency = "W")
+
+  expect_is(xtsDataChunked, "xts")
+  expect_identical(xtsTestData, xtsDataChunked)
+
+  rm(mydsws, xtsTestData, xtsDataChunked, symbolList)
+
+
+})
+
+##############################################################################################
+# This is a test of chunked requests - This is test that large requests strings are chunked correctly
+#
+
+test_that("test of chunking timeSeriesRequests due to request string length", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+
+  symbolList <- readRDS("testData/G100DSCodes.rds")
+  #symbolList <- readRDS("tests/testthat/testData/G100DSCodes.rds")
+
+  # Get the unchunked data
+
+  xtsTestData <- mydsws$timeSeriesRequest(instrument =  symbolList,
+                                          expression = "XXXX(DWND)/XXXX(DWSE)*100.00",
+                                          startDate = as.Date("1996-01-01"),
+                                          endDate = as.Date("2016-01-10"),
+                                          frequency = "W")
+  expect_is(xtsTestData, "xts")
+  expect_true(ncol(xtsTestData) == 426)
+  expect_true(nrow(xtsTestData) == 1045)
+  rm(mydsws, xtsTestData, symbolList)
+})
