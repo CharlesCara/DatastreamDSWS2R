@@ -9,7 +9,7 @@ NULL
 #' @details Creates an R5/RC4 object for accessing the Thomson Reuters
 #'   Datastream DSWS service
 #'
-#'
+#' @import methods
 #' @export dsws
 dsws <- setRefClass(Class="dsws",
                     fields = list(tokenList="ANY",
@@ -133,7 +133,7 @@ dsws$methods(.getToken = function(){
     if(!is.null(myTokenResponse)){
       myTokenList <- rjson::fromJSON(myTokenResponse)
       #TODO: Error check response
-      .self$tokenList <<- list(TokenValue = myTokenList$TokenValue,
+      .self$tokenList <- list(TokenValue = myTokenList$TokenValue,
                                TokenExpiry = .convert_JSON_Datetime(myTokenList$TokenExpiry))
     } else {
       stop("Could not request access Token - response from server was NULL")
