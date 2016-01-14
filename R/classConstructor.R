@@ -177,7 +177,7 @@ dsws$methods(.makeRequest = function(){
   },
   error = function(e) {
     message(e)
-    .self$errorlist <<- c(.self$errorlist, list(request = myRequestJSON, error = e))
+    .self$errorlist <- c(.self$errorlist, list(request = myRequestJSON, error = e))
     return(FALSE)})
 
   if(.self$logging >=3 ){
