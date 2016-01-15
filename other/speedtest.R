@@ -22,12 +22,38 @@ system.time({
                                             frequency = "D", format = "ByInstrument")
 })
 
+# -----
+mydsws <- dsws$new(dsws.serverURL = "http://datastream.thomsonreuters.com/DSWSClient/V1/DSService.svc/rest/")
+mydsws$setLogging(3L)
+
+
+
+system.time({
+  xtsValues <- mydsws$timeSeriesRequest(instrument = "@AAPL",
+                                        datatype = "P",
+                                        startDate = as.Date("2010-01-01"),
+                                        endDate = as.Date("2016-01-01"),
+                                        frequency = "D", format = "ByInstrument")
+})
+
+
+system.time({
+  xtsValues <- mydsws$timeSeriesListRequest(instrument = "LFTSE100",
+                                            datatype = "P",
+                                            startDate = as.Date("2013-01-01"),
+                                            endDate = as.Date("2016-01-01"),
+                                            frequency = "D", format = "ByInstrument")
+})
+
+
+#---------
+
 require(DatastreamDSWS2R)
 myDSCodes <- readRDS(file = "~/FT100DSCodes.RDS")
 mydsws <- dsws$new()
 mydsws$setLogging(3L)
 system.time({
-xtsValues <- mydsws$timeSeriesRequest(instrument = myDSCodes[50:60],
+xtsValues <- mydsws$timeSeriesRequest(instrument = myDSCodes[80:90],
                                       datatype = "P",
                                       startDate = as.Date("2010-01-01"),
                                       endDate = as.Date("2016-01-01"),
@@ -36,7 +62,11 @@ xtsValues <- mydsws$timeSeriesRequest(instrument = myDSCodes[50:60],
 })
 print(ncol(xtsValues))
 
-step <- 10
+
+#-------------------------------------------------------------------
+require(DatastreamDSWS2R)
+step <- 25
+myDSCodes <- readRDS(file = "~/FT100DSCodes.RDS")
 
 for(i in 0:(100/step)){
   mydsws <- dsws$new()
