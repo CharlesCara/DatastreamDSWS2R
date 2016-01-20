@@ -506,7 +506,7 @@ dsws$methods(.basicRequest = function(instrument,
 
 
   doChunk <- FALSE
-  if(datatype != ""){
+  if(datatype[1] != ""){
     # If we are not using a expression, we will just apply the rule that
     # number of instruments * number of datatypes has to be less tha the chunk limit
     doChunk <- (length(instrument) * length(datatype) >= .self$chunkLimit)
@@ -542,7 +542,7 @@ dsws$methods(.basicRequest = function(instrument,
   # Work out the number of chunks and the size of each request
   numCodes <- length(instrument)
 
-  if(datatype != ""){
+  if(datatype[1] != ""){
     numInstrChunk <- floor(.self$chunkLimit / length(datatype))
     numChunks <- ceiling(numCodes / numInstrChunk )
 
