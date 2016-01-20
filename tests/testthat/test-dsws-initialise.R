@@ -29,11 +29,8 @@ test_that("test of creating a dsws object with bad username", {
   skip_on_cran()
 
 
-  mydsws <- dsws$new(username = "MickeyMouse")
+  expect_error(dsws$new(username = "MickeyMouse", password = "Goofy2"))
 
-  expect_null(mydsws$tokenList$TokenValue, "dsws")
-
-  rm(mydsws)
 
 })
 

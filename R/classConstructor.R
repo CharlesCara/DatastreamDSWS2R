@@ -117,8 +117,8 @@ dsws$methods(.getToken = function(){
   }
 
   ts <- .self$tokenList
-  if(is.null(ts$TokenValue) || is.null(ts$TokenExpiry) || ts$TokenExpiry < Sys.time()){
-
+  if(is.null(ts$TokenValue) || is.null(ts$TokenExpiry) || Sys.time() > ts$TokenExpiry ){
+    # Either we do not already have a token, or it has expired, so we need to request one
 
     myTokenURL <- paste0(.self$serverURL, "Token",
                          "?username=", .self$username ,
@@ -130,18 +130,26 @@ dsws$methods(.getToken = function(){
                                   message(e)
                                   stop("Could not request access Token")
                                   return(NULL)})
-    if(!is.null(myTokenResponse)){
-      myTokenList <- rjson::fromJSON(myTokenResponse)
-      #TODO: Error check response
-      .self$tokenList <- list(TokenValue = myTokenList$TokenValue,
-                               TokenExpiry = .convert_JSON_Datetime(myTokenList$TokenExpiry))
-    } else {
+    if(is.null(myTokenResponse)){
       stop("Could not request access Token - response from server was NULL")
+    }
+
+    myTokenList <- rjson::fromJSON(myTokenResponse)
+
+    #Error check response
+    if(!is.null(myTokenList$Code)){
+      stop(paste0("Error requesting access Token.  Message was:\n",
+                  myTokenList$Code, "\n",
+                  myTokenList$Message))
+    } else {
+      .self$tokenList <- list(TokenValue = myTokenList$TokenValue,
+                              TokenExpiry = .convert_JSON_Datetime(myTokenList$TokenExpiry))
     }
   }
 
+
   return(invisible(.self$tokenList$TokenValue))
-})
+  })
 
 
 
@@ -288,7 +296,7 @@ dsws$methods(snapshotRequest = function(instrument,
                              datatype = datatype,
                              expression = expression,
                              isList = FALSE,
-                             startDate = "",
+                             startDate = requestDate,
                              endDate = requestDate,
                              frequency = "D",
                              kind = 0,
@@ -538,7 +546,7 @@ dsws$methods(.basicRequest = function(instrument,
     numInstrChunk <- floor(.self$chunkLimit / length(datatype))
     numChunks <- ceiling(numCodes / numInstrChunk )
 
-    } else {
+  } else {
     # If we are using expressions then we have to choose our number of chunks as the larger
     # of the number defined by the limit on the number of instruments and the number
     # defined by the limit of the request string length
