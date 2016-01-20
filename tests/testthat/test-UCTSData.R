@@ -117,6 +117,7 @@ test_that("Try uploading a real dataset", {
 
   require(xts)
   load("testData/f.RData")
+  #load("tests/testthat/testData/f.RData")
   fTest<-head(f$First,10)
 
   # Test getTimeseries for the first 10 points

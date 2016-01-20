@@ -9,7 +9,7 @@ NULL
 #' @details Creates an R5/RC4 object for accessing the Thomson Reuters
 #'   Datastream DSWS service
 #'
-#'
+#' @import methods
 #' @export dsws
 dsws <- setRefClass(Class="dsws",
                     fields = list(tokenList="ANY",
@@ -26,7 +26,8 @@ dsws <- setRefClass(Class="dsws",
                                   logging = "numeric",
                                   numDatatype = "numeric",
                                   numInstrument = "numeric",
-                                  chunkLimit = "numeric"))
+                                  chunkLimit = "numeric",
+                                  requestStringLimit = "integer"))
 
 #-----Accessors----------------------------------------------------------------
 
@@ -58,10 +59,11 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$initialised <<- FALSE
   .self$errorlist <<- list()
   .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
+  .self$requestStringLimit <<- 4000L # Max length of a request.
   .self$logging <<- 0L
 
   if(dsws.serverURL == ""){
-    .self$serverURL <<- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
+    .self$serverURL <<- "http://datastream.thomsonreuters.com/DSWSClient/V1/DSService.svc/rest/"
   } else {
     .self$serverURL <<- dsws.serverURL
   }
@@ -131,7 +133,7 @@ dsws$methods(.getToken = function(){
     if(!is.null(myTokenResponse)){
       myTokenList <- rjson::fromJSON(myTokenResponse)
       #TODO: Error check response
-      .self$tokenList <<- list(TokenValue = myTokenList$TokenValue,
+      .self$tokenList <- list(TokenValue = myTokenList$TokenValue,
                                TokenExpiry = .convert_JSON_Datetime(myTokenList$TokenExpiry))
     } else {
       stop("Could not request access Token - response from server was NULL")
@@ -175,7 +177,7 @@ dsws$methods(.makeRequest = function(){
   },
   error = function(e) {
     message(e)
-    .self$errors <<- e
+    .self$errorlist <- c(.self$errorlist, list(request = myRequestJSON, error = e))
     return(FALSE)})
 
   if(.self$logging >=3 ){
@@ -470,7 +472,7 @@ dsws$methods(.basicRequest = function(instrument,
    only be of length 1.
    This method will chunk the requests to dsws if necessary.
   "
-
+  # expression has to be atomic and not an array
   if(length(expression) > 1) expression <- expression[1]
   .self$setErrorlist(list())
 
@@ -482,9 +484,6 @@ dsws$methods(.basicRequest = function(instrument,
   }
 
 
-
-  #TODO calc num instrument and num Datatype
-
   if(format == "Snapshot"){
     # Set the holder for the results here
     # Process the response into a dataframe, one row per instrument, with a column for each datatype
@@ -493,11 +492,29 @@ dsws$methods(.basicRequest = function(instrument,
     xtsValues <- NULL
   }
 
+
   # Holder for the type (ie Date, string) for each of the datatypes
   .self$myTypes <- rep(NA, length(datatype))
 
+
+  doChunk <- FALSE
+  if(datatype != ""){
+    # If we are not using a expression, we will just apply the rule that
+    # number of instruments * number of datatypes has to be less tha the chunk limit
+    doChunk <- (length(instrument) * length(datatype) >= .self$chunkLimit)
+  } else {
+    # There appears to be a maximum character limit for a request (or response)
+    # We will need to chunk the request if we are using an expression and when we expand the expression
+    # it is over this limit.
+    expandedInstrument <- paste0(.self$.expandExpression(instrument, expression), collapse=",")
+    if((nchar(expandedInstrument) >= .self$requestStringLimit) |
+       (length(instrument) * length(datatype) >= .self$chunkLimit)){
+      doChunk <- TRUE
+    }
+  }
+
   # if we are using expressions then length(datatype) will be 1L and so will not affect the test
-  if(length(instrument) * length(datatype) < .self$chunkLimit) {
+  if(!doChunk) {
     # Chunking not required so just pass through the request
     return(.self$.basicRequestChunk(instrument = instrument,
                                     datatype = datatype,
@@ -514,17 +531,32 @@ dsws$methods(.basicRequest = function(instrument,
   }
 
   # Chunking required which will to split instrument into chunks
-
-  maxRequest <- .self$chunkLimit
+  # Work out the number of chunks and the size of each request
   numCodes <- length(instrument)
-  maxRequest <- floor(.self$chunkLimit / length(datatype))
-  numChunks <- ceiling(numCodes / maxRequest )
 
+  if(datatype != ""){
+    numInstrChunk <- floor(.self$chunkLimit / length(datatype))
+    numChunks <- ceiling(numCodes / numInstrChunk )
+
+    } else {
+    # If we are using expressions then we have to choose our number of chunks as the larger
+    # of the number defined by the limit on the number of instruments and the number
+    # defined by the limit of the request string length
+
+    numChunksInst <- ceiling(numCodes / .self$chunkLimit )
+    expandedInstrument <- paste0(.self$.expandExpression(instrument, expression), collapse=",")
+    numChunksString <-  ceiling(nchar(expandedInstrument) / .self$requestStringLimit)
+
+    numInstrChunk <- floor(numCodes / max(numChunksInst, numChunksString))
+    numChunks <- ceiling(numCodes / numInstrChunk )
+
+
+  }
 
   for(i in 1:numChunks){
     # get the the list of instruments for each request
-    startIndex <- ((i - 1) * maxRequest) + 1
-    endIndex <- ifelse((i * maxRequest) < numCodes, (i * maxRequest), numCodes )
+    startIndex <- ((i - 1) * numInstrChunk) + 1
+    endIndex <- ifelse((i * numInstrChunk) < numCodes, (i * numInstrChunk), numCodes )
     chunkInstrument <- instrument[startIndex:endIndex]
     resRows <- seq(from = startIndex, to = endIndex)
 
@@ -549,7 +581,7 @@ dsws$methods(.basicRequest = function(instrument,
 
       if(is.null(ret)) {
         .self$setErrorlist(c(.self$getErrorlist(),
-                             paste0("Chunk number ", i, " returned a null response")))
+                             list(message = paste0("Chunk number ", i, " returned a null response"))))
         next
       }
 
@@ -647,7 +679,7 @@ dsws$methods(.basicRequestChunk = function(instrument,
   }
 
   if(!ret){
-    # There has been an error.  Return NULL.  Error is stored in .self$errors
+    # There has been an error.  Return NULL.  Error is stored in .self$errorlist
     return(NULL)
   }
 
@@ -832,6 +864,22 @@ dsws$methods(.parseBranch = function(iInstrument, iDatatype, formatType){
 })
 
 #--------------------------------------------------------------------------------------------
+dsws$methods(.expandExpression = function (instrument, expression){
+  "Internal function the expands an expression with all the instruments.
+  Returns a string."
+  if(expression == ""){
+    myString <- instrument
+  } else {
+    myString <- sapply(instrument,
+                       FUN=function(x) gsub(pattern="XXXX",replacement=x,x=expression,fixed=TRUE),
+                       USE.NAMES = FALSE)
+  }
+
+
+  return(myString)
+})
+
+#--------------------------------------------------------------------------------------------
 dsws$methods(.buildRequestList = function (frequency, instrument, datatype, expression, isList, startDate, endDate, kind, token) {
   "Internal function that builds a request list that can be then parsed
    to JSON and sent to the DSWS server"
@@ -853,10 +901,7 @@ dsws$methods(.buildRequestList = function (frequency, instrument, datatype, expr
       stop("Expressions must contain XXXX so that they can be inserted into instrument")
     } else {
       # convert instrument by inserting instruments into the Expression
-      instrument <- sapply(instrument,
-                           FUN=function(x) gsub(pattern="XXXX",replacement=x,x=expression,fixed=TRUE),
-                           USE.NAMES = FALSE)
-
+      instrument <- .self$.expandExpression(instrument, expression)
     }
     myDataType <- list()
 
