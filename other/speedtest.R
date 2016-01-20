@@ -62,10 +62,6 @@ xtsValues <- mydsws$timeSeriesRequest(instrument = myDSCodes[80:90],
 })
 print(ncol(xtsValues))
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 46a3f17ac2cc815b1ed415ea662b1e972d186a7c
 #-------------------------------------------------------------------
 require(DatastreamDSWS2R)
 step <- 25
