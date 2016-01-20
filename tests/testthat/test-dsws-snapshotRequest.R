@@ -146,3 +146,24 @@ test_that("test of chunked snapshot request with two datatypes that return name 
 })
 
 
+##############################################################################################
+
+test_that("test of equity risk premium", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  mydsws <- dsws$new()
+
+  myData <- mydsws$snapshotRequest(instrument = c("USASERP", "UKASERP", "EKASERP", "JPASERP", "WDASERP"),
+                                   expression = "XXXX",
+                                   requestDate =  as.Date("2016-01-15"))
+
+  expect_is(myData, "data.frame")
+  expect_is(myData[1,2], "numeric")
+  expect_equal(nrow(myData), 5)
+  expect_equal(ncol(myData), 2)
+  expect_false(is.na(myData[1,2]))
+
+})
