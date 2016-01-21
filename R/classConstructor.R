@@ -59,7 +59,7 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$initialised <<- FALSE
   .self$errorlist <<- list()
   .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
-  .self$requestStringLimit <<- 4000L # Max length of a request.
+  .self$requestStringLimit <<- 2000L # Max length of a request.
   .self$logging <<- 0L
 
   if(dsws.serverURL == ""){
@@ -186,10 +186,10 @@ dsws$methods(.makeRequest = function(){
   error = function(e) {
     message(e)
     .self$errorlist <- c(.self$errorlist, list(request = myRequestJSON, error = e))
-    return(FALSE)})
+    return(NULL)})
 
   if(.self$logging >=3 ){
-    message(paste0("DSWS server request took ", Sys.time() - startTime))
+    message(paste0("DSWS server request took ", Sys.time() - startTime, " sec"))
   }
 
   if(.self$logging >=5 ){
@@ -665,6 +665,12 @@ dsws$methods(.basicRequestChunk = function(instrument,
     stop("SnapshotList format cannot be chunked.")
   }
 
+  if(.self$logging >=3 ){
+    message("Making request for:")
+    message(paste0("Number of instruments: ", length(instrument)))
+    message(paste0("Number of datatypes:   ", length(datatype)))
+    message(paste0("Number of expressions: ", length(expression)))
+    }
   myReq <- .self$.buildRequestList(frequency = frequency,
                                    instrument = instrument,
                                    datatype = datatype,
@@ -697,7 +703,17 @@ dsws$methods(.basicRequestChunk = function(instrument,
   # Get the dates - these are provided separately
   myDates <- .convert_JSON_Date(dataResponse$DataResponse$Dates)
 
-  if(length(.convert_JSON_Date(dataResponse$DataResponse$Dates)) == 0 ){
+  if(.self$logging >=3 ){
+    message("Response contained:")
+    message(paste0("Number of dates in response: ", length(myDates)))
+    message(paste0("Number of DataTypeValues returned: ",
+                   length(.self$dataResponse$DataResponse$DataTypeValues)))
+    message(paste0("Number of SymbolValues returned for first DataTypeValue: ",
+                   length(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues)))
+
+  }
+
+  if(length(myDates) == 0 ){
     # If the length of the Dates object is 0 then no data has been returned
     # return a NULL xts
     return(xts::xts(NULL))
@@ -707,15 +723,21 @@ dsws$methods(.basicRequestChunk = function(instrument,
 
   if(format[1] == "ByInstrument"){
     # If the format is byInstrument, then we are going to create a list of wide xts, one for each datatype
+    if(.self$logging >=3 ){
+      message("Processing byInstrument")
+      message("myNumDatatype is ", myNumDatatype)
+    }
 
-    #    if(isDatatype){
     # We have sent the request as multiple instruments and multiple datatypes so
     # response has a single item in DataTypeValues
     for(iDatatype in 1:myNumDatatype){
 
       # Create a dataframe to hold the results
       .self$myValues <- data.frame(matrix(NA, nrow = length(myDates), ncol = myNumInstrument))
-
+      if(.self$logging >=3 ){
+        message("iDatatype is ", iDatatype)
+        message("myNumInstrument is ", myNumInstrument)
+      }
       # Place the returned data into columns of the dataframe and name the column
       for(iInstrument in 1:myNumInstrument){
         .self$.parseBranch(iInstrument,

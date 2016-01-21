@@ -273,6 +273,31 @@ test_that("test of Datastream expression eg 045E(XXXX)", {
 })
 
 #############################################################
+test_that("test of ISIN code and expression that was not being returned", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("JP3111200006","JP3802400006"),
+                                      expression = "(XXXX(SAL1FD12)/XXXX(SAL1TR12))-1.00",
+                                      startDate = as.Date("1996-01-01"),
+                                      endDate = as.Date("2016-01-20"),
+                                      frequency = "M")
+
+  expect_is(xtsData, "xts")
+
+  rm(mydsws, xtsData)
+
+})
+
+
+
+
+
+#############################################################
 #
 # test_that("test of selecting stocks via ISIN codes with missing (NA) codes and expressions", {
 #   if(is.null(options()$Datastream.Username)){
