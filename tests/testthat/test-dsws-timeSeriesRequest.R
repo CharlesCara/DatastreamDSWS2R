@@ -21,6 +21,7 @@ test_that("test of simple timeseries request with relative dates", {
                                       frequency = "D")
 
   expect_is(xtsData, "xts")
+  expect_equal(colnames(xtsData), "MKS")
 
   rm(mydsws, xtsData)
 })
@@ -281,6 +282,7 @@ test_that("test of ISIN code and expression that was not being returned", {
 
 
   mydsws <- dsws$new()
+  mydsws$setLogging(3)
   xtsData <- mydsws$timeSeriesRequest(instrument = c("JP3111200006","JP3802400006"),
                                       expression = "(XXXX(SAL1FD12)/XXXX(SAL1TR12))-1.00",
                                       startDate = as.Date("1996-01-01"),
@@ -288,7 +290,7 @@ test_that("test of ISIN code and expression that was not being returned", {
                                       frequency = "M")
 
   expect_is(xtsData, "xts")
-
+  expect_equal(ncol(xtsData), 2L)
   rm(mydsws, xtsData)
 
 })
@@ -340,6 +342,31 @@ test_that("test of selecting stocks via ISIN codes with missing (NA) codes and e
   rm(mydsws, xtsData)
 
 })
+
+
+#############################################################
+
+test_that("test of selecting stocks via ISIN codes with the first code missing and expressions", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c(NA,"NO0010716582","SE0005999836",NA,"BMG454221059"),
+                                      expression = "(XXXX(EPS1FD12)/XXXX(EPS1TR12))-1.00",
+                                      startDate = as.Date("01/06/2015", "%d/%m/%Y"),
+                                      endDate = as.Date("01/08/2015", "%d/%m/%Y"),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+  expect_equal(ncol(xtsData), 5L)
+
+  rm(mydsws, xtsData)
+
+})
+
 
 #############################################################
 test_that("test of Japanese ISIN with PE", {
