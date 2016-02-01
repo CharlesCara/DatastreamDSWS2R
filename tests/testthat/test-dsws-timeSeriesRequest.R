@@ -367,6 +367,34 @@ test_that("test of selecting stocks via ISIN codes with the first code missing a
 
 })
 
+#############################################################
+
+test_that("further test of missing stocks ", {
+  # In this test, nothing is returned from Datastream.  My thought is that
+  # the correct response should be an xts with a column per instrument
+  # and a single row (dated endDate) that has NA's in it.
+
+  if(is.null(options()$Datastream.Username)){
+  skip("Username not available")
+}
+skip_on_cran()
+
+mydsws <- dsws$new()
+xtsData <- mydsws$timeSeriesRequest(instrument = c("CA91911K1021","US8552441094","VEV0019410A9",
+                                                   "US5007541064","US4385161066"),
+                                    expression = "XXXX(BPS1TR12)/XXXX",
+                                    startDate = as.Date("2016-01-30"),
+                                    endDate = as.Date("2016-02-01"),
+                                    frequency = "D")
+
+expect_is(xtsData, "xts")
+expect_equal(ncol(xtsData), 5L)
+expect_equal(nrow(xtsData), 1L)
+expect_false(FALSE %in% is.na(xtsData[1,]))
+
+rm(mydsws, xtsData)
+
+})
 
 #############################################################
 test_that("test of Japanese ISIN with PE", {

@@ -56,7 +56,7 @@ test_that("test of simple snapshot request with single datatypes that return str
   }
   skip_on_cran()
 
-    mydsws <- dsws$new()
+  mydsws <- dsws$new()
 
   myData <- mydsws$snapshotRequest(instrument = c("ABF","RIO","WPP"),
                                    datatype = "NAME",
@@ -139,8 +139,8 @@ test_that("test of chunked snapshot request with two datatypes that return name 
   mydsws <- dsws$new()
   mydsws$chunkLimit <- 25L
   myDataChunked <- mydsws$snapshotRequest(instrument = symbolList[,2],
-                                   datatype = c("NAME", "EPSFD"),
-                                   requestDate = "0D")
+                                          datatype = c("NAME", "EPSFD"),
+                                          requestDate = "0D")
 
   expect_identical(myData, myDataChunked)
 })
@@ -165,5 +165,34 @@ test_that("test of equity risk premium", {
   expect_equal(nrow(myData), 5)
   expect_equal(ncol(myData), 2)
   expect_false(is.na(myData[1,2]))
+
+})
+
+##############################################################################################
+
+test_that("test of requesting complex expression", {
+# Actually this request gets a $$"ER","E21B","INVALID CODE..." error from Datastream
+    if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  mydsws <- dsws$new()
+
+  myData <- mydsws$snapshotRequest(instrument = c("USTBI10" ,
+                                                  "BMCN10Y(RY)-MLCNGIL(RY)",
+                                                  "BMFR10Y(RY)-MLFRGIL(RY)",
+                                                  "BMUK10Y(RY)-MLUKGIL(RY)",
+                                                  "BMAU10Y(RY)-MLAUGIL(RY)",
+                                                  "BMJP10Y(RY)-MLG0YIY(RY)"),
+                                   expression = "XXXX",
+                                   requestDate =  as.Date("2016-01-15"))
+
+  expect_is(myData, "data.frame")
+  expect_is(myData[1,2], "character")
+  expect_equal(nrow(myData), 6)
+  expect_equal(ncol(myData), 2)
+  expect_false(is.na(myData[1,2]))
+  # Need a test that the cells do not contain $$"ER"
 
 })

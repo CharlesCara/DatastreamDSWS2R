@@ -744,7 +744,38 @@ dsws$methods(.basicRequestTSChunk = function(instrument,
 
   if(length(myDates) == 0 ){
     # If the length of the Dates object is 0 then no data has been returned
-    # return a NULL xts
+
+    if(format[1] == "ByInstrument"){
+      # return an xts with the same number of columns as instrument and a single NA row
+      if(myNumDatatype == 1){
+        myxtsData <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumInstrument), order.by = endDate)
+        colnames(myxtsData) <- instrument
+      } else {
+        myxtsData <- list()
+        myxts <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumInstrument), order.by = endDate)
+        colnames(myxts) <- instrument
+        for(i in 1: myNumDatatype){
+          myxtsData[[i]] <- myxts
+        }
+      }
+      return(myxtsData)
+
+    } else if(format == "ByDatatype"){
+      # return an xts with the same number of columns as datatype and a single NA row
+      if(myNumInstrument == 1){
+        myxtsData <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumDatatype), order.by = endDate)
+        colnames(myxtsData) <- instrument
+      } else {
+        myxtsData <- list()
+        myxts <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumDatatype), order.by = endDate)
+        colnames(myxts) <- instrument
+        for(i in 1: myNumInstrument){
+          myxtsData[[i]] <- myxts
+        }
+      }
+      return(myxtsData)
+
+    }
     return(xts::xts(NULL))
   }
 
@@ -795,7 +826,7 @@ dsws$methods(.processTimeSeriesByInstrument = function(myDates, myNumDatatype, m
                                iDTV = iDatatype,
                                iSV = 1,
                                iCol = iInstrument + 1,
-                         formatType = "ByInstrument")
+                               formatType = "ByInstrument")
     }
 
     # Turn it into a xts and if more than one datatype was requested put it into a list
@@ -840,7 +871,7 @@ dsws$methods(.processTimeSeriesByDatatype = function(myDates, myNumDatatype, myN
                                  iDTV = iDatatype,
                                  iSV = 1,
                                  iCol = iDatatype + 1,
-                         formatType = "ByInstrument")
+                                 formatType = "ByInstrument")
     }
 
     # Turn it into a xts and if more than one datatype was requested put it into a list
@@ -1046,7 +1077,7 @@ dsws$methods(.parseBranch = function(iInstrument, iDatatype, formatType){
 
 #-----------------------------------------------------------------------------
 dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType){
-"This function parses a branch of the getDataBundle response.  It assumes that
+  "This function parses a branch of the getDataBundle response.  It assumes that
   a branch only has data for one instrument in it (ie SymbolValues is of
   length 1"
 
@@ -1078,7 +1109,7 @@ dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType){
 dsws$methods(.parseDatesBundle = function(){
   numResponses <- length(.self$dataResponse$DataResponses)
 
-  if(numResponses ==0 ) return(NULL)
+  if(numResponses == 0) return(NULL)
 
 
   for(i in 1:numResponses){
