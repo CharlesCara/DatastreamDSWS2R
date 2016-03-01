@@ -1081,7 +1081,17 @@ dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType){
   a branch only has data for one instrument in it (ie SymbolValues is of
   length 1"
 
+
   # we are using eval to avoid copying what might be a big table of in myValues
+  lengthSV <- length(.self$dataResponse$DataResponses[[iDRs]]$DataTypeValues[[iDTV]]$SymbolValues)
+
+  if(is.null(lengthSV) | lengthSV == 0) {
+    # No data has been returned
+    # so we do no need to put anything into the
+
+    return(NULL)
+  }
+
   myValuesList <- .self$dataResponse$DataResponses[[iDRs]]$DataTypeValues[[iDTV]]$SymbolValues[[iSV]]$Value
 
   myValuesList[sapply(myValuesList, is.null)] <- NA

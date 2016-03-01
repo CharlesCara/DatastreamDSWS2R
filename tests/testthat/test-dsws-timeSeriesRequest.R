@@ -389,8 +389,8 @@ xtsData <- mydsws$timeSeriesRequest(instrument = c("CA91911K1021","US8552441094"
 
 expect_is(xtsData, "xts")
 expect_equal(ncol(xtsData), 5L)
-expect_equal(nrow(xtsData), 1L)
-expect_false(FALSE %in% is.na(xtsData[1,]))
+expect_equal(nrow(xtsData), 2L)
+expect_false(TRUE %in% is.na(xtsData[1,]))
 
 rm(mydsws, xtsData)
 
