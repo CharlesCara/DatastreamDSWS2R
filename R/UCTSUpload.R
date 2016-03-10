@@ -75,7 +75,7 @@
   }
 
   sFormattedData <- suppressWarnings(formatC(wData, digits = digits, mode="double", format="f"))
-  sFormattedData <- str_trim(sFormattedData)
+  sFormattedData <- stringr::str_trim(sFormattedData)
 
   #We need to make sure that any missing data is replaced with the
   # the correct symbol
