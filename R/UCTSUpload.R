@@ -139,7 +139,7 @@ UCTSUpload <- function(tsData,
                        PrimeCurr="",
                        strUsername=options()$Datastream.Username,
                        strPassword=options()$Datastream.Password,
-                       strServerName="http://prodbeta.datastream.com",
+                       strServerName="http://product.datastream.com",
                        strServerPage="/UCTS/UCTSMaint.asp"){
 
   #Check inputs are valid
