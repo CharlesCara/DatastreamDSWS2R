@@ -138,6 +138,9 @@ dsws$methods(.getToken = function(){
 
     #Error check response
     if(!is.null(myTokenList$Code)){
+      .self$tokenList <- list(TokenValue = NULL,
+                              TokenExpiry = NULL)
+
       stop(paste0("Error requesting access Token.  Message was:\n",
                   myTokenList$Code, "\n",
                   myTokenList$Message))
@@ -151,6 +154,24 @@ dsws$methods(.getToken = function(){
   return(invisible(.self$tokenList$TokenValue))
 })
 
+
+#-------validToken----------------------------------------------------------------------
+
+dsws$methods(.tokenExpired = function(thisToken = NULL, myTime = Sys.time()){
+  "Checks whether the given or saved token has not expired.
+   Returns true if it has, false otherwise"
+
+  if(is.null(thisToken)){
+    thisToken <- .self$tokenList
+  }
+  thisTokenExpiry <- thisToken$TokenExpiry
+
+  if(is.null(thisTokenExpiry)) return(TRUE)
+
+  # We want the token to have at least one hour before expiry
+  return( (thisTokenExpiry - myTime) < as.difftime(1, units = "hours") )
+
+})
 
 
 #-----------------------------------------------------------------------------
@@ -168,6 +189,9 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     myDataURL <- paste0(.self$serverURL , "GetData")
   }
 
+  if(.self$.tokenExpired()){
+    .self$.getToken()
+  }
 
   myRequestJSON <- rjson::toJSON(.self$requestList)
 
