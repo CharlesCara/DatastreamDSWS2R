@@ -370,7 +370,7 @@ test_that("test of selecting stocks via ISIN codes with the first code missing a
 #############################################################
 
 test_that("further test of missing stocks ", {
-  # In this test, nothing is returned from Datastream.  My thought is that
+  # In this test, nothing is returned from Datastream for the third stock.  My thought is that
   # the correct response should be an xts with a column per instrument
   # and a single row (dated endDate) that has NA's in it.
 
@@ -390,7 +390,7 @@ xtsData <- mydsws$timeSeriesRequest(instrument = c("CA91911K1021","US8552441094"
 expect_is(xtsData, "xts")
 expect_equal(ncol(xtsData), 5L)
 expect_equal(nrow(xtsData), 2L)
-expect_false(TRUE %in% is.na(xtsData[1,]))
+expect_true(TRUE %in% is.na(xtsData[1,]))
 
 rm(mydsws, xtsData)
 

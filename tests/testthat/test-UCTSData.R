@@ -68,6 +68,8 @@ test_that("Test a dataset with an NaN in it", {
 
 })
 
+
+
 #------------------------------------------------------------------------------
 test_that("Test a dataset with an NaN, NA and a large value in it", {
   if(is.null(options()$Datastream.Username)){
@@ -163,3 +165,167 @@ test_that("Try uploading a real dataset", {
 
 })
 
+
+#------------------------------------------------------------------------------
+test_that("Try uploading a real dataset with GBP isocode currency", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  require(xts)
+  load("testData/f.RData")
+  #load("tests/testthat/testData/f.RData")
+  fTest<-head(f$First,10)
+
+  # Test getTimeseries for the first 10 points
+  tData <- DatastreamDSWS2R:::.getTimeseries(Data=fTest, freq="D", digits=4, NA_VALUE="NA")
+  tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
+  expect_equal(tData , tDataExpected)
+
+  #Try a round trip and check if data is the same
+  sPost <- UCTSUpload(TSCode="TSTEST99",
+                      MGMTGroup="TEST",
+                      freq = "D",
+                      seriesName="Automatic Upload Test",
+                      Units="",
+                      Decimals=3,
+                      ActPer="Y",
+                      freqConversion="END",
+                      Alignment="END",
+                      Carry="NO",
+                      PrimeCurr="GBP",
+                      tsData=f,
+                      strUsername=options()$Datastream.Username,
+                      strPassword=options()$Datastream.Password)
+  expect_equal(sPost , TRUE)  #Failed to upload
+
+  #Now lets download the data
+  dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)
+  sGet <- timeSeriesRequest(dwei = dwei,
+                            DSCodes = "TSTEST01",
+                            Instrument = "",
+                            startDate = index(first(fTest)),
+                            endDate = index(last(fTest)),
+                            frequency = "D",
+                            sStockList = sTest,
+                            aTimeSeries = aTS,
+                            verbose = FALSE)
+
+  #So success is aTS is the same as f$First
+
+  xResult <- cbind(round(fTest,digits=3),aTS)  # Need to round to the same number of digits as in upload
+
+  colnames(xResult) <- c("Sent","Got")
+  expect_equal(!FALSE %in% as.vector(xResult$Sent==xResult$Got), TRUE)
+
+})
+
+
+#------------------------------------------------------------------------------
+test_that("Error when uploading invalid 4 digit currency", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  require(xts)
+  load("testData/f.RData")
+  #load("tests/testthat/testData/f.RData")
+  fTest<-head(f$First,10)
+
+  # Test getTimeseries for the first 10 points
+  tData <- DatastreamDSWS2R:::.getTimeseries(Data=fTest, freq="D", digits=4, NA_VALUE="NA")
+  tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
+  expect_equal(tData , tDataExpected)
+
+  #Try a round trip and check if data is the same
+  expect_error(UCTSUpload(TSCode="TSTEST01",
+                      MGMTGroup="TEST",
+                      freq = "D",
+                      seriesName="Automatic Upload Test",
+                      Units="",
+                      Decimals=3,
+                      ActPer="Y",
+                      freqConversion="END",
+                      Alignment="END",
+                      Carry="NO",
+                      PrimeCurr="GBPS",
+                      tsData=fTest,
+                      strUsername=options()$Datastream.Username,
+                      strPassword=options()$Datastream.Password),
+               "Invalid currency.  Should be either 3 digit ISO code or Datastream code")
+
+})
+
+#------------------------------------------------------------------------------
+test_that("Error when uploading invalid 2 digit currency", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  require(xts)
+  load("testData/f.RData")
+  #load("tests/testthat/testData/f.RData")
+  fTest<-head(f$First,10)
+
+  # Test getTimeseries for the first 10 points
+  tData <- DatastreamDSWS2R:::.getTimeseries(Data=fTest, freq="D", digits=4, NA_VALUE="NA")
+  tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
+  expect_equal(tData , tDataExpected)
+
+  #Try a round trip and check if data is the same
+  expect_error(UCTSUpload(TSCode="TSTEST01",
+                          MGMTGroup="TEST",
+                          freq = "D",
+                          seriesName="Automatic Upload Test",
+                          Units="",
+                          Decimals=3,
+                          ActPer="Y",
+                          freqConversion="END",
+                          Alignment="END",
+                          Carry="NO",
+                          PrimeCurr="ZZ",
+                          tsData=fTest,
+                          strUsername=options()$Datastream.Username,
+                          strPassword=options()$Datastream.Password),
+               "Invalid currency.  Should be an Datastream code in table currencyDS2ISO.")
+
+})
+
+#------------------------------------------------------------------------------
+test_that("Error when uploading invalid 3 digit currency", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  require(xts)
+  load("testData/f.RData")
+  #load("tests/testthat/testData/f.RData")
+  fTest<-head(f$First,10)
+
+  # Test getTimeseries for the first 10 points
+  tData <- DatastreamDSWS2R:::.getTimeseries(Data=fTest, freq="D", digits=4, NA_VALUE="NA")
+  tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
+  expect_equal(tData , tDataExpected)
+
+  #Try a round trip and check if data is the same
+  expect_error(UCTSUpload(TSCode="TSTEST01",
+                          MGMTGroup="TEST",
+                          freq = "D",
+                          seriesName="Automatic Upload Test",
+                          Units="",
+                          Decimals=3,
+                          ActPer="Y",
+                          freqConversion="END",
+                          Alignment="END",
+                          Carry="NO",
+                          PrimeCurr="ZZZ",
+                          tsData=fTest,
+                          strUsername=options()$Datastream.Username,
+                          strPassword=options()$Datastream.Password),
+               "Invalid currency.  Should be an ISO code in table currencyDS2ISO.")
+
+})

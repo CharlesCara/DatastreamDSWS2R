@@ -174,6 +174,27 @@ UCTSUpload <- function(tsData,
   Units <- substr(Units,0,12)
 
 
+  # Replace any ISO currency codes with DS codes
+  if(nchar(PrimeCurr) > 3){
+    stop("Invalid currency.  Should be either 3 digit ISO code or Datastream code")
+  } else if(nchar(PrimeCurr) == 3 ){
+    # Check ISO code is valid and convert to DS Code
+    data("currencyDS2ISO")
+    if(PrimeCurr %in% currencyDS2ISO$isoCode){
+      PrimeCurr <- currencyDS2ISO$dsCode[which(PrimeCurr == currencyDS2ISO$isoCode &
+                                                 currencyDS2ISO$primeCode == TRUE)]
+    } else {
+      stop("Invalid currency.  Should be an ISO code in table currencyDS2ISO.")
+    }
+  } else if(nchar(PrimeCurr) > 0 ){
+    # Check DS Code is valid
+    data("currencyDS2ISO")
+    if(!PrimeCurr %in% currencyDS2ISO$dsCode){
+      stop("Invalid currency.  Should be an Datastream code in table currencyDS2ISO.")
+    }
+  }
+
+
   # At the moment everything will be a full update, and a hard coded NA value
   NA_VALUE <- "NA"
 
@@ -205,7 +226,7 @@ UCTSUpload <- function(tsData,
                    TSFreqConv = freqConversion,              # Add "Frequency Conversion"
                    TSAlignment = Alignment,                  # Add "Alignment"
                    TSCarryInd = Carry,                       # Add "Carry Indicator"
-                   TSPrimeCurr = PrimeCurr,                  # Add "Prime Currency"
+                   TSPrimeCurr = enc2native(PrimeCurr),                  # Add "Prime Currency" in native (single byte encoding)
                    TSULCurr = "",                            # no longer use Underlying Currency, but need to pass up a null value as the mainframe is expecting it
                    ForceUpdateFlag1 = "Y",
                    ForceUpdateFlag2 = "Y",                   # We have ignored some logic in the original UCTS VBA code
