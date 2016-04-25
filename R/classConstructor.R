@@ -63,7 +63,10 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$logging <<- 0L
 
   if(dsws.serverURL == ""){
-    .self$serverURL <<- "http://datastream.thomsonreuters.com/DSWSClient/V1/DSService.svc/rest/"
+  # 07/4/2016 - due to issue with Datastream's load balancers, using a different URL.  This will
+  # be changed back when the issue is resolved.
+    .self$serverURL <<- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
+#    .self$serverURL <<- "http://datastream.thomsonreuters.com/DSWSClient/V1/DSService.svc/rest/"
   } else {
     .self$serverURL <<- dsws.serverURL
   }
