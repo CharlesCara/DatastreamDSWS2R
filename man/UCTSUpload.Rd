@@ -10,7 +10,7 @@ UCTSUpload(tsData, TSCode = "", MGMTGroup = "ABC", freq = c("D", "W", "M",
   "MID", "END"), Carry = c("YES", "NO", "PAD"), PrimeCurr = "",
   strUsername = options()$Datastream.Username,
   strPassword = options()$Datastream.Password,
-  strServerName = "http://datastream.thomsonreuters.com",
+  strServerName = "http://product.datastream.com",
   strServerPage = "/UCTS/UCTSMaint.asp")
 }
 \arguments{
