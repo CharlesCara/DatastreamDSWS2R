@@ -173,23 +173,26 @@ UCTSUpload <- function(tsData,
   # Trim any excess for units
   Units <- substr(Units,0,12)
 
-
   # Replace any ISO currency codes with DS codes
+  if(is.null(PrimeCurr)) {
+    PrimeCurr <- ""
+  }
+
   if(nchar(PrimeCurr) > 3){
     stop("Invalid currency.  Should be either 3 digit ISO code or Datastream code")
   } else if(nchar(PrimeCurr) == 3 ){
     # Check ISO code is valid and convert to DS Code
-    data("currencyDS2ISO")
-    if(PrimeCurr %in% currencyDS2ISO$isoCode){
-      PrimeCurr <- currencyDS2ISO$dsCode[which(PrimeCurr == currencyDS2ISO$isoCode &
-                                                 currencyDS2ISO$primeCode == TRUE)]
+    dfXRef <- DatastreamDSWS2R::currencyDS2ISO
+    if(PrimeCurr %in% dfXRef$isoCode){
+      PrimeCurr <- dfXRef$dsCode[which(PrimeCurr == dfXRef$isoCode &
+                                         dfXRef$primeCode == TRUE)]
     } else {
       stop("Invalid currency.  Should be an ISO code in table currencyDS2ISO.")
     }
   } else if(nchar(PrimeCurr) > 0 ){
     # Check DS Code is valid
-    data("currencyDS2ISO")
-    if(!PrimeCurr %in% currencyDS2ISO$dsCode){
+    dfXRef <- DatastreamDSWS2R::currencyDS2ISO
+    if(!PrimeCurr %in% dfXRef$dsCode){
       stop("Invalid currency.  Should be an Datastream code in table currencyDS2ISO.")
     }
   }
