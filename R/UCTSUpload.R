@@ -191,6 +191,7 @@ UCTSUpload <- function(tsData,
     }
   } else if(nchar(PrimeCurr) > 0 ){
     # Check DS Code is valid
+    PrimeCurr <- iconv(PrimeCurr, from="utf-8", to = "latin1")
     dfXRef <- DatastreamDSWS2R::currencyDS2ISO
     if(!PrimeCurr %in% dfXRef$dsCode){
       stop("Invalid currency.  Should be an Datastream code in table currencyDS2ISO.")
@@ -229,7 +230,7 @@ UCTSUpload <- function(tsData,
                    TSFreqConv = freqConversion,              # Add "Frequency Conversion"
                    TSAlignment = Alignment,                  # Add "Alignment"
                    TSCarryInd = Carry,                       # Add "Carry Indicator"
-                   TSPrimeCurr = enc2native(PrimeCurr),                  # Add "Prime Currency" in native (single byte encoding)
+                   TSPrimeCurr = PrimeCurr,                  # Add "Prime Currency"
                    TSULCurr = "",                            # no longer use Underlying Currency, but need to pass up a null value as the mainframe is expecting it
                    ForceUpdateFlag1 = "Y",
                    ForceUpdateFlag2 = "Y",                   # We have ignored some logic in the original UCTS VBA code
@@ -253,7 +254,7 @@ UCTSUpload <- function(tsData,
                          .params = dsParams,
                          style = "POST",
                          .encoding = "utf-8",
-                         .contentEncodeFun = RCurl::curlPercentEncode)
+                         .contentEncodeFun = RCurl::curlEscape)
     if(retValue != "*OK*"){
       # If not succesful then wait 2 seconds before re-submitting, ie give time for the
       # server/network to recover.
