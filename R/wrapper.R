@@ -253,3 +253,187 @@ timeSeriesListRequest <- function (dwei = getDataStream(),
   return(myStockMap)
 
 }
+
+
+
+##############################################################################################
+#'
+#' @title myStaticRequestSet
+#'
+#' @details internal function for requesting an expression for an array of instruments.
+#' The function will initially try a snapshot request, and if this
+#' fails try a timeseries request.
+#'
+#' @param mydsws a dsws object, if not provided a new one will be created
+#' @param instrument array of instruments
+#' @param iExpression an expression such as PCH#(XXXX,1M)
+#' @param endDate the date of the request
+#' @param frequency optional frequency defaults to "D"
+#'
+#' @return a dataframe of the
+#'
+#' @importFrom xts last
+#'
+myStaticRequestSet <- function(mydsws = dsws$new(),
+                               instrument,
+                               iExpression,
+                               endDate = Sys.Date(),
+                               frequency = "D"){
+
+  if(grepl(pattern="XXXX", x=iExpression, fixed=TRUE) == FALSE){
+    idf <- tryCatch(mydsws$listRequest(instrument = instrument,
+                                       datatype = iExpression,
+                                       requestDate =  endDate),
+                    error = function(e) return(NULL))
+  } else {
+
+    idf <- tryCatch(mydsws$listRequest(instrument = instrument,
+                                       expression = iExpression,
+                                       requestDate =  endDate),
+                    error = function(e) return(NULL))
+
+  }
+
+  if(is.null(idf) || length(idf) == 0 || idf[1,2] == "NA"
+     | grepl(pattern="$$\"ER\"", x= idf[1,2], fixed=TRUE) == TRUE){
+    # Assume a null means this is a timeseries expression
+    if(grepl(pattern="XXXX", x=iExpression, fixed=TRUE) == FALSE){
+      # Instrument is not an expression if it does not contain 'XXXX
+      aTS <- mydsws$timeSeriesListRequest(instrument = instrument,
+                                          datatype = iExpression,
+                                          startDate =  endDate - 7,
+                                          endDate =  endDate,
+                                          frequency = frequency)
+    } else {
+      aTS <- mydsws$timeSeriesListRequest(instrument = instrument,
+                                          expression = iExpression,
+                                          startDate =  endDate - 7,
+                                          endDate =  endDate,
+                                          frequency = frequency)
+    }
+
+    idf <- t(last(aTS, 1))
+  } else {
+    idf <- idf[,2]
+  }
+
+
+  rownames(idf) <- NULL
+  return(idf)
+}
+
+##############################################################################################
+#'
+#' @title staticRequestSet
+#'
+#' @details This function creates a dataframe set of static requests for a set of stocks/indices
+#'
+#' @param mydsws a dsws object, if not provided a new one will be created
+#' @param instrument array of instruments
+#' @param expression an array of expressions such as PCH#(XXXX,1M) or Dataitems
+#' @param endDate the date of the request
+#' @param frequency optional frequency defaults to "D"
+#' @param verbose whether to display messages as making the request
+#'
+#' @return a dataframe of the data
+#'
+#' @importFrom xts last
+#' @importFrom foreach foreach %do%
+#'
+#' @export
+#'
+staticRequestSet <- function(mydsws = dsws$new(),
+                             instrument,
+                             expression = "",
+                             endDate = Sys.Date(),
+                             frequency = "D",
+                             verbose = FALSE){
+
+
+  ldf <- foreach(iExpression = expression) %do%
+  {
+    if(grepl(pattern="XXXX", x=iExpression, fixed=TRUE) == FALSE){
+      # Instrument is not an expression if it does not contain 'XXXX
+      idf <- mydsws$snapshotRequest(instrument = instrument,
+                                    datatype = iExpression,
+                                    requestDate =  endDate)
+    } else {
+      idf <- mydsws$snapshotRequest(instrument = instrument,
+                                    expression = iExpression,
+                                    requestDate =  endDate)
+    }
+
+    if(length(idf) == 0 | grepl(pattern="$$\"ER\"", x= idf[1,2], fixed=TRUE) == TRUE){
+      #
+      if(grepl(pattern="XXXX", x=iExpression, fixed=TRUE) == FALSE){
+        # Instrument is not an expression if it does not contain 'XXXX
+        aTS <- mydsws$timeSeriesRequest(instrument = instrument,
+                                        datatype = iExpression,
+                                        startDate =  endDate - 7,
+                                        endDate =  endDate,
+                                        frequency = frequency)
+      } else {
+        aTS <- mydsws$timeSeriesRequest(instrument = instrument,
+                                        expression = iExpression,
+                                        startDate =  endDate - 7,
+                                        endDate =  endDate,
+                                        frequency = frequency)
+      }
+      idf <- t(unlist(last(aTS, 1)))
+      if(length(idf) == 0){
+        #If we still do not have anything valid then return a column of NULLs
+        idf <- data.frame(matrix(NA,nrow = length(instrument), ncol = 1))
+      }
+    } else {
+      idf <- idf[,2]
+    }
+
+    idf
+  }
+
+  df <- do.call("cbind", ldf)
+  colnames(df) <- expression
+  rownames(df) <- NULL
+  return(as.data.frame(df))
+}
+
+
+##############################################################################################
+#'
+#' @title staticListRequestSet
+#'
+#' @details This function creates a dataframe set of static list requests for a constituent list
+#'
+#' @param mydsws a dsws object, if not provided a new one will be created
+#' @param instrument array of instruments
+#' @param expression an array of expressions such as PCH#(XXXX,1M)
+#' @param endDate the date of the request
+#' @param frequency optional frequency defaults to "D"
+#'
+#' @return a dataframe of the data
+#'
+#' @importFrom xts last
+#' @importFrom foreach foreach %do%
+#'
+#' @export
+#'
+staticListRequestSet <- function(mydsws = dsws$new(),
+                                 instrument,
+                                 expression = "",
+                                 endDate = Sys.Date(),
+                                 frequency = "D"){
+
+  ldf <- foreach(iExpression = expression) %do%
+  {
+    myStaticRequestSet(mydsws = mydsws,
+                       instrument = instrument,
+                       iExpression = iExpression,
+                       endDate = endDate,
+                       frequency = frequency)
+  }
+
+  df <- do.call("cbind", ldf)
+  rownames(df) <- NULL
+  return(as.data.frame(df))
+}
+
