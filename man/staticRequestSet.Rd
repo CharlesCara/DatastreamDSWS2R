@@ -12,7 +12,7 @@ staticRequestSet(mydsws = dsws$new(), instrument, expression = "",
 
 \item{instrument}{array of instruments}
 
-\item{expression}{an array of expressions such as PCH#(XXXX,1M)}
+\item{expression}{an array of expressions such as PCH#(XXXX,1M) or Dataitems}
 
 \item{endDate}{the date of the request}
 

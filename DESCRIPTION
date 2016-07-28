@@ -17,7 +17,8 @@ Imports:
     stringr,
     xts,
     zoo,
-    methods
+    methods,
+    foreach
 Suggests: testthat
 Roxygen: list(wrap = FALSE)
 RoxygenNote: 5.0.1

@@ -234,6 +234,7 @@ UCTSUpload <- function(tsData,
                    TSULCurr = "",                            # no longer use Underlying Currency, but need to pass up a null value as the mainframe is expecting it
                    ForceUpdateFlag1 = "Y",
                    ForceUpdateFlag2 = "Y",                   # We have ignored some logic in the original UCTS VBA code
+#                   AmendFlag = "Y",
                    TSValsStart = format(startDate,format="%d/%m/%Y"),  #TODO adjust this date according to the frequency of the data VBA function AdjustDateTo1st
                    NAValue = NA_VALUE,
                    TSValues = .getTimeseries(myXtsData,
@@ -268,4 +269,122 @@ UCTSUpload <- function(tsData,
   else{
     return(paste("*Error* Upload failed after ", iCounter, " attempts with error ", retValue[1]))
   }
+}
+
+
+
+#' @title Append a xts to an existing UCTS timeseries in Datastream
+#'
+#' @description Uploads and appends an xts into a UCTS in the Datastream Database
+#' @details This function checks if there is a pre-existing timeseries already in Datastream.
+#' If there is then it will append the xts onto the existing series.  If there are any
+#' overlapping dates then depending on the setting of overwrite then the new data
+#' will overwrite the existing data in the UCTS
+#'
+#' @param tsData - an xts (or timeseries object that can be converted to
+#' one) to be uploaded.
+#' @param TSCode  The mnemonic of the target UCTS
+#' @param MGMTGroup Must have managment group.  Only the first
+#' characters will be used.
+#' @param freq The frequency of the data to be uploaded
+#' @param seriesName the name of the series
+#' @param Units Units of the data - can be no more than 12 characters -
+#'  excess will be trimmed to that length
+#' @param Decimals Number of Decimals in the data - a number between 0 and
+#'  9 - if outside that range then trimmed
+#' @param ActPer Whether the values are percentages ("N") or actual
+#' numbers ("Y")
+#' @param freqConversion How to do any FX conversions
+#' @param Alignment Alignment of the data within periods
+#' @param Carry whether to carry data over missing dates
+#' @param PrimeCurr the currency of the timeseries
+#' @param overwrite if TRUE then existing data in the UCTS will be overwritten
+#' @param strUsername your Datastream username
+#' @param strPassword your Datastream Password
+#' @param strServerName URL of the Datastream server
+#' @param strServerPage page on the datastream server
+#' @return TRUE if the upload has been a success, otherwise an error message
+#'
+#' @export
+#'
+#' @importFrom zoo index
+#' @importFrom RCurl postForm curlPercentEncode
+#' @importFrom xts as.xts first last
+#'
+UCTSAppend <- function(tsData,
+                       TSCode = "",
+                       MGMTGroup = "ABC",
+                       freq = c("D","W","M","Q","Y"),
+                       seriesName,
+                       Units = "",
+                       Decimals = 2,
+                       ActPer = c("N","Y"),
+                       freqConversion = c("ACT","SUM","AVG","END"),
+                       Alignment = c("1ST","MID","END"),
+                       Carry = c("YES","NO","PAD"),
+                       PrimeCurr ="",
+                       overwrite = TRUE,
+                       strUsername = options()$Datastream.Username,
+                       strPassword = options()$Datastream.Password,
+                       strServerName = "http://product.datastream.com",
+                       strServerPage = "/UCTS/UCTSMaint.asp"){
+
+  # Get the existing UCTS from Datastream
+  mydsws <- dsws$new()
+  tsExisting <- mydsws$timeSeriesRequest(instrument = TSCode,
+                                         startDate = as.Date("1950-01-01"),
+                                         endDate = index(last(tsData)),
+                                         frequency = freq)
+
+  # In the absence of being able to define start and end dates for UCTS as defined
+  # on http://product.datastream.com/DSWSClient/Docs/SoapApiHelp/EnumDetails.html#DSDateNames
+  # We are going to trim the start and end of the series of any null values
+  # If this is fixed by Datastream or another way is suggested then these lines
+  # could be removed
+
+  validRows <- which(!is.na(tsExisting))
+
+  # Check if any data was found
+
+  if(length(validRows) != 0){
+    # There was no existing timeseries
+    # Take the non-null middle segment
+
+    firstNotNULL <- min(validRows)
+    lastNotNULL <- max(validRows)
+
+    tsExisting <- tsExisting[firstNotNULL:lastNotNULL, ]
+
+    # Combine the new data with the existing data
+
+    if(overwrite){
+      # append with new data overwriting the old
+      tsData <- make.index.unique(rbind(tsData, tsExisting), drop = TRUE)
+
+    } else {
+      # append with old data being kept
+      tsData <- make.index.unique(rbind(tsExisting, tsData), drop = TRUE)
+    }
+
+  }
+
+  # Upload combined timeseries
+
+
+  return(UCTSUpload(tsData = tsData,
+                    TSCode = TSCode,
+                    MGMTGroup = MGMTGroup,
+                    freq = freq,
+                    seriesName = seriesName,
+                    Units = Units,
+                    Decimals = Decimals,
+                    ActPer = ActPer,
+                    freqConversion = freqConversion,
+                    Alignment = Alignment,
+                    Carry = Carry,
+                    PrimeCurr = PrimeCurr,
+                    strUsername = strUsername,
+                    strPassword = strPassword,
+                    strServerName = strServerName,
+                    strServerPage = strServerPage))
 }
