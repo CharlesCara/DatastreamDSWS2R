@@ -27,7 +27,8 @@ dsws <- setRefClass(Class="dsws",
                                   numDatatype = "numeric",
                                   numInstrument = "numeric",
                                   chunkLimit = "numeric",
-                                  requestStringLimit = "integer"))
+                                  requestStringLimit = "integer",
+                                  logFileFolder = "character"))
 
 #-----Accessors----------------------------------------------------------------
 
@@ -61,6 +62,7 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
   .self$requestStringLimit <<- 2000L # Max length of a request.
   .self$logging <<- 0L
+  .self$logFileFolder <<- Sys.getenv("R_USER")
 
   if(dsws.serverURL == ""){
   # 07/4/2016 - due to issue with Datastream's load balancers, using a different URL.  This will
@@ -178,8 +180,8 @@ dsws$methods(.tokenExpired = function(thisToken = NULL, myTime = Sys.time()){
 
 
 #-----------------------------------------------------------------------------
-#' @importFrom rjson toJSON
-#' @importFrom rjson fromJSON
+#' @importFrom rjson toJSON fromJSON
+#' @importFrom stringr str_detect
 dsws$methods(.makeRequest = function(bundle = FALSE){
   "Internal function: make a request from the DSWS server.
   The request  (in a R list form) is taken from .self$requestList,
@@ -232,6 +234,14 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   } else {
     if(.self$logging >=3 ){
       startTime <- Sys.time()
+    }
+    if(TRUE %in% stringr::str_detect(myDataResponse,
+                                    "MainframeAccessPoint error.Timed out waiting for a response from mainframe.")){
+      # Would like to catch this server timeout error
+      # but do not know what it looks like.
+      myErrorResponse <- file.path(.self$logFileFolder,
+                                   paste0("TimeoutResponse", format(Sys.time(), "%Y%m%d %H %M %S"), ".txt"))
+      writeChar(myDataResponse, myErrorResponse)
     }
     .self$dataResponse <- rjson::fromJSON(json_str = myDataResponse)
 

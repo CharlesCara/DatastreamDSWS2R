@@ -198,7 +198,7 @@ test_that("test of download worldscope data - this data is numeric", {
   expect_is(xtsData, "xts")
   myValues <- coredata(xtsData)
   colnames(myValues) <- NULL
-  expect_equal(myValues[1:2,1], c(28270000, NA) )
+  expect_equal(myValues[1:2,1], c(28237000, NA) )
   rm(mydsws, xtsData)
 
 })

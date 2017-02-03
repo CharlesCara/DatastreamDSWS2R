@@ -196,7 +196,7 @@ listRequest <- function (dwei=getDataStream(),
 #' @title make a timeSeries request for a list
 #' @description  make a timeseries request for a constituent list from
 #'  Datastream DSWS
-#'\code{timeSeriesListRequest} Function that returns a timeseries from
+#' \code{timeSeriesListRequest} Function that returns a timeseries from
 #' Datastream constituent list parameters are
 #' @param dwei - A Datastream Client Interface object created with
 #'  getDataStream
@@ -259,8 +259,7 @@ timeSeriesListRequest <- function (dwei = getDataStream(),
 ##############################################################################################
 #'
 #' @title myStaticRequestSet
-#'
-#' @details internal function for requesting an expression for an array of instruments.
+#' @description internal function for requesting an expression for an array of instruments.
 #' The function will initially try a snapshot request, and if this
 #' fails try a timeseries request.
 #'
@@ -326,7 +325,7 @@ myStaticRequestSet <- function(mydsws = dsws$new(),
 #'
 #' @title staticRequestSet
 #'
-#' @details This function creates a dataframe set of static requests for a set of stocks/indices
+#' @description  This function creates a dataframe set of static requests for a set of stocks/indices
 #'
 #' @param mydsws a dsws object, if not provided a new one will be created
 #' @param instrument array of instruments
@@ -402,7 +401,7 @@ staticRequestSet <- function(mydsws = dsws$new(),
 #'
 #' @title staticListRequestSet
 #'
-#' @details This function creates a dataframe set of static list requests for a constituent list
+#' @description This function creates a dataframe set of static list requests for a constituent list
 #'
 #' @param mydsws a dsws object, if not provided a new one will be created
 #' @param instrument array of instruments

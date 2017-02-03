@@ -21,7 +21,7 @@ staticListRequestSet(mydsws = dsws$new(), instrument, expression = "",
 \value{
 a dataframe of the data
 }
-\details{
+\description{
 This function creates a dataframe set of static list requests for a constituent list
 }
 
