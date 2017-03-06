@@ -615,3 +615,58 @@ test_that("test of chunking timeSeriesRequests due to request string length", {
   expect_true(nrow(xtsTestData) == 1045)
   rm(mydsws, xtsTestData, symbolList)
 })
+
+
+##############################################################################################
+# This is a test of handling mainframe timeouts
+#
+
+test_that("test of handling mainframe timeouts", {
+
+
+
+  mydsws <- dsws$new()
+
+  mydsws$jsonResponseLoadFile <- "./testData/TimeoutResponseFull.json"
+  # mydsws$jsonResponseLoadFile <- "tests/testthat/testData/TimeoutResponseFull.json"
+
+  # Get the unchunked data
+
+  instCodes <- c("PCH#(US88033G4073(EPS1TR12),3Y)/100.000", "PCH#(US87612E1064(EPS1TR12),3Y)/100.000",
+    "PCH#(US87901J1051(EPS1TR12),3Y)/100.000", "PCH#(US8723751009(EPS1TR12),3Y)/100.000",
+    "PCH#(US8794338298(EPS1TR12),3Y)/100.000", "PCH#(US8718291078(EPS1TR12),3Y)/100.000",
+    "PCH#(US8636671013(EPS1TR12),3Y)/100.000", "PCH#(US8711301007(EPS1TR12),3Y)/100.000",
+    "PCH#(US8581222036(EPS1TR12),3Y)/100.000", "PCH#(US7865142084(EPS1TR12),3Y)/100.000",
+    "PCH#(US8545021011(EPS1TR12),3Y)/100.000", "PCH#(US8685361037(EPS1TR12),3Y)/100.000",
+    "PCH#(US8574771031(EPS1TR12),3Y)/100.000", "PCH#(US7908491035(EPS1TR12),3Y)/100.000",
+    "PCH#(US8679141031(EPS1TR12),3Y)/100.000", "PCH#(US8110544025(EPS1TR12),3Y)/100.000",
+    "PCH#(US8550301027(EPS1TR12),3Y)/100.000", "PCH#(US8354951027(EPS1TR12),3Y)/100.000",
+    "PCH#(US8425871071(EPS1TR12),3Y)/100.000", "PCH#(US87161C5013(EPS1TR12),3Y)/100.000",
+    "PCH#(US78442P1066(EPS1TR12),3Y)/100.000", "PCH#(AN8068571086(EPS1TR12),3Y)/100.000",
+    "PCH#(US8265521018(EPS1TR12),3Y)/100.000", "PCH#(US8202861022(EPS1TR12),3Y)/100.000",
+    "PCH#(US8243481061(EPS1TR12),3Y)/100.000", "PCH#(US8066051017(EPS1TR12),3Y)/100.000",
+    "PCH#(US8270561025(EPS1TR12),3Y)/100.000", "PCH#(US8175651046(EPS1TR12),3Y)/100.000",
+    "PCH#(US8085131055(EPS1TR12),3Y)/100.000", "PCH#(US80589M1027(EPS1TR12),3Y)/100.000",
+    "PCH#(US7864291007(EPS1TR12),3Y)/100.000", "PCH#(US7551115071(EPS1TR12),3Y)/100.000",
+    "PCH#(US7504381036(EPS1TR12),3Y)/100.000", "PCH#(US2578671016(EPS1TR12),3Y)/100.000",
+    "PCH#(US7753711073(EPS1TR12),3Y)/100.000", "PCH#(US7617631012(EPS1TR12),3Y)/100.000",
+    "PCH#(US7591EP1005(EPS1TR12),3Y)/100.000", "PCH#(US7616951056(EPS1TR12),3Y)/100.000",
+    "PCH#(US0019201070(EPS1TR12),3Y)/100.000", "PCH#(US7581101000(EPS1TR12),3Y)/100.000",
+    "PCH#(US7512773026(EPS1TR12),3Y)/100.000", "PCH#(US7677541044(EPS1TR12),3Y)/100.000",
+    "PCH#(US7835491082(EPS1TR12),3Y)/100.000", "PCH#(US7475251036(EPS1TR12),3Y)/100.000",
+    "PCH#(US74005P1049(EPS1TR12),3Y)/100.000", "PCH#(US7310951055(EPS1TR12),3Y)/100.000",
+    "PCH#(US6951141083(EPS1TR12),3Y)/100.000", "PCH#(US69351T1060(EPS1TR12),3Y)/100.000",
+    "PCH#(US6935061076(EPS1TR12),3Y)/100.000")
+
+  xtsTestData <- mydsws$timeSeriesRequest(instrument =  instCodes,
+                                          expression = "",
+                                          startDate = as.Date("2017-02-01"),
+                                          endDate = as.Date("2017-03-03"),
+                                          frequency = "D")
+  expect_is(xtsTestData, "xts")
+  expect_true(ncol(xtsTestData) == 49)
+  expect_true(nrow(xtsTestData) == 23)
+  rm(mydsws, xtsTestData, instCodes)
+})
+
+

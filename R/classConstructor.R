@@ -19,6 +19,8 @@ dsws <- setRefClass(Class="dsws",
                                   initialised = "logical",
                                   errorlist = "ANY",
                                   requestList = "ANY",
+                                  jsonResponseSaveFile = "ANY",
+                                  jsonResponseLoadFile = "ANY",
                                   dataResponse = "ANY",
                                   symbolList = "ANY",
                                   myValues = "ANY",
@@ -63,12 +65,13 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$requestStringLimit <<- 2000L # Max length of a request.
   .self$logging <<- 0L
   .self$logFileFolder <<- Sys.getenv("R_USER")
+  .self$jsonResponseLoadFile <<- NULL  # By default is to hit the server
+  .self$jsonResponseSaveFile <<- NULL # Default is not to save JSON response
 
   if(dsws.serverURL == ""){
   # 07/4/2016 - due to issue with Datastream's load balancers, using a different URL.  This will
   # be changed back when the issue is resolved.
     .self$serverURL <<- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
-#    .self$serverURL <<- "http://datastream.thomsonreuters.com/DSWSClient/V1/DSService.svc/rest/"
   } else {
     .self$serverURL <<- dsws.serverURL
   }
@@ -188,6 +191,19 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   parsed into JSON and sent to the DSWS server.  The JSON response is
   parsed and saved in .self$dataResponse"
 
+  # This option is for testing purposes.  The response is loaded
+  # from a specified JSON file, rather than the DSWS server
+
+  if(!is.null(.self$jsonResponseLoadFile)){
+    if(file.exists(.self$jsonResponseLoadFile)) {
+      .self$dataResponse <- rjson::fromJSON(file = .self$jsonResponseLoadFile)
+      return(TRUE)
+    } else {
+      stop("File specified by dsws$jsonResponseLoadFile does not exist")
+    }
+  }
+
+
   if(bundle){
     myDataURL <- paste0(.self$serverURL , "GetDataBundle")
   }else{
@@ -203,9 +219,6 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   httpheader <- c(Accept="application/json; charset=UTF-8",
                   "Content-Type"="application/json")
 
-  if(.self$logging >=3 ){
-    startTime <- Sys.time()
-  }
 
   if(.self$logging >=5 ){
     message(paste0("JSON request to DSWS server response is:\n", myRequestJSON))
@@ -221,39 +234,28 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     .self$errorlist <- c(.self$errorlist, list(request = myRequestJSON, error = e))
     return(NULL)})
 
-  if(.self$logging >=3 ){
-    message(paste0("DSWS server request took ", Sys.time() - startTime, " sec"))
-  }
 
   if(.self$logging >=5 ){
     message(paste0("DSWS server response is:\n", myDataResponse))
   }
 
+
+  if(!is.null(.self$jsonResponseSaveFile)){
+    writeChar(myDataResponse, .self$jsonResponseSaveFile)
+  }
+
+
   if(is.null(myDataResponse)){
     .self$dataResponse <-  NULL
   } else {
-    if(.self$logging >=3 ){
-      startTime <- Sys.time()
-    }
-    if(TRUE %in% stringr::str_detect(myDataResponse,
-                                    "MainframeAccessPoint error.Timed out waiting for a response from mainframe.")){
-      # Would like to catch this server timeout error
-      # but do not know what it looks like.
-      myErrorResponse <- file.path(.self$logFileFolder,
-                                   paste0("TimeoutResponse", format(Sys.time(), "%Y%m%d %H %M %S"), ".txt"))
-      writeChar(myDataResponse, myErrorResponse)
-    }
     .self$dataResponse <- rjson::fromJSON(json_str = myDataResponse)
-
-    if(.self$logging >=3 ){
-      message(paste0("Processing response into JSON took ", Sys.time() - startTime))
-    }
-
   }
+
 
   if(.self$logging >= 4 ){
     message(paste0("JSON returned by DSWS server response is:\n", .self$dataResponse))
   }
+
 
   return(TRUE)
 
@@ -401,9 +403,7 @@ dsws$methods(timeSeriesRequest = function(instrument,
       endDate = \"-0D\", frequency = \"D\", format = \"ByDatatype\")
 
   "
-  if(.self$logging >=3 ){
-    overallStartTime <- Sys.time()
-  }
+
   myData <- .self$.basicRequest(instrument = instrument,
                                 datatype = datatype,
                                 expression = expression,
@@ -413,9 +413,7 @@ dsws$methods(timeSeriesRequest = function(instrument,
                                 frequency = frequency,
                                 kind = 1,
                                 format = format)
-  if(.self$logging >=3 ){
-    message(paste0("Processing request took ", Sys.time() - overallStartTime))
-  }
+
   return(myData)
 
 })
@@ -841,7 +839,6 @@ dsws$methods(.processTimeSeriesByInstrument = function(myDates, myNumDatatype, m
   if(.self$logging >=3 ){
     message("Processing byInstrument")
     message("myNumDatatype is ", myNumDatatype)
-    startTime <- Sys.time()
   }
 
   myxtsData <- list()
@@ -876,9 +873,7 @@ dsws$methods(.processTimeSeriesByInstrument = function(myDates, myNumDatatype, m
       colnames(myxtsData[[iDatatype]]) <- colnames(.self$myValues)[2:(myNumInstrument + 1)]
     }
   }
-  if(.self$logging >=3 ){
-    message(paste0("Processing from JSON to R took ", Sys.time() - startTime))
-  }
+
   return(myxtsData)
 })
 
@@ -892,7 +887,6 @@ dsws$methods(.processTimeSeriesByDatatype = function(myDates, myNumDatatype, myN
   if(.self$logging >=3 ){
     message("Processing byInstrument")
     message("myNumDatatype is ", myNumDatatype)
-    startTime <- Sys.time()
   }
 
   myxtsData <- list()
@@ -920,9 +914,7 @@ dsws$methods(.processTimeSeriesByDatatype = function(myDates, myNumDatatype, myN
       colnames(myxtsData[[iInstrument]]) <- colnames(.self$myValues)[2:(myNumDatatype + 1)]
     }
   }
-  if(.self$logging >=3 ){
-    message(paste0("Processing from JSON to R took ", Sys.time() - startTime))
-  }
+
   return(myxtsData)
 
 })
@@ -979,10 +971,6 @@ dsws$methods(.basicRequestSnapshotChunk = function(instrument,
 
   # Make the request to the server
   ret <- .self$.makeRequest(bundle = FALSE)
-
-  if(.self$logging >=3 ){
-    startTime <- Sys.time()
-  }
 
   if(!ret){
     # There has been an error.  Return NULL.  Error is stored in .self$errorlist
@@ -1080,9 +1068,7 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
 
 
   }
-  if(.self$logging >=3 ){
-    message(paste0("Processing from JSON to R took ", Sys.time() - startTime))
-  }
+
   return(.self$myValues)
 
 
@@ -1090,6 +1076,7 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
 
 
 #-----------------------------------------------------------------------------
+#' @importFrom stringr coll str_detect
 dsws$methods(.parseBranch = function(iInstrument, iDatatype, formatType){
 
   # we are using eval to avoid copying what might be a big table of in myValues
@@ -1097,7 +1084,10 @@ dsws$methods(.parseBranch = function(iInstrument, iDatatype, formatType){
 
   myValuesList[sapply(myValuesList, is.null)] <- NA
 
-  if(!(TRUE %in% grepl("[$$ER:]", myValuesList[[1]]) )){
+  if(!(TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("$$ER:")) |
+       TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("MainframeAccessPoint error")))){
+    # We only process if we have not got an error message
+
     .self$myValues[,iInstrument] <- t(data.frame(lapply(myValuesList, FUN = .convertJSONString)))
   }
 
@@ -1106,6 +1096,7 @@ dsws$methods(.parseBranch = function(iInstrument, iDatatype, formatType){
     make.names(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues[[iInstrument]]$Symbol)
   # Replace errors with NA
   .self$myValues[which(myValues[,iDatatype] == "$$ER: 0904,NO DATA AVAILABLE"),iDatatype] <- NA
+  .self$myValues[which(myValues[,iDatatype] == "MainframeAccessPoint error.Timed out waiting for a response from mainframe."),iDatatype] <- NA
 
   return(NULL)
 
@@ -1113,6 +1104,7 @@ dsws$methods(.parseBranch = function(iInstrument, iDatatype, formatType){
 
 
 #-----------------------------------------------------------------------------
+#' @importFrom stringr coll str_detect
 dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType){
   "This function parses a branch of the getDataBundle response.  It assumes that
   a branch only has data for one instrument in it (ie SymbolValues is of
@@ -1134,7 +1126,9 @@ dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType){
   myValuesList[sapply(myValuesList, is.null)] <- NA
   myDates <- .convert_JSON_Date(dataResponse$DataResponses[[iDRs]]$Dates)
 
-  if(!(TRUE %in% grepl("[$$ER:]", myValuesList[[1]]) )){
+  if(!(TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("$$ER:")) |
+     TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("MainframeAccessPoint error")))){
+    # We only process if we have not got an error message
     # match up the rows with the existing tables
 
     .self$myValues[match( myDates, .self$myValues[,1]),iCol]<-
@@ -1147,6 +1141,9 @@ dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType){
 
   # Replace errors with NA
   .self$myValues[which(myValues[,iCol] == "$$ER: 0904,NO DATA AVAILABLE"),iCol] <- NA
+  .self$myValues[which(myValues[,iCol] == "MainframeAccessPoint error.Timed out waiting for a response from mainframe."),iCol] <- NA
+
+
 
   return(NULL)
 
