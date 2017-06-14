@@ -523,6 +523,11 @@ dsws$methods(.basicRequest = function(instrument,
   if(length(expression) > 1) expression <- expression[1]
   .self$setErrorlist(list())
 
+  # We have to have at least one instrument
+  numCodes <- length(instrument)
+  if(numCodes == 0){
+    stop("instruments is empty and has length zero")
+  }
 
   # Setting a limit on the number of datatypes means that we will always split instrument up into chunks
   # simplifying the chunking and stitching process.
@@ -592,7 +597,6 @@ dsws$methods(.basicRequest = function(instrument,
 
   # Chunking required which will to split instrument into chunks
   # Work out the number of chunks and the size of each request
-  numCodes <- length(instrument)
 
   if(datatype[1] != ""){
     numInstrChunk <- floor(.self$chunkLimit / length(datatype))
@@ -613,7 +617,9 @@ dsws$methods(.basicRequest = function(instrument,
 
   }
 
-  for(i in 1:numChunks){
+
+
+    for(i in 1:numChunks){
     # get the the list of instruments for each request
     startIndex <- ((i - 1) * numInstrChunk) + 1
     endIndex <- ifelse((i * numInstrChunk) < numCodes, (i * numInstrChunk), numCodes )
