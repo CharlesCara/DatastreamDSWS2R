@@ -11,6 +11,7 @@ NULL
 #'
 #' @import methods
 #' @export dsws
+#' @exportClass dsws
 dsws <- setRefClass(Class="dsws",
                     fields = list(tokenList="ANY",
                                   serverURL = "character",
@@ -904,7 +905,7 @@ dsws$methods(.processTimeSeriesByDatatype = function(myDates, myNumDatatype, myN
 
     # Place the returned data into columns of the dataframe and name the column
     for(iDatatype in 1:myNumDatatype){
-      .self$.$.parseBundleBranch(iDRs = iInstrument,
+      .self$.parseBundleBranch(iDRs = iInstrument,
                                  iDTV = iDatatype,
                                  iSV = 1,
                                  iCol = iDatatype + 1,
