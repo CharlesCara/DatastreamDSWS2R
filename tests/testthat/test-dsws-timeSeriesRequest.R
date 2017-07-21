@@ -587,6 +587,49 @@ test_that("test of chunking timeSeriesRequests due to request string length", {
 
 })
 
+
+##############################################################################################
+# This is a test of named instruments requests
+#
+
+test_that("test of named instruments, datatypes and expressions", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+
+  myIns <- c("@AAPL", "MKS")
+  names(myIns) <- c("a", "b")
+  myExp <- "XXXX(P)"
+  names(myExp) <- "c"
+  myDt <- "P"
+  names(myDt) <- "d"
+
+
+
+  # Expect
+  expect_silent(xtsTestData <- mydsws$timeSeriesRequest(instrument =  myIns,
+                                                        expression = myExp,
+                                                        startDate = as.Date("2016-01-01"),
+                                                        endDate = as.Date("2016-01-10"),
+                                                        frequency = "D"))
+  expect_is(xtsTestData, "xts")
+  expect_true(nrow(xtsTestData) > 1)
+
+  expect_silent(xtsTestData <- mydsws$timeSeriesRequest(instrument =  myIns,
+                                                        datatype = myDt,
+                                                        startDate = as.Date("2016-01-01"),
+                                                        endDate = as.Date("2016-01-10"),
+                                                        frequency = "D"))
+  expect_is(xtsTestData, "xts")
+  expect_true(nrow(xtsTestData) > 1)
+  rm(mydsws, myIns, myExp, myDt, xtsTestData)
+
+})
+
 ##############################################################################################
 # This is a test of chunked requests - This is test that large requests strings are chunked correctly
 #

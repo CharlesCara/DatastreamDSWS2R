@@ -536,6 +536,10 @@ dsws$methods(.basicRequest = function(instrument,
     stop(paste0("The number of datatypes request must be less than the limit of ", .self$chunkLimit))
   }
 
+  # names of can upset the format of the json request
+  names(instrument) <- NULL
+  names(datatype) <- NULL
+  names(expression) <- NULL
 
   if(format == "Snapshot"){
     # Set the holder for the results here
