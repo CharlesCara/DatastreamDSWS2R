@@ -21,7 +21,7 @@ test_that("test of simple snapshot request for price datatype with relative date
 
   expect_is(myData, "data.frame")
   expect_is(myData[1,2], "numeric")
-  expect_more_than(nrow(myData), 99)
+  expect_gt(nrow(myData), 99)
   expect_equal(ncol(myData), 2)
 
 })
@@ -43,7 +43,7 @@ test_that("test of simple snapshot request for price datatype with absolute date
 
   expect_is(myData, "data.frame")
   expect_is(myData[1,2], "numeric")
-  expect_more_than(nrow(myData), 99)
+  expect_gt(nrow(myData), 99)
   expect_equal(ncol(myData), 2)
 
 })
@@ -64,7 +64,7 @@ test_that("test of simple snapshot request for price datatype with relative date
 
   expect_is(myData, "data.frame")
   expect_is(myData[1,2], "character")
-  expect_more_than(nrow(myData), 99)
+  expect_gt(nrow(myData), 99)
   expect_equal(ncol(myData), 2)
 
 })
@@ -85,7 +85,7 @@ test_that("test of simple snapshot request for Expression datatype with relative
 
   expect_is(myData, "data.frame")
   expect_is(myData[1,2], "character")
-  expect_more_than(nrow(myData), 99)
+  expect_gt(nrow(myData), 99)
   expect_equal(ncol(myData), 2)
 
 })
@@ -106,7 +106,7 @@ test_that("test of simple snapshot request for Date datatype with relative dates
 
   expect_is(myData, "data.frame")
   expect_is(myData[1,2], "Date")
-  expect_more_than(nrow(myData), 99)
+  expect_gt(nrow(myData), 99)
   expect_equal(ncol(myData), 2)
 
 })

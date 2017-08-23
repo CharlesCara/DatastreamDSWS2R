@@ -70,8 +70,8 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$jsonResponseSaveFile <<- NULL # Default is not to save JSON response
 
   if(dsws.serverURL == ""){
-  # 07/4/2016 - due to issue with Datastream's load balancers, using a different URL.  This will
-  # be changed back when the issue is resolved.
+    # 07/4/2016 - due to issue with Datastream's load balancers, using a different URL.  This will
+    # be changed back when the issue is resolved.
     .self$serverURL <<- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
   } else {
     .self$serverURL <<- dsws.serverURL
@@ -133,12 +133,34 @@ dsws$methods(.getToken = function(){
                          "?username=", .self$username ,
                          "&password=", .self$password )
 
-
+    # We are going to handle timeouts by
+    # waiting incrementally up to 16 sec and repeating the request
+    maxLoop <- 4L
+    waitTimeBase <- 2
+    nLoop <- 0
+    repeat{
     myTokenResponse <- tryCatch(RCurl::getURL(url = myTokenURL),
                                 error = function(e) {
+                                  message("Error requesting token...")
                                   message(e)
-                                  stop("Could not request access Token")
+                                  .self$errorlist <- c(.self$errorlist, list(request = "Token request", error = e))
                                   return(NULL)})
+
+    # Success
+    if(!is.null(myTokenResponse)) break
+
+    # Only retry timeouts
+    if(!str_detect(.self$errorlist[[length(.self$errorlist)]]$error, "Timed out")) break
+
+    # Too many tries
+    if(nLoop >= maxLoop) break
+
+    message("...retrying")
+    Sys.sleep(waitTimeBase ^ nLoop)
+    nLoop <- nLoop + 1
+    }
+
+
     if(is.null(myTokenResponse)){
       stop("Could not request access Token - response from server was NULL")
     }
@@ -225,16 +247,36 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     message(paste0("JSON request to DSWS server response is:\n", myRequestJSON))
   }
 
-  myDataResponse <- tryCatch({
-    RCurl::postForm(myDataURL,
-                    .opts=list(httpheader=httpheader
-                               ,postfields=myRequestJSON))
-  },
-  error = function(e) {
-    message(e)
-    .self$errorlist <- c(.self$errorlist, list(request = myRequestJSON, error = e))
-    return(NULL)})
+  # We are going to handle timeouts by
+  # waiting incrementally up to 16 sec and repeating the request
+  maxLoop <- 4L
+  waitTimeBase <- 2
+  nLoop <- 0
+  repeat{
+    myDataResponse <- tryCatch({
+      RCurl::postForm(myDataURL,
+                      .opts=list(httpheader=httpheader
+                                 ,postfields=myRequestJSON))
+    },
+    error = function(e) {
+      message("Error posting request to server...")
+      message(e)
+      .self$errorlist <- c(.self$errorlist, list(request = myRequestJSON, error = e))
+      return(NULL)})
 
+    # Success
+    if(!is.null(myDataResponse)) break
+
+    # Only retry timeouts
+    if(!str_detect(.self$errorlist[[length(.self$errorlist)]]$error, "Timed out")) break
+
+    # Too many tries
+    if(nLoop >= maxLoop) break
+
+    message("...retrying")
+    Sys.sleep(waitTimeBase ^ nLoop)
+    nLoop <- nLoop + 1
+  }
 
   if(.self$logging >=5 ){
     message(paste0("DSWS server response is:\n", myDataResponse))
@@ -624,7 +666,7 @@ dsws$methods(.basicRequest = function(instrument,
 
 
 
-    for(i in 1:numChunks){
+  for(i in 1:numChunks){
     # get the the list of instruments for each request
     startIndex <- ((i - 1) * numInstrChunk) + 1
     endIndex <- ifelse((i * numInstrChunk) < numCodes, (i * numInstrChunk), numCodes )
@@ -910,10 +952,10 @@ dsws$methods(.processTimeSeriesByDatatype = function(myDates, myNumDatatype, myN
     # Place the returned data into columns of the dataframe and name the column
     for(iDatatype in 1:myNumDatatype){
       .self$.parseBundleBranch(iDRs = iInstrument,
-                                 iDTV = iDatatype,
-                                 iSV = 1,
-                                 iCol = iDatatype + 1,
-                                 formatType = "ByInstrument")
+                               iDTV = iDatatype,
+                               iSV = 1,
+                               iCol = iDatatype + 1,
+                               formatType = "ByInstrument")
     }
 
     # Turn it into a xts and if more than one datatype was requested put it into a list
@@ -1138,7 +1180,7 @@ dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType){
   myDates <- .convert_JSON_Date(dataResponse$DataResponses[[iDRs]]$Dates)
 
   if(!(TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("$$ER:")) |
-     TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("MainframeAccessPoint error")))){
+       TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("MainframeAccessPoint error")))){
     # We only process if we have not got an error message
     # match up the rows with the existing tables
 

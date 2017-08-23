@@ -23,7 +23,7 @@ test_that("test of timeseries list request for price datatype with relative date
 
   expect_is(myData, "xts")
   expect_is(coredata(myData)[1,2], "numeric")
-  expect_more_than(ncol(myData), 99)
+  expect_gt(ncol(myData), 99)
   expect_equal(nrow(myData), 11)
 
 })
@@ -46,7 +46,7 @@ test_that("test of timeseries list request for default datatype with relative da
 
   expect_is(myData, "xts")
   expect_is(coredata(myData)[1,2], "numeric")
-  expect_more_than(ncol(myData), 99)
+  expect_gt(ncol(myData), 99)
   expect_equal(nrow(myData), 11)
 
 })
@@ -70,7 +70,7 @@ test_that("test of timeseries list request for price datatype with absolute date
 
   expect_is(myData, "xts")
   expect_is(coredata(myData)[1,2], "numeric")
-  expect_more_than(ncol(myData), 99)
+  expect_gt(ncol(myData), 99)
   expect_equal(nrow(myData), 4)
 
 })
@@ -92,7 +92,7 @@ test_that("test of timeseries list request for expression with relative date", {
 
   expect_is(myData, "xts")
   expect_is(coredata(myData)[1,2], "numeric")
-  expect_more_than(ncol(myData), 99)
+  expect_gt(ncol(myData), 99)
   expect_equal(nrow(myData), 4)
 
 })
