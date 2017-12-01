@@ -139,25 +139,25 @@ dsws$methods(.getToken = function(){
     waitTimeBase <- 2
     nLoop <- 0
     repeat{
-    myTokenResponse <- tryCatch(RCurl::getURL(url = myTokenURL),
-                                error = function(e) {
-                                  message("Error requesting token...")
-                                  message(e)
-                                  .self$errorlist <- c(.self$errorlist, list(request = "Token request", error = e))
-                                  return(NULL)})
+      myTokenResponse <- tryCatch(RCurl::getURL(url = myTokenURL),
+                                  error = function(e) {
+                                    message("Error requesting token...")
+                                    message(e)
+                                    .self$errorlist <- c(.self$errorlist, list(request = "Token request", error = e))
+                                    return(NULL)})
 
-    # Success
-    if(!is.null(myTokenResponse)) break
+      # Success
+      if(!is.null(myTokenResponse)) break
 
-    # Only retry timeouts
-    if(!str_detect(.self$errorlist[[length(.self$errorlist)]]$error, "Timed out")) break
+      # Only retry timeouts
+      if(!str_detect(.self$errorlist[[length(.self$errorlist)]]$error, "Timed out")) break
 
-    # Too many tries
-    if(nLoop >= maxLoop) break
+      # Too many tries
+      if(nLoop >= maxLoop) break
 
-    message("...retrying")
-    Sys.sleep(waitTimeBase ^ nLoop)
-    nLoop <- nLoop + 1
+      message("...retrying")
+      Sys.sleep(waitTimeBase ^ nLoop)
+      nLoop <- nLoop + 1
     }
 
 
@@ -1230,8 +1230,11 @@ dsws$methods(.expandExpression = function (instrument, expression){
   if(expression == ""){
     myString <- instrument
   } else {
+    # If the instrument is NA we need to return invalid code
     myString <- sapply(instrument,
-                       FUN=function(x) gsub(pattern="XXXX",replacement=x,x=expression,fixed=TRUE),
+                       FUN=function(x) {if(is.na(x)) {"ABCDEFGH"}
+                         else
+                         {gsub(pattern="XXXX", replacement=x, x=expression, fixed=TRUE)}},
                        USE.NAMES = FALSE)
   }
 

@@ -3,6 +3,9 @@
 context("classConstructor.R : test of timeSeriesRequest method")
 
 suppressPackageStartupMessages(require(xts))
+
+#testDataFolder <- "tests/testthat/testData/"
+testDataFolder <- "./testData/"
 ##############################################################################################
 
 test_that("test of simple timeseries request with relative dates", {
@@ -13,6 +16,9 @@ test_that("test of simple timeseries request with relative dates", {
 
 
   mydsws <- dsws$new()
+
+  #Load the response rather than hit server
+  mydsws$jsonResponseLoadFile <- file.path(testDataFolder, "test-dsws-timeSeriesRequest-test01.json")
 
   xtsData <- mydsws$timeSeriesRequest(instrument = "MKS",
                                       datatype = "MV",
@@ -36,6 +42,9 @@ test_that("test of two stock timeseries request with relative dates", {
 
 
   mydsws <- dsws$new()
+
+  #Load the response rather than hit server
+  mydsws$jsonResponseLoadFile <- file.path(testDataFolder, "test-dsws-timeSeriesRequest-test02.json")
 
   xtsData <- mydsws$timeSeriesRequest(instrument = c("MKS","RIO"),
                                       datatype = "MV",
@@ -343,7 +352,29 @@ test_that("test of selecting stocks via ISIN codes with missing (NA) codes and e
 
 })
 
+#############################################################
+test_that("test of selecting stocks via ISIN codes with missing (NA) codes ", {
+if(is.null(options()$Datastream.Username)){
+  skip("Username not available")
+}
+skip_on_cran()
 
+
+DSCodes <- c("JP3735400008", NA, "JP3305990008", "JP3117700009")
+startDate <- as.Date("1994-12-02")
+endDate <- as.Date("2018-01-23")
+mydsws <- dsws$new()
+xtsRepDates <- mydsws$timeSeriesRequest(instrument = DSCodes,
+                                        expression =  "XXXX(WC05905A)",
+                                        startDate = startDate,
+                                        endDate = endDate,
+                                        frequency = "M",
+                                        format = "ByInstrument")
+
+naRepDates <- xtsRepDates[ , 2]
+expect_false(FALSE %in% is.na(naRepDates))
+
+})
 #############################################################
 
 test_that("test of selecting stocks via ISIN codes with the first code missing and expressions", {

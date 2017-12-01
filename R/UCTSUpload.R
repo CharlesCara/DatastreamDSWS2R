@@ -143,23 +143,23 @@ UCTSUpload <- function(tsData,
                        strServerPage="/UCTS/UCTSMaint.asp"){
 
   #Check inputs are valid
-  if(!freq %in% c("D","W","M","Q","Y")){
+  if(!freq[1] %in% c("D","W","M","Q","Y")){
     stop("freq is not an allowed value")
   }
 
-  if(!ActPer %in% c("N","Y")){
+  if(!ActPer[1] %in% c("N","Y")){
     stop("ActPer is not an allowed value")
   }
 
-  if(!freqConversion %in% c("ACT","SUM","AVG","END")){
+  if(!freqConversion[1] %in% c("ACT","SUM","AVG","END")){
     stop("freqConversion is not an allowed value")
   }
 
-  if(!Alignment %in% c("1ST","MID","END")){
+  if(!Alignment[1] %in% c("1ST","MID","END")){
     stop("Alignment is not an allowed value")
   }
 
-  if(!Carry %in% c("YES","NO","PAD")){
+  if(!Carry[1] %in% c("YES","NO","PAD")){
     stop("Carry is not an allowed value")
   }
 
@@ -222,14 +222,14 @@ UCTSUpload <- function(tsData,
                    TSMLM = toupper(MGMTGroup),
                    TSStartDate = format(startDate,format="%d/%m/%Y"),
                    TSEndDate = format(endDate,format="%d/%m/%Y"),
-                   TSFrequency = freq,
+                   TSFrequency = freq[1],
                    TSTitle = seriesName,
                    TSUnits = Units,
                    TSDecPlaces = Decimals,
-                   TSAsPerc = ActPer,
-                   TSFreqConv = freqConversion,              # Add "Frequency Conversion"
-                   TSAlignment = Alignment,                  # Add "Alignment"
-                   TSCarryInd = Carry,                       # Add "Carry Indicator"
+                   TSAsPerc = ActPer[1],
+                   TSFreqConv = freqConversion[1],              # Add "Frequency Conversion"
+                   TSAlignment = Alignment[1],                  # Add "Alignment"
+                   TSCarryInd = Carry[1],                       # Add "Carry Indicator"
                    TSPrimeCurr = PrimeCurr,                  # Add "Prime Currency"
                    TSULCurr = "",                            # no longer use Underlying Currency, but need to pass up a null value as the mainframe is expecting it
                    ForceUpdateFlag1 = "Y",
@@ -238,7 +238,7 @@ UCTSUpload <- function(tsData,
                    TSValsStart = format(startDate,format="%d/%m/%Y"),  #TODO adjust this date according to the frequency of the data VBA function AdjustDateTo1st
                    NAValue = NA_VALUE,
                    TSValues = .getTimeseries(myXtsData,
-                                          freq= freq,
+                                          freq= freq[1],
                                           digits=Decimals,
                                           NA_VALUE),           #Now add the datapoints - the date element of the series is discarded here, with obvious risks
                    UserOption = .EncryptPassword(strPassword)
@@ -335,7 +335,11 @@ UCTSAppend <- function(tsData,
                                          startDate = as.Date("1950-01-01"),
                                          endDate = index(last(tsData)),
                                          frequency = freq)
-
+  if(is.null(tsExisting)){
+    errMsg <- paste0("Datastream Server Error retrieving existing series\n",
+                     paste(mydsws$errorlist, collapse = "\n", sep = "\n"))
+    stop(errMsg)
+  }
   # In the absence of being able to define start and end dates for UCTS as defined
   # on http://product.datastream.com/DSWSClient/Docs/SoapApiHelp/EnumDetails.html#DSDateNames
   # We are going to trim the start and end of the series of any null values
