@@ -368,7 +368,7 @@ xtsRepDates <- mydsws$timeSeriesRequest(instrument = DSCodes,
                                         expression =  "XXXX(WC05905A)",
                                         startDate = startDate,
                                         endDate = endDate,
-                                        frequency = "M",
+                                        frequency = "D",
                                         format = "ByInstrument")
 
 naRepDates <- xtsRepDates[ , 2]
