@@ -145,12 +145,19 @@ dsws$methods(.getToken = function(){
                                     message(e)
                                     .self$errorlist <- c(.self$errorlist, list(request = "Token request", error = e))
                                     return(NULL)})
+      # Try and catch a timeout
 
-      # Success
-      if(!is.null(myTokenResponse)) break
+      if(!str_detect(myTokenResponse, "Timed out")) {
+        # Success
+        if(!is.null(myTokenResponse)) break
 
-      # Only retry timeouts
-      if(!str_detect(.self$errorlist[[length(.self$errorlist)]]$error, "Timed out")) break
+        # Only retry timeouts
+        if(!str_detect(.self$errorlist[[length(.self$errorlist)]]$error, "Timed out")) break
+
+
+      } else {
+        message("time out in body of text")
+      }
 
       # Too many tries
       if(nLoop >= maxLoop) break
