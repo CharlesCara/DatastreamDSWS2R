@@ -62,4 +62,3 @@ Note this function does not check to see if there is
  a pre-existing timeseries already in Datastream.  It will just overwrite
   any existing UCTS.
 }
-

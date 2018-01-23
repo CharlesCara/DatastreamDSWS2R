@@ -49,4 +49,3 @@ make a timeseries request from the Datastream DSWS server
 \code{timeSeriesRequest} Function that obtains a timeseries
 from Datastream parameters are
 }
-

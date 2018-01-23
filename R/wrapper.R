@@ -194,6 +194,7 @@ listRequest <- function (dwei=getDataStream(),
 
 ##############################################################################################
 #' @title make a timeSeries request for a list
+#' @details
 #' @description  make a timeseries request for a constituent list from
 #'  Datastream DSWS
 #' \code{timeSeriesListRequest} Function that returns a timeseries from

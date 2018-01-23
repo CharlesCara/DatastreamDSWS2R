@@ -36,4 +36,3 @@ Expression for the instrument list in DSCode from Datastream
 \details{
 Make a list request for static data
 }
-

@@ -43,4 +43,3 @@ make a timeseries request for a constituent list from
 \code{timeSeriesListRequest} Function that returns a timeseries from
 Datastream constituent list parameters are
 }
-

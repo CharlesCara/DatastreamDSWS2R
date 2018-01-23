@@ -65,4 +65,3 @@ If there is then it will append the xts onto the existing series.  If there are 
 overlapping dates then depending on the setting of overwrite then the new data
 will overwrite the existing data in the UCTS
 }
-

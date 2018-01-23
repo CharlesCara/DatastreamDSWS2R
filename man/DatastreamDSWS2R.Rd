@@ -9,4 +9,3 @@
 A package to manage access to the Thomson Reuters Datastream
  DSWS webservice
 }
-

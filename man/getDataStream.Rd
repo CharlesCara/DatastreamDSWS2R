@@ -26,4 +26,3 @@ a dsws object
 Initialise connection with Datastream DSWS server.  Provided
 for backwards compatibility
 }
-

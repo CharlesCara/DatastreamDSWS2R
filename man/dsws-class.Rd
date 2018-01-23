@@ -2,8 +2,8 @@
 % Please edit documentation in R/classConstructor.R
 \docType{class}
 \name{dsws-class}
-\alias{dsws}
 \alias{dsws-class}
+\alias{dsws}
 \title{dsws}
 \description{
 An R5/RC object for accessing the Thomson Reuters Datastream

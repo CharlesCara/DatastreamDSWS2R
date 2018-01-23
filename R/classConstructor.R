@@ -61,7 +61,7 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   "
 
   .self$initialised <<- FALSE
-  .self$errorlist <<- list()
+  .self$errorlist <<- NULL
   .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
   .self$requestStringLimit <<- 2000L # Max length of a request.
   .self$logging <<- 0L
@@ -138,12 +138,13 @@ dsws$methods(.getToken = function(){
     maxLoop <- 4L
     waitTimeBase <- 2
     nLoop <- 0
+    .self$errorlist <- NULL
     repeat{
       myTokenResponse <- tryCatch(RCurl::getURL(url = myTokenURL),
                                   error = function(e) {
                                     message("Error requesting token...")
                                     message(e)
-                                    .self$errorlist <- c(.self$errorlist, list(request = "Token request", error = e))
+                                    .self$errorlist <- c(.self$errorlist, list(list(request = "Token request", error = e)))
                                     return(NULL)})
       # Try and catch a timeout
 
@@ -259,6 +260,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   maxLoop <- 4L
   waitTimeBase <- 2
   nLoop <- 0
+  .self$errorlist <- NULL
   repeat{
     myDataResponse <- tryCatch({
       RCurl::postForm(myDataURL,
@@ -268,7 +270,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     error = function(e) {
       message("Error posting request to server...")
       message(e)
-      .self$errorlist <- c(.self$errorlist, list(request = myRequestJSON, error = e))
+      .self$errorlist <- c(.self$errorlist, list(list(request = myRequestJSON, error = e)))
       return(NULL)})
 
     # Success

@@ -26,4 +26,3 @@ internal function for requesting an expression for an array of instruments.
 The function will initially try a snapshot request, and if this
 fails try a timeseries request.
 }
-

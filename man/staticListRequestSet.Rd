@@ -24,4 +24,3 @@ a dataframe of the data
 \description{
 This function creates a dataframe set of static list requests for a constituent list
 }
-
