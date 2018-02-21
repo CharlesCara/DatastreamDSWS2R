@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper.R
 \name{timeSeriesListRequest}
 \alias{timeSeriesListRequest}
-\title{make a timeSeries request for a list}
+\title{make a timeSeries request for a list (Depreciated)}
 \usage{
 timeSeriesListRequest(dwei = getDataStream(), DSCode, Instrument, startDate,
   endDate = Sys.Date(), frequency = "D", sStockList, aTimeSeries,
@@ -42,4 +42,7 @@ make a timeseries request for a constituent list from
  Datastream DSWS
 \code{timeSeriesListRequest} Function that returns a timeseries from
 Datastream constituent list parameters are
+}
+\details{
+List request
 }

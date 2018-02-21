@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper.R
 \name{getDataStream}
 \alias{getDataStream}
-\title{Initialise connection with Datastream DSWS server}
+\title{Initialise connection with Datastream DSWS server (Depreciated)}
 \usage{
 getDataStream(dweURLwsdl = "", User = as.character("USERNAME"),
   Pass = as.character("PASSWORD"))

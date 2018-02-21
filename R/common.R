@@ -1,3 +1,4 @@
+#' @name dotconvert_JSON_Date
 #' @title .convert_JSON_Date
 #' @details converts a JSON Date string (including with Timezone) to a R
 #'  Date object
@@ -32,6 +33,7 @@
 
 #-----------------------------------------------------------------------------
 #
+#' @name dotconvert_JSON_Datetime
 #' @title .convert_JSON_Datetime
 #' @details converts a JSON Date string (including with Timezone) to a
 #'  POSIXct/POSIXt object
@@ -61,7 +63,8 @@
 }
 
 
-#' @title convertJSONString
+#' @name dotconvertJSONString
+#' @title .convertJSONString
 #' @details converts a JSON string (including with Timezone) into either a
 #' numeric, string, or a R Date object
 #'
@@ -109,6 +112,7 @@
 
 #-----------------------------------------------------------------------------
 #
+#' @name dotgetValueTyped
 #' @title .getValueTyped
 #' @details extracts and converts a JSON string (including with Timezone)
 #'  from the item 'Value'
@@ -149,6 +153,7 @@
 
 #-----------------------------------------------------------------------------
 #
+#' @name dotgetValue
 #' @title .getValue
 #' @details extracts and converts a JSON string (including with Timezone)
 #'  from the item 'Value'
@@ -176,6 +181,7 @@
 
 #-----------------------------------------------------------------------------
 #
+#' @name dotgetSymbol
 #' @title .getSymbol
 #' @details extracts and converts a JSON string (including with Timezone)
 #'  from the item 'Symbol'
@@ -203,6 +209,7 @@
 
 #-----------------------------------------------------------------------------
 #
+#' @name dotgetType
 #' @title .getType
 #' @details extracts and converts a JSON string (including with Timezone)
 #'  from the item 'Type'

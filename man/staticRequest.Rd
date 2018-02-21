@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper.R
 \name{staticRequest}
 \alias{staticRequest}
-\title{make a static request}
+\title{make a static request (Depreciated)}
 \usage{
 staticRequest(dwei = getDataStream(), DSCode, Expression = "",
   endDate = Sys.Date(), frequency = "D", verbose = FALSE,

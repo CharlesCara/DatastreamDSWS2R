@@ -26,3 +26,6 @@ a dataframe of the data
 \description{
 This function creates a dataframe set of static requests for a set of stocks/indices
 }
+\details{
+return a dataframe of static data
+}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper.R
 \name{myStaticRequestSet}
 \alias{myStaticRequestSet}
-\title{myStaticRequestSet}
+\title{myStaticRequestSet (Depreciated)}
 \usage{
 myStaticRequestSet(mydsws = dsws$new(), instrument, iExpression,
   endDate = Sys.Date(), frequency = "D")
@@ -25,4 +25,7 @@ a dataframe of the
 internal function for requesting an expression for an array of instruments.
 The function will initially try a snapshot request, and if this
 fails try a timeseries request.
+}
+\details{
+Internal function
 }

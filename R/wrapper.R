@@ -20,8 +20,8 @@ NULL
 
 ##############################################################################################
 #'
-#'
-#' @title Initialise connection with Datastream DSWS server
+#' @name getDataStream
+#' @title Initialise connection with Datastream DSWS server (Depreciated)
 #' @details Initialise connection with Datastream DSWS server.  Provided
 #' for backwards compatibility
 #' @description \code{getDataStream} initialises an R5 object that contains
@@ -44,11 +44,12 @@ getDataStream <- function(dweURLwsdl = "",
 
 
 ###############################################################################################
-#' @title make a timeseries request
+#' @name timeSeriesRequest
+#' @title make a timeseries request (Depreciated)
 #'
 #' @description make a timeseries request from the Datastream DSWS server
-#' @details \code{timeSeriesRequest} Function that obtains a timeseries
-#' from Datastream parameters are
+#' @details function \code{timeSeriesRequest} obtains a timeseries
+#' from Datastream
 #'
 #' @param    dwei - A Datastream Client Interface object created with
 #'  getDataStream
@@ -114,7 +115,9 @@ timeSeriesRequest <- function (dwei=getDataStream(),
 
 
 ##############################################################################################
-#' @title make a static request
+#'
+#' @name staticRequest
+#' @title make a static request (Depreciated)
 #'
 #' @description makes a static (or snapshot request) from the
 #' Datastream DSWS server
@@ -122,17 +125,17 @@ timeSeriesRequest <- function (dwei=getDataStream(),
 #'  Expression for the array of instruments in DSCode from Datastream
 #' parameters are
 #'
-#'@param dwei - A Datastream Client Interface object created with
+#' @param dwei - A Datastream Client Interface object created with
 #'  getDataStream
-#'@param  DSCode - an array of instruments eg c("RIO","MKS")
-#'@param  Expression - the data to return eg MNEM or NAME
-#'@param  endDate - the date of the request, or the string "TODAY"
-#'@param  frequency - the frequency of the request
-#'@param   verbose - whether to give messages during the request
-#'@param noCache - no longer used
+#' @param  DSCode - an array of instruments eg c("RIO","MKS")
+#' @param  Expression - the data to return eg MNEM or NAME
+#' @param  endDate - the date of the request, or the string "TODAY"
+#' @param  frequency - the frequency of the request
+#' @param   verbose - whether to give messages during the request
+#' @param noCache - no longer used
 #'
-#'@return   returns an array of the requested information
-#'@export
+#' @return   returns an array of the requested information
+#' @export
 
 staticRequest <- function (dwei=getDataStream(),
                            DSCode,
@@ -153,25 +156,25 @@ staticRequest <- function (dwei=getDataStream(),
 
 ##############################################################################################
 #'
-#'
-#'@title Make a list request for static data
-#'@details Make a list request for static data
-#'@description \code{listRequest} Function that returns a the value of
+#' @name listRequest
+#' @title Make a list request for static data (Depreciated)
+#' @details Make a list request for static data
+#' @description \code{listRequest} Function that returns a the value of
 #' Expression for the instrument list in DSCode from Datastream
 #'
-#'@param dwei - A Datastream Client Interface object created with
+#' @param dwei - A Datastream Client Interface object created with
 #' getDataStream
-#'@param  DSCode - the constituent list for the request eg LDJSTOXX
-#'@param  Expression - the data to return eg MNEM or NAME.
+#' @param  DSCode - the constituent list for the request eg LDJSTOXX
+#' @param  Expression - the data to return eg MNEM or NAME.
 #' If NULL or "" then we will return the code that has been loaded
 #' into the User Created List.
-#'@param  startDate - the date of the request, or the string "TODAY"
-#'@param  endDate - Ignored
-#'@param  frequency - the frequency of the request
-#'@param  verbose - whether to give messages during the request
+#' @param  startDate - the date of the request, or the string "TODAY"
+#' @param  endDate - Ignored
+#' @param  frequency - the frequency of the request
+#' @param  verbose - whether to give messages during the request
 #'
-#'@return  returns an array of the requested information
-#'@export
+#' @return  returns an array of the requested information
+#' @export
 #'
 
 listRequest <- function (dwei=getDataStream(),
@@ -193,8 +196,9 @@ listRequest <- function (dwei=getDataStream(),
 
 
 ##############################################################################################
-#' @title make a timeSeries request for a list
-#' @details
+#' @name  timeSeriesListRequest
+#' @title make a timeSeries request for a list (Depreciated)
+#' @details List request
 #' @description  make a timeseries request for a constituent list from
 #'  Datastream DSWS
 #' \code{timeSeriesListRequest} Function that returns a timeseries from
@@ -259,7 +263,9 @@ timeSeriesListRequest <- function (dwei = getDataStream(),
 
 ##############################################################################################
 #'
-#' @title myStaticRequestSet
+#' @name myStaticRequestSet
+#' @title myStaticRequestSet (Depreciated)
+#' @details Internal function
 #' @description internal function for requesting an expression for an array of instruments.
 #' The function will initially try a snapshot request, and if this
 #' fails try a timeseries request.
@@ -324,8 +330,9 @@ myStaticRequestSet <- function(mydsws = dsws$new(),
 
 ##############################################################################################
 #'
+#' @name staticRequestSet
 #' @title staticRequestSet
-#'
+#' @details return a dataframe of static data
 #' @description  This function creates a dataframe set of static requests for a set of stocks/indices
 #'
 #' @param mydsws a dsws object, if not provided a new one will be created
@@ -400,10 +407,11 @@ staticRequestSet <- function(mydsws = dsws$new(),
 
 ##############################################################################################
 #'
+#' @name staticListRequestSet
 #' @title staticListRequestSet
 #'
+#' @details This function creates a dataframe set of static list requests for a constituent list
 #' @description This function creates a dataframe set of static list requests for a constituent list
-#'
 #' @param mydsws a dsws object, if not provided a new one will be created
 #' @param instrument array of instruments
 #' @param expression an array of expressions such as PCH#(XXXX,1M)

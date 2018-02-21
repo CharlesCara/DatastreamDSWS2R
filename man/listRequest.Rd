@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper.R
 \name{listRequest}
 \alias{listRequest}
-\title{Make a list request for static data}
+\title{Make a list request for static data (Depreciated)}
 \usage{
 listRequest(dwei = getDataStream(), DSCode, Expression = "",
   startDate = Sys.Date(), endDate = Sys.Date(), frequency = "D",

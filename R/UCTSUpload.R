@@ -2,6 +2,7 @@
 #' @include classConstructor.R
 #' @include wrapper.R
 #'
+#' @name dotEncryptPassword
 #' @title Encrypt the Datastream password
 #' @description This is a port of the VBA code
 #'
@@ -29,7 +30,7 @@
 
 
 
-
+#' @name dotgetTimeseries
 #' @title convert xts timeseries into a string that can be sent to
 #' the Datastream server
 #'
@@ -264,10 +265,12 @@ UCTSUpload <- function(tsData,
     iCounter <- iCounter + 1
   }
   if(retValue[1] == "*OK*"){
-    return(TRUE)
+    return(structure(TRUE,
+                     error = ""))
   }
   else{
-    return(paste("*Error* Upload failed after ", iCounter, " attempts with error ", retValue[1]))
+    return(structure(FALSE,
+                     error = paste("*Error* Upload failed after ", iCounter, " attempts with error ", retValue[1])))
   }
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/wrapper.R
 \name{timeSeriesRequest}
 \alias{timeSeriesRequest}
-\title{make a timeseries request}
+\title{make a timeseries request (Depreciated)}
 \usage{
 timeSeriesRequest(dwei = getDataStream(), DSCodes = "", Instrument = "",
   startDate = Sys.Date(), endDate = Sys.Date(), frequency = "D",
@@ -46,6 +46,6 @@ whether the request has been successful
 make a timeseries request from the Datastream DSWS server
 }
 \details{
-\code{timeSeriesRequest} Function that obtains a timeseries
-from Datastream parameters are
+function \code{timeSeriesRequest} obtains a timeseries
+from Datastream
 }
