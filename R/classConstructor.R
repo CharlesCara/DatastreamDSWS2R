@@ -143,7 +143,7 @@ dsws$methods(.getToken = function(){
       myTokenResponse <- tryCatch(RCurl::getURL(url = myTokenURL),
                                   error = function(e) {
                                     message("Error requesting token...")
-                                    message(e)
+                                    message(as.character(e))
                                     .self$errorlist <- c(.self$errorlist, list(list(request = "Token request", error = e)))
                                     return(NULL)})
       # Try and catch a timeout
@@ -269,7 +269,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     },
     error = function(e) {
       message("Error posting request to server...")
-      message(e)
+      message(as.character(e))
       .self$errorlist <- c(.self$errorlist, list(list(request = myRequestJSON, error = e)))
       return(NULL)})
 
