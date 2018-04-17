@@ -35,7 +35,8 @@ test_that("Try appending a real dataset", {
                       tsData=fTest,
                       strUsername=options()$Datastream.Username,
                       strPassword=options()$Datastream.Password)
-  expect_equal(sPost , TRUE)  #Failed to upload
+
+  expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
   dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)
@@ -81,7 +82,8 @@ test_that("Appending two more rows to UCTS", {
                       tsData=fTestAppend,
                       strUsername=options()$Datastream.Username,
                       strPassword=options()$Datastream.Password)
-  expect_equal(sPost , TRUE)  #Failed to upload
+
+  expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
   dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)

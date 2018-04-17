@@ -139,26 +139,31 @@ dsws$methods(.getToken = function(){
     waitTimeBase <- 2
     nLoop <- 0
     .self$errorlist <- NULL
+
+    handleCurlError <- function(e){
+      message("Error requesting token...")
+      message(as.character(e))
+      .self$errorlist <- c(.self$errorlist, list(list(request = "Token request", error = e)))
+      return(NULL)}
+
     repeat{
       myTokenResponse <- tryCatch(RCurl::getURL(url = myTokenURL),
-                                  error = function(e) {
-                                    message("Error requesting token...")
-                                    message(as.character(e))
-                                    .self$errorlist <- c(.self$errorlist, list(list(request = "Token request", error = e)))
-                                    return(NULL)})
-      # Try and catch a timeout
+                                  error = function(e) e)
 
-      if(!str_detect(myTokenResponse, "Timed out")) {
-        # Success
-        if(!is.null(myTokenResponse)) break
-
-        # Only retry timeouts
-        if(!str_detect(.self$errorlist[[length(.self$errorlist)]]$error, "Timed out")) break
+      # Success so leave loop
+      if(!is.null(myTokenResponse) && !("error" %in% class(myTokenResponse))) break
 
 
-      } else {
-        message("time out in body of text")
-      }
+      # write out error message and store it
+      message("Error requesting token...")
+      message(as.character(myTokenResponse))
+      .self$errorlist <- c(.self$errorlist, list(list(request = "Token request", error = myTokenResponse)))
+
+
+      # Only retry timeouts
+      if(!("GenericCurlError" %in% class(myTokenResponse) &&
+           str_detect(myTokenResponse$message, "Timed out"))) break
+
 
       # Too many tries
       if(nLoop >= maxLoop) break
@@ -267,17 +272,21 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
                       .opts=list(httpheader=httpheader
                                  ,postfields=myRequestJSON))
     },
-    error = function(e) {
-      message("Error posting request to server...")
-      message(as.character(e))
-      .self$errorlist <- c(.self$errorlist, list(list(request = myRequestJSON, error = e)))
-      return(NULL)})
+    error = function(e) e)
 
-    # Success
-    if(!is.null(myDataResponse)) break
+    # Success so leave loop
+    if(!is.null(myDataResponse) && !("error" %in% class(myDataResponse))) break
+
+
+    # write out error message and store it
+    message("Error requesting json...")
+    message(as.character(myDataResponse))
+    .self$errorlist <- c(.self$errorlist, list(list(request = myRequestJSON, error = myDataResponse)))
+
 
     # Only retry timeouts
-    if(!str_detect(.self$errorlist[[length(.self$errorlist)]]$error, "Timed out")) break
+    if(!("GenericCurlError" %in% class(myDataResponse) &&
+         str_detect(myDataResponse$message, "Timed out"))) break
 
     # Too many tries
     if(nLoop >= maxLoop) break

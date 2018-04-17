@@ -45,7 +45,7 @@ test_that(" Test the post string generation code", {
                       strPassword=options()$Datastream.Password)
 
 
-  sExpected <-  TRUE
+  sExpected <-  structure(TRUE, error = "")
 
   expect_equal(sPost, sExpected)
 
@@ -103,7 +103,7 @@ test_that("Test a dataset with an NaN, NA and a large value in it", {
                       strPassword=options()$Datastream.Password)
 
 
-  sExpected <-  TRUE
+  sExpected <-  structure(TRUE, error = "")
 
   expect_equal(sPost , sExpected)
 
@@ -142,7 +142,7 @@ test_that("Try uploading a real dataset", {
                       tsData=fTest,
                       strUsername=options()$Datastream.Username,
                       strPassword=options()$Datastream.Password)
-  expect_equal(sPost , TRUE)  #Failed to upload
+  expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
   dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)
@@ -198,7 +198,7 @@ test_that("Try uploading a real dataset with GBP isocode currency", {
                       tsData=f,
                       strUsername=options()$Datastream.Username,
                       strPassword=options()$Datastream.Password)
-  expect_equal(sPost , TRUE)  #Failed to upload
+  expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
   dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)
@@ -238,6 +238,7 @@ test_that("Error when uploading invalid 4 digit currency", {
   tData <- DatastreamDSWS2R:::.getTimeseries(Data=fTest, freq="D", digits=4, NA_VALUE="NA")
   tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
   expect_equal(tData , tDataExpected)
+
 
   #Try a round trip and check if data is the same
   expect_error(UCTSUpload(TSCode="TSTEST01",
@@ -310,6 +311,7 @@ test_that("Error when uploading invalid 3 digit currency", {
   tData <- DatastreamDSWS2R:::.getTimeseries(Data=fTest, freq="D", digits=4, NA_VALUE="NA")
   tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
   expect_equal(tData , tDataExpected)
+
 
   #Try a round trip and check if data is the same
   expect_error(UCTSUpload(TSCode="TSTEST01",
