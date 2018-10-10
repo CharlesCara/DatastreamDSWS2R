@@ -1,8 +1,8 @@
 Package: DatastreamDSWS2R
 Type: Package
 Title: Provides a link between the Thomson Reuters Datastream system and R
-Version: 1.2.3
-Date: 2018-04-17
+Version: 1.2.4
+Date: 2018-10-10
 Author: Charles Cara
 Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
 Description: Provides a set of functions and a class to connect, extract and
@@ -21,10 +21,11 @@ Imports:
     foreach
 Suggests: testthat
 Roxygen: list(wrap = FALSE)
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0.9000
 Collate: 
     'DatastreamDSWS2R.R'
     'common.R'
     'classConstructor.R'
     'wrapper.R'
     'UCTSUpload.R'
+Encoding: UTF-8 

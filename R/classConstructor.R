@@ -257,7 +257,9 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
 
 
   if(.self$logging >=5 ){
-    message(paste0("JSON request to DSWS server response is:\n", myRequestJSON))
+    message("JSON request to DSWS server response is:\n")
+    message(myRequestJSON)
+    message("--------------------------------------------------")
   }
 
   # We are going to handle timeouts by
@@ -286,8 +288,12 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
 
     # Only retry timeouts
     if(!("GenericCurlError" %in% class(myDataResponse) &&
-         str_detect(myDataResponse$message, "Timed out"))) break
-
+         str_detect(myDataResponse$message, "Timed out"))) {
+      message("GenericCurlError:")
+      message(myDataResponse$message)
+      message(class(myDataResponse))
+      break
+}
     # Too many tries
     if(nLoop >= maxLoop) break
 
@@ -297,12 +303,16 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   }
 
   if(.self$logging >=5 ){
-    message(paste0("DSWS server response is:\n", myDataResponse))
+    message("DSWS server response is:\n")
+    message(myDataResponse)
+    message("--------------------------------------------------")
   }
 
 
   if(!is.null(.self$jsonResponseSaveFile)){
-    writeChar(myDataResponse, .self$jsonResponseSaveFile)
+    if(!is.null(myDataResponse)){
+      writeChar(object = myDataResponse, con = .self$jsonResponseSaveFile)
+    }
   }
 
 

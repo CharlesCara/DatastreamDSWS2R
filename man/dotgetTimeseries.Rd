@@ -20,3 +20,7 @@ the Datastream server}
 \value{
 A string of the core data of Data
 }
+\description{
+convert xts timeseries into a string that can be sent to
+the Datastream server
+}

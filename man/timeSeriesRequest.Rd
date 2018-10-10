@@ -4,9 +4,10 @@
 \alias{timeSeriesRequest}
 \title{make a timeseries request (Depreciated)}
 \usage{
-timeSeriesRequest(dwei = getDataStream(), DSCodes = "", Instrument = "",
-  startDate = Sys.Date(), endDate = Sys.Date(), frequency = "D",
-  sStockList, aTimeSeries, myType = "numeric", verbose = FALSE)
+timeSeriesRequest(dwei = getDataStream(), DSCodes = "",
+  Instrument = "", startDate = Sys.Date(), endDate = Sys.Date(),
+  frequency = "D", sStockList, aTimeSeries, myType = "numeric",
+  verbose = FALSE)
 }
 \arguments{
 \item{dwei}{- A Datastream Client Interface object created with

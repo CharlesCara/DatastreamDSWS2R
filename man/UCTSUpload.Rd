@@ -4,11 +4,11 @@
 \alias{UCTSUpload}
 \title{Upload a UCTS timeseries into Datastream}
 \usage{
-UCTSUpload(tsData, TSCode = "", MGMTGroup = "ABC", freq = c("D", "W", "M",
-  "Q", "Y"), seriesName, Units = "", Decimals = 2, ActPer = c("N", "Y"),
-  freqConversion = c("ACT", "SUM", "AVG", "END"), Alignment = c("1ST",
-  "MID", "END"), Carry = c("YES", "NO", "PAD"), PrimeCurr = "",
-  strUsername = options()$Datastream.Username,
+UCTSUpload(tsData, TSCode = "", MGMTGroup = "ABC", freq = c("D", "W",
+  "M", "Q", "Y"), seriesName, Units = "", Decimals = 2,
+  ActPer = c("N", "Y"), freqConversion = c("ACT", "SUM", "AVG", "END"),
+  Alignment = c("1ST", "MID", "END"), Carry = c("YES", "NO", "PAD"),
+  PrimeCurr = "", strUsername = options()$Datastream.Username,
   strPassword = options()$Datastream.Password,
   strServerName = "http://product.datastream.com",
   strServerPage = "/UCTS/UCTSMaint.asp")
