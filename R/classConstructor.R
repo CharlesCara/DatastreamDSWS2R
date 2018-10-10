@@ -77,25 +77,26 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
     .self$serverURL <<- dsws.serverURL
   }
 
-  if(username == ""){
-    if(is.null(options()$Datastream.Username)){
-      stop("Either username must be specified or it must be set via options(\"Datastream.Username\", \"Myusername\"")
-    } else {
-      .self$username <<- options()$Datastream.Username
-    }
-  } else {
+  if(username != ""){
     .self$username <<- username
-  }
-
-  if(password == ""){
-    if(is.null(options()$Datastream.Password)){
-      stop("Either username must be specified or it must be set via options(\"Datastream.Password\", \"Mypassword\"")
-    } else {
-      .self$password <<- options()$Datastream.Password
-    }
+  } else if(Sys.getenv("DatastreamUsername") != ""){
+    .self$username <<- Sys.getenv("DatastreamUsername")
+  } else if(!is.null(options()$Datastream.Username)){
+    .self$username <<- options()$Datastream.Username
   } else {
-    .self$password <<- password
+    stop("Either username must be specified or it must be set via options(\"Datastream.Username\", \"Myusername\"")
   }
+    
+
+  if(password != ""){
+    .self$password <<- password
+  } else if(Sys.getenv("DatastreamPassword") != ""){
+    .self$password <<- Sys.getenv("DatastreamPassword")
+  } else if(!is.null(options()$Datastream.Password)){
+    .self$password <<- options()$Datastream.Password
+  } else {
+    stop("Either username must be specified or it must be set via options(\"Datastream.Password\", \"Mypassword\"")   
+  } 
 
 
   .self$tokenList <<- list(TokenValue = NULL,
