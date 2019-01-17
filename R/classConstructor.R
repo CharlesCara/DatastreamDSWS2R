@@ -86,7 +86,7 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   } else {
     stop("Either username must be specified or it must be set via options(\"Datastream.Username\", \"Myusername\"")
   }
-    
+
 
   if(password != ""){
     .self$password <<- password
@@ -95,8 +95,8 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   } else if(!is.null(options()$Datastream.Password)){
     .self$password <<- options()$Datastream.Password
   } else {
-    stop("Either username must be specified or it must be set via options(\"Datastream.Password\", \"Mypassword\"")   
-  } 
+    stop("Either username must be specified or it must be set via options(\"Datastream.Password\", \"Mypassword\"")
+  }
 
 
   .self$tokenList <<- list(TokenValue = NULL,
@@ -152,7 +152,9 @@ dsws$methods(.getToken = function(){
                                   error = function(e) e)
 
       # Success so leave loop
-      if(!is.null(myTokenResponse) && !("error" %in% class(myTokenResponse))) break
+      if(!is.null(myTokenResponse) &&
+         !("error" %in% class(myTokenResponse)) &&
+         !("list" %in% class(myTokenResponse))) break
 
 
       # write out error message and store it
@@ -278,7 +280,9 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     error = function(e) e)
 
     # Success so leave loop
-    if(!is.null(myDataResponse) && !("error" %in% class(myDataResponse))) break
+    if(!is.null(myDataResponse) &&
+       !("error" %in% class(myDataResponse)) &&
+       !("list" %in% class(myDataResponse))) break
 
 
     # write out error message and store it
@@ -294,7 +298,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
       message(myDataResponse$message)
       message(class(myDataResponse))
       break
-}
+    }
     # Too many tries
     if(nLoop >= maxLoop) break
 
@@ -317,7 +321,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   }
 
 
-  if(is.null(myDataResponse)){
+  if(is.null(myDataResponse) || "list" %in% class(myDataResponse)){
     .self$dataResponse <-  NULL
   } else {
     .self$dataResponse <- rjson::fromJSON(json_str = myDataResponse)
