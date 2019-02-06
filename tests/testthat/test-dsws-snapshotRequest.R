@@ -192,7 +192,7 @@ test_that("test of requesting complex expression", {
   expect_is(myData[1,2], "character")
   expect_equal(nrow(myData), 6)
   expect_equal(ncol(myData), 2)
-  expect_true(is.na(myData[1,2]))
+  expect_true(!is.na(myData[1,2]))
   # Need a test that the cells do not contain $$"ER"
 
 })

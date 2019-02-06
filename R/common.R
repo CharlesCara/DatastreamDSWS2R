@@ -257,13 +257,24 @@
 #' -transforming-json-date
 #'
 #' @param x a list that is expected to have an item 'Value'
+#'
 #' @return the parsed result: either Date, String or numeric
+#'
+#' @importFrom stringr fixed str_detect
 #'
 .getValue <- function(x){
   if(!("Value" %in% names(x)) | !("Type" %in% names(x))) {
     return(NA)
   } else {
-    return(.getJSONValue(value = x$Value, type = .getType(x)))
+    if(TRUE %in% str_detect(string = x$Value, pattern = fixed("$$\"ER"))){
+      #TODO: write the response in the errorList object
+      return(x$Value)
+    } else {
+      return(.getJSONValue(value = x$Value, type = .getType(x)))
+    }
+
+
+
   }
 }
 
