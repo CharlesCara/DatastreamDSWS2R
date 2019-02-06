@@ -1,3 +1,94 @@
+#' @name dotconvert_JSON_Bool
+#' @title .convert_JSON_Date
+#' @details converts a JSON Boolean string to an R
+#'  logical object
+#'
+#' @description this is a modification of the function provided by
+#'  'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when-
+#' transforming-json-date
+#'
+#' @param Input_Strings a JSON string (or an array)
+#' @return an array of Dates
+#'
+#'
+.convert_JSON_Bool <- function(Input_Strings){
+  suppressWarnings({
+    ret <- sapply(X = Input_Strings, FUN = as.logical)
+  })
+  return(ret)
+}
+
+
+#' @name dotconvert_JSON_Integer
+#' @title .convert_JSON_Date
+#' @details converts a JSON Date string (including with Timezone) to a R
+#'  Date object
+#'
+#' @description this is a modification of the function provided by
+#'  'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when-
+#' transforming-json-date
+#'
+#' @param Input_Strings a JSON Date string (or an array)
+#' @return an array of Dates
+#'
+#'
+.convert_JSON_Integer <- function(Input_Strings){
+  suppressWarnings({
+    ret <- sapply(X = Input_Strings, FUN = as.integer)
+  })
+
+  return(ret)
+}
+
+
+#' @name dotconvert_JSON_String
+#' @title .convert_JSON_Date
+#' @details converts a JSON Date string (including with Timezone) to a R
+#'  Date object
+#'
+#' @description this is a modification of the function provided by
+#'  'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when-
+#' transforming-json-date
+#'
+#' @param Input_Strings a JSON Date string (or an array)
+#' @return an array of String
+#'
+#'
+.convert_JSON_String <- function(Input_Strings){
+  suppressWarnings({
+    ret <- sapply(X = Input_Strings, FUN = as.character)
+  })
+
+  return(ret)
+}
+
+#' @name dotconvert_JSON_Double
+#' @title .convert_JSON_Double
+#' @details converts a JSON Double object an R
+#'  Double object
+#'
+#' @description this is a modification of the function provided by
+#'  'phiver' on
+#' http://stackoverflow.com/questions/32076957/nas-introduced-when-
+#' transforming-json-date
+#'
+#' @param Input_Strings a JSON Date string (or an array)
+#' @return an array of Dates
+#'
+#'
+.convert_JSON_Double <- function(Input_Strings){
+  suppressWarnings({
+    ret <- sapply(X = Input_Strings, FUN = as.numeric)
+  })
+  return(ret)
+}
+
+
+
+
 #' @name dotconvert_JSON_Date
 #' @title .convert_JSON_Date
 #' @details converts a JSON Date string (including with Timezone) to a R
@@ -169,14 +260,13 @@
 #' @return the parsed result: either Date, String or numeric
 #'
 .getValue <- function(x){
-  thisValue <- .convertJSONString(x$Value)
-  if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
-    #TODO: write the response in the errorList object
+  if(!("Value" %in% names(x)) | !("Type" %in% names(x))) {
     return(NA)
   } else {
-    return(thisValue)
+    return(.getJSONValue(value = x$Value, type = .getType(x)))
   }
 }
+
 
 
 #-----------------------------------------------------------------------------
@@ -188,22 +278,103 @@
 #' in the list x.  the item is parsed from JSON into either a numeric,
 #'  string, or a R Date object
 #'
-#' @description this is a modification of the function provided
-#' by 'phiver' on
-#' http://stackoverflow.com/questions/32076957/nas-introduced-when
-#' -transforming-json-date
+#' @description
 #'
-#' @param x a list that is expected to have an item 'Value'
+#' @param x a list that is expected to have an item 'Symbol' and 'Type'
 #' @return the parsed result: either Date, String or numeric
 #'
 .getSymbol <- function(x){
-  thisValue <- .convertJSONString(x$Symbol)
-  if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
-    #TODO: write the response in the errorList object
+  if(!("Symbol" %in% names(x)) | !("Type" %in% names(x))) {
     return(NA)
   } else {
-    return(thisValue)
+    return(.getJSONValue(value = x$Symbol, type = .getType(x)))
   }
+}
+#-----------------------------------------------------------------------------
+#
+#' @name dotgetJSONValue
+#' @title .getSymbol
+#' @details extracts and converts a JSON string (including with Timezone)
+#'  from the item 'Symbol'
+#' in the list x.  the item is parsed from JSON into either a numeric,
+#'  string, or a R Date object
+#'
+#' @description
+#'
+#' @param x a list that is expected to have an item 'Symbol' and 'Type'
+#' @return the parsed result: either Date, String or numeric
+#'
+.getJSONValue <- function(value, type){
+
+  if(length(type) == 0) {
+    # Type was missing
+    return(NA)
+  }
+
+  if(TRUE %in% grepl("\\$\\$ER:", value)){
+    return(NA)
+  }
+
+  if(type == 0){
+    # Value is error
+    return(NA)
+  }
+  if(type == 1){
+    # Value is empty
+    return(NA)
+  }
+  if(type == 2){
+    # Value is Bool
+    return(.convert_JSON_Boolean(value))
+  }
+  if(type == 3){
+    # Value is Integer
+    return(.convert_JSON_Integer(value))
+  }
+  if(type == 4){
+    # Value is DateTime
+    return(.convert_JSON_Date(value))
+  }
+  if(type == 5){
+    # Value is Double
+    return(.convert_JSON_Double(value))
+  }
+  if(type == 6){
+    # Value is String
+    return(.convert_JSON_String(value))
+  }
+  if(type == 7){
+    # Value is BoolArray
+    # TODO: Not handled
+    return(NA)
+  }
+  if(type == 8){
+    # Value is IntegerArray
+    # TODO: Not handled
+    return(NA)
+  }
+  if(type == 9){
+    # Value is DateTimeArray
+    # TODO: Not handled
+    return(NA)
+  }
+  if(type == 10){
+    # Value is DoubleArray
+    # TODO: Not handled
+    return(NA)
+  }
+  if(type == 11){
+    # Value is String Array
+    # TODO: Not handled
+    return(NA)
+  }
+  if(type == 12){
+    # Value is Object Array
+    # TODO: Not handled
+    return(NA)
+  }
+
+
 }
 
 
@@ -230,6 +401,6 @@
     #TODO: write the response in the errorList object
     return(NaN)
   } else {
-    return(as.integer(thisValue))
+    return(suppressWarnings(as.integer(thisValue)))
   }
 }

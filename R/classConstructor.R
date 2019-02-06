@@ -1132,8 +1132,7 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
 
     # Can't use sapply with simplify or unlist directly as they strip any Date attributes.
     dd <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
-                 FUN = .getValueTyped,
-                 myType = myTypes[iDatatype],
+                 FUN = .getValue,
                  simplify = FALSE)
 
     if(myTypes[iDatatype] == 4) {

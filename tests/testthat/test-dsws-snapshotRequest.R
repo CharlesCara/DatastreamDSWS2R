@@ -192,7 +192,30 @@ test_that("test of requesting complex expression", {
   expect_is(myData[1,2], "character")
   expect_equal(nrow(myData), 6)
   expect_equal(ncol(myData), 2)
-  expect_false(is.na(myData[1,2]))
+  expect_true(is.na(myData[1,2]))
   # Need a test that the cells do not contain $$"ER"
 
 })
+
+
+
+##############################################################################################
+
+test_that("test that if INF is returned then it is not interpreted as Inf", {
+
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  mydsws <- dsws$new()
+  mydsws$jsonResponseSaveFile <- "INFORMA"
+  myData <- mydsws$snapshotRequest(instrument = c("INF"),
+                                   datatype=c("NAME","MNEM","ISIN","RIC"),
+                                   requestDate =  as.Date("2019-01-15"))
+
+  expect_false(is.infinite(myData$Instrument[1]))
+  expect_false(is.infinite(myData$MNEM[1]))
+
+})
+
