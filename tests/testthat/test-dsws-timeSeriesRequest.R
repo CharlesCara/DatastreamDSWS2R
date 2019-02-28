@@ -744,3 +744,121 @@ test_that("test of handling mainframe timeouts", {
 })
 
 
+##############################################################################################
+# This is a test of that if a single timeseries returns $$ER: 0904,NO DATA AVAILABLE and no dates
+# the dsws returns a zero row xts.
+# Issue # 4
+# json response of server stored in testData/test-dsws-timeSeriesRequest-test04.json
+#
+
+
+test_that(" test of that if a single timeseries returns $$ER: 0904,NO DATA AVAILABLE", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+
+  # Get the unchunked data
+
+  xtsActData <- mydsws$timeSeriesRequest(instrument = "KO:SGL",
+                                      datatype = "AX",
+                                      startDate = "2018-05-07",
+                                      endDate = "2018-05-09",
+                                      frequency = "D")
+  expect_is(xtsActData, "xts")
+  expect_true(ncol(xtsActData) == 1)
+  expect_true(nrow(xtsActData) == 0)
+  rm(mydsws, xtsActData)
+})
+
+##############################################################################################
+# This is a test of that if a we request two timeseries and the first returns $$ER: 0904,NO DATA AVAILABLE
+# we get then dsws returns an xts with rows.
+# Issue # 4
+#
+
+
+test_that("equest two timeseries and the first returns $$ER: 0904,NO DATA AVAILABLE", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+
+  # Get the unchunked data
+
+  xtsActData <- mydsws$timeSeriesRequest(instrument = c("III", "KO:SGL"),
+                                         datatype = "AX",
+                                         startDate = "2018-05-03",
+                                         endDate = "2018-05-07",
+                                         frequency = "D")
+  expect_is(xtsActData, "xts")
+  expect_true(ncol(xtsActData) == 2)
+  expect_true(nrow(xtsActData) == 3)
+  rm(mydsws, xtsActData)
+})
+
+
+##############################################################################################
+# This is a test of that if a we request two timeseries and the second returns $$ER: 0904,NO DATA AVAILABLE
+# we get then dsws returns an xts with rows.
+# Issue # 4
+#
+
+
+test_that("test of that if a we request two timeseries and the second returns $$ER: 0904,NO DATA AVAILABLE", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+
+  # Get the unchunked data
+
+  xtsActData <- mydsws$timeSeriesRequest(instrument = c("KO:SGL", "III"),
+                                         datatype = "AX",
+                                         startDate = "2018-05-03",
+                                         endDate = "2018-05-07",
+                                         frequency = "D")
+  expect_is(xtsActData, "xts")
+  expect_true(ncol(xtsActData) == 2)
+  expect_true(nrow(xtsActData) == 3)
+  rm(mydsws, xtsActData)
+})
+
+##############################################################################################
+# This is a test of that if a we request two timeseries and both return $$ER: 0904,NO DATA AVAILABLE
+# we get then dsws returns an xts with zero rows.
+# Issue # 4
+#
+
+
+test_that(" test of that if a single timeseries returns $$ER: 0904,NO DATA AVAILABLE", {
+  if(is.null(options()$Datastream.Username)){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+
+  # Get the unchunked data
+
+  xtsActData <- mydsws$timeSeriesRequest(instrument = c("III", "KO:SGL"),
+                                         datatype = "AX",
+                                         startDate = "2018-05-07",
+                                         endDate = "2018-05-09",
+                                         frequency = "D")
+  expect_is(xtsActData, "xts")
+  expect_true(ncol(xtsActData) == 2)
+  expect_true(nrow(xtsActData) == 0)
+  rm(mydsws, xtsActData)
+})
+

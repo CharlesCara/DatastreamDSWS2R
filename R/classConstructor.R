@@ -867,13 +867,13 @@ dsws$methods(.basicRequestTSChunk = function(instrument,
     # If the length of the Dates object is 0 then no data has been returned
 
     if(format[1] == "ByInstrument"){
-      # return an xts with the same number of columns as instrument and a single NA row
+      # return an xts with the same number of columns as instrument and no rows
       if(myNumDatatype == 1){
-        myxtsData <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumInstrument), order.by = endDate)
+        myxtsData <- xts::xts(matrix(NA, nrow = 1, ncol = myNumInstrument), order.by = as.Date("2017-01-01"))["20170131"]
         colnames(myxtsData) <- instrument
       } else {
         myxtsData <- list()
-        myxts <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumInstrument), order.by = endDate)
+        myxts <- xts::xts(matrix(NA, nrow = 1, ncol = myNumInstrument), order.by = as.Date("2017-01-01"))["20170131"]
         colnames(myxts) <- instrument
         for(i in 1: myNumDatatype){
           myxtsData[[i]] <- myxts
@@ -884,11 +884,11 @@ dsws$methods(.basicRequestTSChunk = function(instrument,
     } else if(format == "ByDatatype"){
       # return an xts with the same number of columns as datatype and a single NA row
       if(myNumInstrument == 1){
-        myxtsData <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumDatatype), order.by = endDate)
+        myxtsData <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumDatatype), as.Date("2017-01-01"))["20170131"]
         colnames(myxtsData) <- instrument
       } else {
         myxtsData <- list()
-        myxts <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumDatatype), order.by = endDate)
+        myxts <- xts::xts(matrix(NA, nrow = 1L, ncol = myNumDatatype), as.Date("2017-01-01"))["20170131"]
         colnames(myxts) <- instrument
         for(i in 1: myNumInstrument){
           myxtsData[[i]] <- myxts
