@@ -138,8 +138,16 @@ UCTSUpload <- function(tsData,
                        Alignment=c("1ST","MID","END"),
                        Carry=c("YES","NO","PAD"),
                        PrimeCurr="",
-                       strUsername=options()$Datastream.Username,
-                       strPassword=options()$Datastream.Password,
+                       strUsername = if(Sys.getenv("DatastreamUsername") != ""){
+                         Sys.getenv("DatastreamUsername")
+                       }else{
+                         options()$Datastream.Username
+                       },
+                       strPassword = if(Sys.getenv("DatastreamPassword") != ""){
+                         Sys.getenv("DatastreamPassword")
+                       }else{
+                         options()$Datastream.Password
+                       },
                        strServerName="http://product.datastream.com",
                        strServerPage="/UCTS/UCTSMaint.asp"){
 
@@ -235,13 +243,13 @@ UCTSUpload <- function(tsData,
                    TSULCurr = "",                            # no longer use Underlying Currency, but need to pass up a null value as the mainframe is expecting it
                    ForceUpdateFlag1 = "Y",
                    ForceUpdateFlag2 = "Y",                   # We have ignored some logic in the original UCTS VBA code
-#                   AmendFlag = "Y",
+                   #                   AmendFlag = "Y",
                    TSValsStart = format(startDate,format="%d/%m/%Y"),  #TODO adjust this date according to the frequency of the data VBA function AdjustDateTo1st
                    NAValue = NA_VALUE,
                    TSValues = .getTimeseries(myXtsData,
-                                          freq= freq[1],
-                                          digits=Decimals,
-                                          NA_VALUE),           #Now add the datapoints - the date element of the series is discarded here, with obvious risks
+                                             freq= freq[1],
+                                             digits=Decimals,
+                                             NA_VALUE),           #Now add the datapoints - the date element of the series is discarded here, with obvious risks
                    UserOption = .EncryptPassword(strPassword)
   )
 
@@ -253,10 +261,10 @@ UCTSUpload <- function(tsData,
 
   while(iCounter <3 && retValue != "*OK*"){
     retValue <- RCurl::postForm(uri = dsURL,
-                         .params = dsParams,
-                         style = "POST",
-                         .encoding = "utf-8",
-                         .contentEncodeFun = RCurl::curlEscape)
+                                .params = dsParams,
+                                style = "POST",
+                                .encoding = "utf-8",
+                                .contentEncodeFun = RCurl::curlEscape)
     if(retValue != "*OK*"){
       # If not succesful then wait 2 seconds before re-submitting, ie give time for the
       # server/network to recover.
@@ -327,8 +335,16 @@ UCTSAppend <- function(tsData,
                        Carry = c("YES","NO","PAD"),
                        PrimeCurr ="",
                        overwrite = TRUE,
-                       strUsername = options()$Datastream.Username,
-                       strPassword = options()$Datastream.Password,
+                       strUsername = if(Sys.getenv("DatastreamUsername") != ""){
+                         Sys.getenv("DatastreamUsername")
+                       }else{
+                         options()$Datastream.Username
+                       },
+                       strPassword = if(Sys.getenv("DatastreamPassword") != ""){
+                         Sys.getenv("DatastreamPassword")
+                       }else{
+                         options()$Datastream.Password
+                       },
                        strServerName = "http://product.datastream.com",
                        strServerPage = "/UCTS/UCTSMaint.asp"){
 
