@@ -32,9 +32,7 @@ test_that("Try appending a real dataset", {
                       Alignment="END",
                       Carry="NO",
                       PrimeCurr="",
-                      tsData=fTest,
-                      strUsername=options()$Datastream.Username,
-                      strPassword=options()$Datastream.Password)
+                      tsData=fTest)
 
   expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
@@ -79,9 +77,7 @@ test_that("Appending two more rows to UCTS", {
                       Alignment="END",
                       Carry="NO",
                       PrimeCurr="",
-                      tsData=fTestAppend,
-                      strUsername=options()$Datastream.Username,
-                      strPassword=options()$Datastream.Password)
+                      tsData=fTestAppend)
 
   expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 

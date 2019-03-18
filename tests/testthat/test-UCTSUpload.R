@@ -40,9 +40,7 @@ test_that(" Test the post string generation code", {
                       Alignment="MID",
                       Carry="NO",
                       PrimeCurr="U$",
-                      tsData=testData,
-                      strUsername=options()$Datastream.Username,
-                      strPassword=options()$Datastream.Password)
+                      tsData=testData)
 
 
   sExpected <-  structure(TRUE, error = "")
