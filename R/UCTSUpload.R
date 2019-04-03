@@ -138,16 +138,12 @@ UCTSUpload <- function(tsData,
                        Alignment=c("1ST","MID","END"),
                        Carry=c("YES","NO","PAD"),
                        PrimeCurr="",
-                       strUsername = if(Sys.getenv("DatastreamUsername") != ""){
-                         Sys.getenv("DatastreamUsername")
-                       }else{
-                         options()$Datastream.Username
-                       },
-                       strPassword = if(Sys.getenv("DatastreamPassword") != ""){
-                         Sys.getenv("DatastreamPassword")
-                       }else{
-                         options()$Datastream.Password
-                       },
+                       strUsername = ifelse(Sys.getenv("DatastreamUsername") != "",
+                                            Sys.getenv("DatastreamUsername"),
+                                            options()$Datastream.Username),
+                       strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
+                                            Sys.getenv("DatastreamPassword"),
+                                            options()$Datastream.Password),
                        strServerName="http://product.datastream.com",
                        strServerPage="/UCTS/UCTSMaint.asp"){
 
@@ -335,16 +331,12 @@ UCTSAppend <- function(tsData,
                        Carry = c("YES","NO","PAD"),
                        PrimeCurr ="",
                        overwrite = TRUE,
-                       strUsername = if(Sys.getenv("DatastreamUsername") != ""){
-                         Sys.getenv("DatastreamUsername")
-                       }else{
-                         options()$Datastream.Username
-                       },
-                       strPassword = if(Sys.getenv("DatastreamPassword") != ""){
-                         Sys.getenv("DatastreamPassword")
-                       }else{
-                         options()$Datastream.Password
-                       },
+                       strUsername = ifelse(Sys.getenv("DatastreamUsername") != "",
+                                            Sys.getenv("DatastreamUsername"),
+                                            options()$Datastream.Username),
+                       strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
+                                            Sys.getenv("DatastreamPassword"),
+                                            options()$Datastream.Password),
                        strServerName = "http://product.datastream.com",
                        strServerPage = "/UCTS/UCTSMaint.asp"){
 

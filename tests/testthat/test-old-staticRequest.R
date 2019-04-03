@@ -5,14 +5,14 @@ context("classConstructor.R : test of staticRequest function")
 ##############################################################################################
 
 test_that("test of simple snapshot request for price datatype with relative dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
 
 
 
-  dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)
+  dwei <- getDataStream(User=Sys.getenv("DatastreamUsername"), Pass=Sys.getenv("DatastreamPassword"))
 
   myData <- staticRequest(dwei = dwei,
                           DSCode = c("ABF","RIO","WPP"),

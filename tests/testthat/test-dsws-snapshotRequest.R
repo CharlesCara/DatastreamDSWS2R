@@ -5,7 +5,7 @@ context("classConstructor.R : test of snapshotRequest method")
 ##############################################################################################
 
 test_that("test of simple snapshot request for price datatype with relative dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -29,7 +29,7 @@ test_that("test of simple snapshot request for price datatype with relative date
 ##############################################################################################
 
 test_that("test of simple snapshot request for price datatype with absolute dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -51,7 +51,7 @@ test_that("test of simple snapshot request for price datatype with absolute date
 ##############################################################################################
 
 test_that("test of simple snapshot request with single datatypes that return strings", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -73,7 +73,7 @@ test_that("test of simple snapshot request with single datatypes that return str
 ##############################################################################################
 
 test_that("test of simple snapshot request with datatypes that return dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -95,7 +95,7 @@ test_that("test of simple snapshot request with datatypes that return dates", {
 ##############################################################################################
 
 test_that("test of simple snapshot request with two datatypes that return name and dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -119,7 +119,7 @@ test_that("test of simple snapshot request with two datatypes that return name a
 ##############################################################################################
 
 test_that("test of chunked snapshot request with two datatypes that return name and dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -149,7 +149,7 @@ test_that("test of chunked snapshot request with two datatypes that return name 
 ##############################################################################################
 
 test_that("test of equity risk premium", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -172,7 +172,7 @@ test_that("test of equity risk premium", {
 
 test_that("test of requesting complex expression", {
 # Actually this request gets a $$"ER","E21B","INVALID CODE..." error from Datastream
-    if(is.null(options()$Datastream.Username)){
+    if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -203,7 +203,7 @@ test_that("test of requesting complex expression", {
 
 test_that("test that if INF is returned then it is not interpreted as Inf", {
 
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()

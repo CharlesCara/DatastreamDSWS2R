@@ -6,7 +6,7 @@ context("classConstructor.R : test of .buildRequestBundle method")
 ##############################################################################################
 
 test_that("test of two stocks and a single datatype", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -57,7 +57,7 @@ test_that("test of two stocks and a single datatype", {
 
 
 test_that("test of two stocks and a single expression", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -109,7 +109,7 @@ test_that("test of two stocks and a single expression", {
 
 
 test_that("test of two stocks and two datatypes", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()

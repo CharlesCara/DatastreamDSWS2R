@@ -9,7 +9,7 @@ testDataFolder <- "./testData/"
 ##############################################################################################
 
 test_that("test of simple timeseries request with relative dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -35,7 +35,7 @@ test_that("test of simple timeseries request with relative dates", {
 ##############################################################################################
 
 test_that("test of two stock timeseries request with relative dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -61,7 +61,7 @@ test_that("test of two stock timeseries request with relative dates", {
 ##############################################################################################
 
 test_that("test of simple timeseries request with absolute dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -84,7 +84,7 @@ test_that("test of simple timeseries request with absolute dates", {
 ##############################################################################################
 
 test_that("test of two stock timeseries request with absolute dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -105,7 +105,7 @@ test_that("test of two stock timeseries request with absolute dates", {
 
 #######################################################################################
 test_that("test of the instrument being an expression with economic data", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -126,7 +126,7 @@ test_that("test of the instrument being an expression with economic data", {
 })
 #######################################################################################
 test_that("test of the instrument being an expression with economic data but call with wrong periodicity", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -148,7 +148,7 @@ test_that("test of the instrument being an expression with economic data but cal
 
 ##############################################################################
 test_that("test of three stock request", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -169,7 +169,7 @@ test_that("test of three stock request", {
 
 ##############################################################################################
 test_that("test of multi stock timeseries request with an expression as the datatype", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -191,7 +191,7 @@ test_that("test of multi stock timeseries request with an expression as the data
 
 #############################################################
 test_that("test of download worldscope data - this data is numeric", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -216,7 +216,7 @@ test_that("test of download worldscope data - this data is numeric", {
 
 #############################################################
 test_that("test of download worldscope data - this data is Dates", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -242,7 +242,7 @@ test_that("test of download worldscope data - this data is Dates", {
 
 #############################################################
 test_that("test of download worldscope data for multiple stocks", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -263,7 +263,7 @@ test_that("test of download worldscope data for multiple stocks", {
 
 #############################################################
 test_that("test of Datastream expression eg 045E(XXXX)", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -284,7 +284,7 @@ test_that("test of Datastream expression eg 045E(XXXX)", {
 
 #############################################################
 test_that("test of ISIN code and expression that was not being returned", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -332,7 +332,7 @@ test_that("test of ISIN code and expression that was not being returned", {
 #############################################################
 
 test_that("test of selecting stocks via ISIN codes with missing (NA) codes and expressions", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -354,7 +354,7 @@ test_that("test of selecting stocks via ISIN codes with missing (NA) codes and e
 
 #############################################################
 test_that("test of selecting stocks via ISIN codes with missing (NA) codes ", {
-if(is.null(options()$Datastream.Username)){
+if(Sys.getenv("DatastreamUsername") == ""){
   skip("Username not available")
 }
 skip_on_cran()
@@ -378,7 +378,7 @@ expect_false(FALSE %in% is.na(naRepDates))
 #############################################################
 
 test_that("test of selecting stocks via ISIN codes with the first code missing and expressions", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -405,7 +405,7 @@ test_that("further test of missing stocks ", {
   # the correct response should be an xts with a column per instrument
   # and a single row (dated endDate) that has NA's in it.
 
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
   skip("Username not available")
 }
 skip_on_cran()
@@ -429,7 +429,7 @@ rm(mydsws, xtsData)
 
 #############################################################
 test_that("test of Japanese ISIN with PE", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -450,7 +450,7 @@ test_that("test of Japanese ISIN with PE", {
 
 ##############################################################################################
 test_that("test of ISIN returns Failure, status code 2, message $$\"ER\", 0904, NO DATA AVAILABLE", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -473,7 +473,7 @@ test_that("test of ISIN returns Failure, status code 2, message $$\"ER\", 0904, 
 # This is a mixture of NO DATA AVAILABLE and valid data
 #
 test_that("test of ISIN returns mixture of NO DATA AVAILABLE and valid data", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -496,7 +496,7 @@ test_that("test of ISIN returns mixture of NO DATA AVAILABLE and valid data", {
 # This is a test of chunked requests - first make an unchunked one, and then a chunked one
 #
 test_that("test of chunked timeSeriesRequests with a datatype", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -537,7 +537,7 @@ test_that("test of chunked timeSeriesRequests with a datatype", {
 # This is a test of chunked requests - first make an unchunked one, and then a chunked one
 #
 test_that("test of chunked timeSeriesRequests with an expression", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -574,12 +574,29 @@ test_that("test of chunked timeSeriesRequests with an expression", {
   rm(mydsws, xtsTestData, xtsDataChunked, symbolList)
 })
 
+
+##############################################################################################
+# This is a test of setting chunkLimit via options()
+#
+test_that("test of setting chunkLimit via options()", {
+
+  myChunkLimit <- 123L
+  options(Datastream.ChunkLimit = myChunkLimit)
+
+  mydsws <- dsws$new()
+
+  expect_equal(mydsws$chunkLimit, myChunkLimit)
+
+  rm(mydsws, myChunkLimit)
+  options(Datastream.ChunkLimit = NULL)
+})
+
 ##############################################################################################
 # This is a test of chunked requests - This is test that large requests strings are chunked correctly
 #
 
 test_that("test of chunking timeSeriesRequests due to request string length", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -624,7 +641,7 @@ test_that("test of chunking timeSeriesRequests due to request string length", {
 #
 
 test_that("test of named instruments, datatypes and expressions", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -666,7 +683,7 @@ test_that("test of named instruments, datatypes and expressions", {
 #
 
 test_that("test of chunking timeSeriesRequests due to request string length", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -696,8 +713,6 @@ test_that("test of chunking timeSeriesRequests due to request string length", {
 #
 
 test_that("test of handling mainframe timeouts", {
-
-
 
   mydsws <- dsws$new()
 
@@ -753,7 +768,7 @@ test_that("test of handling mainframe timeouts", {
 
 
 test_that(" test of that if a single timeseries returns $$ER: 0904,NO DATA AVAILABLE", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -782,7 +797,7 @@ test_that(" test of that if a single timeseries returns $$ER: 0904,NO DATA AVAIL
 
 
 test_that("equest two timeseries and the first returns $$ER: 0904,NO DATA AVAILABLE", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -812,7 +827,7 @@ test_that("equest two timeseries and the first returns $$ER: 0904,NO DATA AVAILA
 
 
 test_that("test of that if a we request two timeseries and the second returns $$ER: 0904,NO DATA AVAILABLE", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -841,7 +856,7 @@ test_that("test of that if a we request two timeseries and the second returns $$
 
 
 test_that(" test of that if a single timeseries returns $$ER: 0904,NO DATA AVAILABLE", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()

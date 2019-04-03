@@ -40,6 +40,15 @@ and for a timeseries request (expressions are also supported)
                            frequency = "D")
 
 
+The dsws interface will split large requests down into chunks small enough for the DSWS interface to process.  However, the maximum chunk size varies in the DSWS documentation and is either [2000](https://product.datastream.com/DswsClient/Docs/AboutRestSvc.aspx) or [50](https://developers.refinitiv.com/sites/default/files/DSWS%20for%20Desktop%20-%20User%20stats%20and%20limits_0.pdf).  Different users have different limits.  The default chunkLimit is 2000, but it can be to 50:
+
+    mydsws <- dsws$new()
+    mydsws$chunkLimit <- 50L
+
+Alternatively this can be set as an option by adding this line to your .RProfile file.
+
+    options(Datastream.ChunkLimit = 50L)
+
 In addition, this package has been built to be largely backwards compatible with the [Datastream2R](https://github.com/CharlesCara/Datastream2R) package.  You just need to replace 
     require(Datastream2R) 
 with 

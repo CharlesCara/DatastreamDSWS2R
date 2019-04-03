@@ -14,7 +14,7 @@ useServer <-TRUE
 ##############################################################################################
 
 test_that("test of a large timeseries request - long list with expression", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()

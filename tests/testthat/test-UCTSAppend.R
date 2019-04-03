@@ -10,7 +10,7 @@ context("UCTSAppend.R : test of appending timeSeries")
 
 #------------------------------------------------------------------------------
 test_that("Try appending a real dataset", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()  # cran is not set up to access Datastream
@@ -37,7 +37,7 @@ test_that("Try appending a real dataset", {
   expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
-  dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)
+  dwei <- getDataStream(User=Sys.getenv("DatastreamUsername"), Pass=Sys.getenv("DatastreamPassword"))
   sGet <- timeSeriesRequest(dwei = dwei,
                             DSCodes = "TSTEST01",
                             Instrument = "",
@@ -59,6 +59,10 @@ test_that("Try appending a real dataset", {
 
 #------------------------------------------------------------------------------
 test_that("Appending two more rows to UCTS", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()  # cran is not set up to access Datastream
 
   # Now append another two rows
   load("testData/f.RData")
@@ -82,7 +86,7 @@ test_that("Appending two more rows to UCTS", {
   expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
-  dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)
+  dwei <- getDataStream(User=Sys.getenv("DatastreamUsername"), Pass=Sys.getenv("DatastreamPassword"))
   sGet <- timeSeriesRequest(dwei = dwei,
                             DSCodes = "TSTEST01",
                             Instrument = "",

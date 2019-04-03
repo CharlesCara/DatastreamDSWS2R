@@ -18,7 +18,7 @@ test_that("test the password encryption function", {
 
 #------------------------------------------------------------------------------
 test_that(" Test the post string generation code", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -55,7 +55,7 @@ test_that(" Test the post string generation code", {
 test_that("Test a dataset with an NaN in it", {
 
 
-  testData <- xts(x=c(4.445, 4.121, -30754.896, 0.0001, NaN, NA, "TEXT"),
+  testData <- xts::xts(x=c(4.445, 4.121, -30754.896, 0.0001, NaN, NA, "TEXT"),
                   order.by = as.Date(c("2013-01-01", "2013-02-01", "2013-03-01", "2013-04-01", "2013-05-01", "2013-06-01", "2013-07-01")))
 
   sPost <- DatastreamDSWS2R:::.getTimeseries(testData,"M",2,"NA")
@@ -70,7 +70,7 @@ test_that("Test a dataset with an NaN in it", {
 
 #------------------------------------------------------------------------------
 test_that("Test a dataset with an NaN, NA and a large value in it", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -96,9 +96,7 @@ test_that("Test a dataset with an NaN, NA and a large value in it", {
                       Alignment="MID",
                       Carry="NO",
                       PrimeCurr="U$",
-                      tsData=testData,
-                      strUsername=options()$Datastream.Username,
-                      strPassword=options()$Datastream.Password)
+                      tsData=testData)
 
 
   sExpected <-  structure(TRUE, error = "")
@@ -110,7 +108,7 @@ test_that("Test a dataset with an NaN, NA and a large value in it", {
 
 #------------------------------------------------------------------------------
 test_that("Try uploading a real dataset", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -137,13 +135,11 @@ test_that("Try uploading a real dataset", {
                       Alignment="END",
                       Carry="NO",
                       PrimeCurr="",
-                      tsData=fTest,
-                      strUsername=options()$Datastream.Username,
-                      strPassword=options()$Datastream.Password)
+                      tsData=fTest)
   expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
-  dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)
+  dwei <- getDataStream(User=Sys.getenv("DatastreamUsername"), Pass=Sys.getenv("DatastreamPassword"))
   sGet <- timeSeriesRequest(dwei = dwei,
                             DSCodes = "TSTEST01",
                             Instrument = "",
@@ -166,7 +162,7 @@ test_that("Try uploading a real dataset", {
 
 #------------------------------------------------------------------------------
 test_that("Try uploading a real dataset with GBP isocode currency", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -193,13 +189,11 @@ test_that("Try uploading a real dataset with GBP isocode currency", {
                       Alignment="END",
                       Carry="NO",
                       PrimeCurr="GBP",
-                      tsData=f,
-                      strUsername=options()$Datastream.Username,
-                      strPassword=options()$Datastream.Password)
+                      tsData=f)
   expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
-  dwei <- getDataStream(User=options()$Datastream.Username, Pass=options()$Datastream.Password)
+  dwei <- getDataStream(User=Sys.getenv("DatastreamUsername"), Pass=Sys.getenv("DatastreamPassword"))
   sGet <- timeSeriesRequest(dwei = dwei,
                             DSCodes = "TSTEST01",
                             Instrument = "",
@@ -222,7 +216,7 @@ test_that("Try uploading a real dataset with GBP isocode currency", {
 
 #------------------------------------------------------------------------------
 test_that("Error when uploading invalid 4 digit currency", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -250,16 +244,14 @@ test_that("Error when uploading invalid 4 digit currency", {
                       Alignment="END",
                       Carry="NO",
                       PrimeCurr="GBPS",
-                      tsData=fTest,
-                      strUsername=options()$Datastream.Username,
-                      strPassword=options()$Datastream.Password),
+                      tsData=fTest),
                "Invalid currency.  Should be either 3 digit ISO code or Datastream code")
 
 })
 
 #------------------------------------------------------------------------------
 test_that("Error when uploading invalid 2 digit currency", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -286,16 +278,14 @@ test_that("Error when uploading invalid 2 digit currency", {
                           Alignment="END",
                           Carry="NO",
                           PrimeCurr="ZZ",
-                          tsData=fTest,
-                          strUsername=options()$Datastream.Username,
-                          strPassword=options()$Datastream.Password),
+                          tsData=fTest),
                "Invalid currency.  Should be an Datastream code in table currencyDS2ISO.")
 
 })
 
 #------------------------------------------------------------------------------
 test_that("Error when uploading invalid 3 digit currency", {
-  if(is.null(options()$Datastream.Username)){
+  if(Sys.getenv("DatastreamUsername") == ""){
     skip("Username not available")
   }
   skip_on_cran()
@@ -323,9 +313,8 @@ test_that("Error when uploading invalid 3 digit currency", {
                           Alignment="END",
                           Carry="NO",
                           PrimeCurr="ZZZ",
-                          tsData=fTest,
-                          strUsername=options()$Datastream.Username,
-                          strPassword=options()$Datastream.Password),
+                          tsData=fTest),
                "Invalid currency.  Should be an ISO code in table currencyDS2ISO.")
 
 })
+

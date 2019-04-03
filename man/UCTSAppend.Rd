@@ -8,13 +8,11 @@ UCTSAppend(tsData, TSCode = "", MGMTGroup = "ABC", freq = c("D", "W",
   "M", "Q", "Y"), seriesName, Units = "", Decimals = 2,
   ActPer = c("N", "Y"), freqConversion = c("ACT", "SUM", "AVG", "END"),
   Alignment = c("1ST", "MID", "END"), Carry = c("YES", "NO", "PAD"),
-  PrimeCurr = "", overwrite = TRUE, strUsername = if
-  (Sys.getenv("DatastreamUsername") != "") {    
-  Sys.getenv("DatastreamUsername") } else {    
-  options()$Datastream.Username }, strPassword = if
-  (Sys.getenv("DatastreamPassword") != "") {    
-  Sys.getenv("DatastreamPassword") } else {    
-  options()$Datastream.Password },
+  PrimeCurr = "", overwrite = TRUE,
+  strUsername = ifelse(Sys.getenv("DatastreamUsername") != "",
+  Sys.getenv("DatastreamUsername"), options()$Datastream.Username),
+  strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
+  Sys.getenv("DatastreamPassword"), options()$Datastream.Password),
   strServerName = "http://product.datastream.com",
   strServerPage = "/UCTS/UCTSMaint.asp")
 }

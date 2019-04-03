@@ -20,12 +20,20 @@ Creates an R5/RC4 object for accessing the Thomson Reuters
   connect = TRUE)}}{  initialises the class.
   Unless noConnect is TRUE also connects to the
   Datastream dsws server.  If the username and password are not
-  provided, then they are sourced from
+  provided, then they are sourced from system enviroment variables (ie Sys.getenv)
+      'DatastreamUsername' and 'DatastreamPassword'
+  or failing that from
       options()$Datastream.Username and
       options()$Datastream.Password
 
-    This allows the password to be stored in .RProfile rather
+    This allows the password to be stored in .Renviron or .RProfile rather
   than in the source code.
+
+  There is a difference in the Refinitiv's documentation about the chunk limit and different accounts have
+  different limits.  Some users are limited to 50 items while others are limited to 2000L.  The chunk limit
+  can be controlled by setting the chunkLimit parameter of the dsws object.  If options()$Datastream.ChunkLimit is
+  set then the value is taken from there.
+
   }
 
 \item{\code{listRequest(instrument, datatype = "", expression = "", requestDate)}}{  Make a listRequest from Datastream DSWS.

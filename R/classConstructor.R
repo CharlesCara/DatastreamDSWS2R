@@ -52,18 +52,30 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   initialises the class.
   Unless noConnect is TRUE also connects to the
   Datastream dsws server.  If the username and password are not
-  provided, then they are sourced from
+  provided, then they are sourced from system enviroment variables (ie Sys.getenv)
+      'DatastreamUsername' and 'DatastreamPassword'
+  or failing that from
       options()$Datastream.Username and
       options()$Datastream.Password
 
-    This allows the password to be stored in .RProfile rather
+    This allows the password to be stored in .Renviron or .RProfile rather
   than in the source code.
+
+  There is a difference in the Refinitiv's documentation about the chunk limit and different accounts have
+  different limits.  Some users are limited to 50 items while others are limited to 2000L.  The chunk limit
+  can be controlled by setting the chunkLimit parameter of the dsws object.  If options()$Datastream.ChunkLimit is
+  set then the value is taken from there.
+
   "
 
   .self$initialised <<- FALSE
   .self$errorlist <<- NULL
-  .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
-  .self$requestStringLimit <<- 2000L # Max length of a request.
+  if(is.null(options()$Datastream.ChunkLimit)){
+      .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
+  } else {
+    .self$chunkLimit <<- as.integer(options()$Datastream.ChunkLimit)
+      }
+  .self$requestStringLimit <<- 2000L # Max character length of an http request.
   .self$logging <<- 0L
   .self$logFileFolder <<- Sys.getenv("R_USER")
   .self$jsonResponseLoadFile <<- NULL  # By default is to hit the server
