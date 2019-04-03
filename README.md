@@ -6,12 +6,19 @@ The package can be installed using:
     require(devtools)
     install_github(“CharlesCara/DatastreamDSWS2R”)
 
-Your Thomson Reuters Datastream username and password need to be saved in options().  We suggest you add these lines to your .RProfile file:
+Your Thomson Reuters Datastream username and password are best stored in environment variables by adding to your .Renviron file the following
+lines.  This approach makes DatastreamDSWS2R able to be run securely in Docker containers by passing the credentials into the container at
+runtime.
+
+    DatastreamUsername=YOURUSERNAME
+    DatastreamPassword=YOURPASSWORD
+
+For backwards compatibility we have retained the ability to put credentials into options().  In this scenario you would add these lines to your .RProfile file:
 
     options(Datastream.Username = "YOURUSERNAME")
     options(Datastream.Password = "YOURPASSWORD")
 
-A typical request would be for a snapshot request:
+Once set up a typical request would be for a snapshot request:
 
      mydsws <- dsws$new()
      myData <- mydsws$snapshotRequest(instrument = c("ABF","RIO","WPP"),
