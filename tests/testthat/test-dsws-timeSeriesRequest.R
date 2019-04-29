@@ -592,6 +592,29 @@ test_that("test of setting chunkLimit via options()", {
 })
 
 ##############################################################################################
+# This is a test that if a chunk returns all NA it does not 'poison' the other chunks
+#
+test_that("test of single chunk returning NA", {
+
+endDate = as.Date("2019-04-26")
+expression = "HIDE#(XXXX(NERI0YR))"
+frequency = "D"
+startDate = as.Date("2019-04-26")
+
+stocks <- readRDS(file.path(testthat::test_path(),"testData", "Europe600Codes.rds"))
+
+mydsws <- dsws$new()
+#mydsws$logging <- 60L
+myDF <- mydsws$timeSeriesRequest(instrument = stocks,
+                                 expression = expression,
+                                 startDate = startDate,
+                                 endDate = endDate,
+                                 frequency = frequency)
+
+expect_true(sum(!is.na(myDF)) > 0)
+})
+
+##############################################################################################
 # This is a test of chunked requests - This is test that large requests strings are chunked correctly
 #
 

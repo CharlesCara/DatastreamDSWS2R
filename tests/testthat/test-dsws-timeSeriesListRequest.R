@@ -2,7 +2,7 @@
 
 context("classConstructor.R : test of timeSeriesListRequest method")
 
-suppressPackageStartupMessages(require(xts))
+#suppressPackageStartupMessages(require(xts))
 ##############################################################################################
 
 test_that("test of timeseries list request for price datatype with relative dates", {
@@ -22,7 +22,7 @@ test_that("test of timeseries list request for price datatype with relative date
                                          frequency = "D")
 
   expect_is(myData, "xts")
-  expect_is(coredata(myData)[1,2], "numeric")
+  expect_is(zoo::coredata(myData)[1,2], "numeric")
   expect_gt(ncol(myData), 99)
   expect_equal(nrow(myData), 11)
 
@@ -45,7 +45,7 @@ test_that("test of timeseries list request for default datatype with relative da
                                          frequency = "D")
 
   expect_is(myData, "xts")
-  expect_is(coredata(myData)[1,2], "numeric")
+  expect_is(zoo::coredata(myData)[1,2], "numeric")
   expect_gt(ncol(myData), 99)
   expect_equal(nrow(myData), 11)
 
@@ -69,7 +69,7 @@ test_that("test of timeseries list request for price datatype with absolute date
                                          frequency = "D")
 
   expect_is(myData, "xts")
-  expect_is(coredata(myData)[1,2], "numeric")
+  expect_is(zoo::coredata(myData)[1,2], "numeric")
   expect_gt(ncol(myData), 99)
   expect_equal(nrow(myData), 4)
 
@@ -91,7 +91,7 @@ test_that("test of timeseries list request for expression with relative date", {
                                          frequency = "D")
 
   expect_is(myData, "xts")
-  expect_is(coredata(myData)[1,2], "numeric")
+  expect_is(zoo::coredata(myData)[1,2], "numeric")
   expect_gt(ncol(myData), 99)
   expect_equal(nrow(myData), 4)
 
@@ -114,7 +114,7 @@ test_that("test of timeseries list request for user created list that has a mixt
                                          frequency = "D")
 
   expect_is(myData, "xts")
-  expect_is(coredata(myData)[1,2], "numeric")
+  expect_is(zoo::coredata(myData)[1,2], "numeric")
   expect_equal(ncol(myData), 35)
   expect_equal(nrow(myData), 4)
 

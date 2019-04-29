@@ -764,7 +764,7 @@ dsws$methods(.basicRequest = function(instrument,
         if(is.null(xtsValues)){
           xtsValues <- ret
         } else {
-          xtsValues <- cbind(xtsValues, ret)
+          xtsValues <- cbindRobust(xtsValues, ret)
         }
       } else {
         # If multiple datatypes then the xts for each datatype has to be merged individually
@@ -772,7 +772,7 @@ dsws$methods(.basicRequest = function(instrument,
           if(is.null(xtsValues[[i]])){
             xtsValues[[i]] <- ret[[i]]
           } else {
-            xtsValues[[i]] <- cbind(xtsValues[[i]], ret[[i]])
+            xtsValues[[i]] <- cbindRobust(xtsValues[[i]], ret[[i]])
           }
         }
       }
