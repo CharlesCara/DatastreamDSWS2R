@@ -128,3 +128,24 @@ test_that("Both series numeric", {
 })
 
 
+test_that("One series is zero width", {
+  var1 <- structure(c(0.043, 0.043, 0.043, 0.092, 0.0924, 0.0926, 0.063,
+                      0.063, 0.062, 0.068, 0.068, 0.068, 0.0402, 0.0402, 0.04), class = c("xts",
+                                                                                          "zoo"), .indexCLASS = "Date", .indexTZ = "UTC", tclass = "Date", tzone = "UTC", index = structure(c(1553558400,
+                                                                                                                                                                                              1553644800, 1553731200), tzone = "UTC", tclass = "Date"), .Dim = c(3L,
+                                                                                                                                                                                                                                                                 5L), .Dimnames = list(NULL, c("CH0038863350.EPS1TR12..CH0038863350",
+                                                                                                                                                                                                                                                                                               "GB00B03MLX29.EPS1TR12..GB00B03MLX29", "CH0012005267.EPS1TR12..CH0012005267",
+                                                                                                                                                                                                                                                                                               "CH0012032048.EPS1TR12..CH0012032048", "FR0000121014.EPS1TR12..FR0000121014"
+                                                                                                                                                                                                                                                                 )))
+  var2 <- structure(logical(0), class = c("xts", "zoo"), .indexCLASS = "Date", tclass = "Date", .indexTZ = "UTC", tzone = "UTC", index = structure(numeric(0), tzone = "UTC", tclass = "Date"), .Dim = 0:1, .Dimnames = list(
+    NULL, "IS0000000503"))
+
+  test <- expect_silent(cbindRobust(xts1 = var1, xts2 = var2))
+
+
+  expect_true(xts::is.xts(test))
+  expect_true(ncol(test) == 6)
+
+})
+
+

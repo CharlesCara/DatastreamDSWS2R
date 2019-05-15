@@ -14,6 +14,22 @@
 #'
 #'
 cbindRobust <- function(xts1, xts2) {
+  # If either are zero row then we
+  if(nrow(xts1) == 0 | nrow(xts2) == 0 ){
+    # We need to set the
+    if(nrow(xts1) == 0 & nrow(xts2) == 0 ){
+      # We need to return a two combine to give a zero row xts
+      xts3 <- xts::xts(matrix(NA, nrow = 1, ncol = ncol(var2) + ncol(var2) ), order.by = as.Date("20170101"))["20180101"]
+      colnames(xts3) <- c(colnames(xts1), colnames(xts2))
+      return(xts3)
+    } else {
+      # else use zoo to combine
+      xts3 <- zoo::cbind.zoo(xts1, xts2)
+      xts3 <- xts::xts(xts3, order.by = zoo::index(xts3))
+      return(xts3)
+    }
+  }
+
 
   # If neither of the two series are empty NA series, then we combine them as normal in order to save time.
   if(!is.na(unique(xts1)) && !is.na(unique(xts2))){
