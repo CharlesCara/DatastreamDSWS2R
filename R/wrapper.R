@@ -300,7 +300,7 @@ myStaticRequestSet <- function(mydsws = dsws$new(),
 
   }
 
-  if(is.null(idf) || length(idf) == 0 || idf[1,2] == "NA"
+  if(is.null(idf) || length(idf) == 0 || (is.character(idf[1, 2]) && idf[1,2] == "NA")
      | grepl(pattern="$$\"ER\"", x= idf[1,2], fixed=TRUE) == TRUE){
     # Assume a null means this is a timeseries expression
     if(grepl(pattern="XXXX", x=iExpression, fixed=TRUE) == FALSE){
@@ -398,7 +398,7 @@ staticRequestSet <- function(mydsws = dsws$new(),
     idf
   }
 
-  df <- do.call("cbind", ldf)
+  df <- bind_cols(ldf)
   colnames(df) <- expression
   rownames(df) <- NULL
   return(as.data.frame(df))
@@ -422,6 +422,7 @@ staticRequestSet <- function(mydsws = dsws$new(),
 #'
 #' @importFrom xts last
 #' @importFrom foreach foreach %do%
+#' @importFrom dplyr bind_cols
 #'
 #' @export
 #'
@@ -440,8 +441,9 @@ staticListRequestSet <- function(mydsws = dsws$new(),
                        frequency = frequency)
   }
 
-  df <- do.call("cbind", ldf)
+  df <- bind_cols(ldf)
   rownames(df) <- NULL
+  colnames(df) <- expression
   return(as.data.frame(df))
 }
 

@@ -1,0 +1,40 @@
+context("wrapper.R : staticListRequestSet function")
+
+test_that("test of myStaticRequestSet with a date returned", {
+expect_silent(
+  adf <- DatastreamDSWS2R:::myStaticRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
+                                             instrument = "U:SNAP",
+                                             iExpression = "BDATE",
+                                             endDate = Sys.Date(),
+                                             frequency = "D"))
+
+expect_is(adf, "Date")
+})
+
+test_that("test of staticListRequestSet with a date", {
+
+adf <- DatastreamDSWS2R::staticListRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
+                                              instrument = "U:SNAP", expression = "BDATE",
+                                              endDate = Sys.Date(), frequency = "D")
+expect_is(adf[1,1], "Date")
+})
+
+
+test_that("test of staticListRequestSet with a character and a date", {
+
+adf <- DatastreamDSWS2R::staticListRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
+                                              instrument = "U:SNAP", expression = c("NAME", "BDATE"),
+                                              endDate = Sys.Date(), frequency = "D")
+expect_is(adf[1,1], "character")
+expect_is(adf[1,2], "Date")
+})
+
+
+test_that("test of staticListRequestSet with a number and a date", {
+
+  adf <- DatastreamDSWS2R::staticListRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
+                                                instrument = "U:SNAP", expression = c("P", "BDATE"),
+                                                endDate = Sys.Date(), frequency = "D")
+  expect_is(adf[1,1], "numeric")
+  expect_is(adf[1,2], "Date")
+})
