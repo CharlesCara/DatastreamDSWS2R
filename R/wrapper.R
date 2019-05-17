@@ -319,13 +319,14 @@ myStaticRequestSet <- function(mydsws = dsws$new(),
     }
 
     idf <- t(last(aTS, 1))
+
   } else {
     idf <- idf[,2]
   }
 
 
   rownames(idf) <- NULL
-  return(idf)
+  return(as.data.frame(idf))
 }
 
 ##############################################################################################
@@ -389,13 +390,14 @@ staticRequestSet <- function(mydsws = dsws$new(),
       idf <- t(unlist(last(aTS, 1)))
       if(length(idf) == 0){
         #If we still do not have anything valid then return a column of NULLs
-        idf <- data.frame(matrix(NA,nrow = length(instrument), ncol = 1))
+        idf <- data.frame(matrix(NA, nrow = length(instrument), ncol = 1))
+        colnames(idf) <- iExpression
       }
     } else {
       idf <- idf[,2]
     }
 
-    idf
+    as.data.frame(idf)
   }
 
   df <- bind_cols(ldf)
