@@ -16,8 +16,8 @@ test_that("Try appending a real dataset", {
   skip_on_cran()  # cran is not set up to access Datastream
 
   require(xts)
-  load("testData/f.RData")
-  #load("tests/testthat/testData/f.RData")
+  load(file.path(testthat::test_path(), "testData/f.RData"))
+
   fTest<-head(f$First,10)
 
   #Try a round trip and check if data is the same
@@ -65,8 +65,8 @@ test_that("Appending two more rows to UCTS", {
   skip_on_cran()  # cran is not set up to access Datastream
 
   # Now append another two rows
-  load("testData/f.RData")
-  #load("tests/testthat/testData/f.RData")
+  load(file.path(testthat::test_path(), "testData/f.RData"))
+
   fTestAppend <- f$First[11:12,]
   fExpected <- f$First[1:12,]
   #Try a round trip and check if data is the same

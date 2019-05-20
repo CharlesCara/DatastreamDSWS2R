@@ -307,8 +307,8 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     if(!("GenericCurlError" %in% class(myDataResponse) &&
          str_detect(myDataResponse$message, "Timed out"))) {
       message("GenericCurlError:")
-      message(myDataResponse$message)
-      message(class(myDataResponse))
+      message(myDataResponse$message, "\n")
+      message(class(myDataResponse), "\n")
       break
     }
     # Too many tries
@@ -321,7 +321,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
 
   if(.self$logging >=5 ){
     message("DSWS server response is:\n")
-    message(myDataResponse)
+    message(myDataResponse, "\n")
     message("--------------------------------------------------")
   }
 
@@ -333,17 +333,37 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   }
 
 
-  if(is.null(myDataResponse) || "list" %in% class(myDataResponse)){
+  if(is.null(myDataResponse)) {
+    message("Response is not able to be parsed: response is null")
     .self$dataResponse <-  NULL
+
+  } else if("list" %in% class(myDataResponse)) {
+    message("Response is not able to be parsed: response is a list")
+    .self$dataResponse <-  NULL
+
+  } else if("error" %in% class(myDataResponse)){
+    message("Response is not able to be parsed: response is an error")
+    message(myDataResponse$message)
+    .self$dataResponse <-  NULL
+
   } else {
-    .self$dataResponse <- rjson::fromJSON(json_str = myDataResponse)
+    .self$dataResponse <- tryCatch({
+      rjson::fromJSON(json_str = myDataResponse)
+    },
+    error = function(e) e)
   }
 
+  if(("error" %in% class(.self$dataResponse))){
+    message("Error parsing response: ", .self$dataResponse$message)
+    message("Class of response", class(myDataResponse))
+    message(paste0("JSON returned by DSWS server response is:\n", myDataResponse), "\n")
+    message("------------------")
+    .self$dataResponse <- NULL
+  }
 
   if(.self$logging >= 4 ){
-    message(paste0("JSON returned by DSWS server response is:\n", .self$dataResponse))
+    message(paste0("JSON returned by DSWS server response is:\n", .self$dataResponse, "\n"))
   }
-
 
   return(TRUE)
 
