@@ -148,6 +148,12 @@ UCTSUpload <- function(tsData,
                        strServerPage="/UCTS/UCTSMaint.asp"){
 
   #Check inputs are valid
+
+  if(!xtsible(tsData)){
+    stop(paste0("tsData must be a time-based object and not of class ",class(tsData)))
+
+  }
+
   if(!freq[1] %in% c("D","W","M","Q","Y")){
     stop("freq is not an allowed value")
   }
@@ -339,6 +345,17 @@ UCTSAppend <- function(tsData,
                                             options()$Datastream.Password),
                        strServerName = "http://product.datastream.com",
                        strServerPage = "/UCTS/UCTSMaint.asp"){
+
+  #Check inputs are valid - we can also rely on checks in UCTSUpload later
+
+  if(!xtsible(tsData)){
+    stop(paste0("tsData must be a time-based object and not of class ", class(tsData)))
+  }
+  tsData <- as.xts(tsData)
+
+  if(!freq[1] %in% c("D","W","M","Q","Y")){
+    stop("freq is not an allowed value")
+  }
 
   # Get the existing UCTS from Datastream
   mydsws <- dsws$new()
