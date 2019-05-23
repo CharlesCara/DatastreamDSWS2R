@@ -124,7 +124,7 @@
 #'
 #' @importFrom zoo index
 #' @importFrom RCurl postForm curlPercentEncode
-#' @importFrom xts as.xts first last
+#' @importFrom xts as.xts first last xtsible
 #'
 UCTSUpload <- function(tsData,
                        TSCode="",
@@ -322,7 +322,7 @@ UCTSUpload <- function(tsData,
 #'
 #' @importFrom zoo index
 #' @importFrom RCurl postForm curlPercentEncode
-#' @importFrom xts as.xts first last
+#' @importFrom xts as.xts first last xtsible
 #'
 UCTSAppend <- function(tsData,
                        TSCode = "",
