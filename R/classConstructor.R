@@ -1,6 +1,5 @@
 #' @include common.R
-NULL
-
+#' @name classconstructor
 #' @title dsws
 #'
 #' @description An R5/RC object for accessing the Thomson Reuters Datastream
@@ -71,10 +70,10 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   .self$initialised <<- FALSE
   .self$errorlist <<- NULL
   if(is.null(options()$Datastream.ChunkLimit)){
-      .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
+    .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
   } else {
     .self$chunkLimit <<- as.integer(options()$Datastream.ChunkLimit)
-      }
+  }
   .self$requestStringLimit <<- 2000L # Max character length of an http request.
   .self$logging <<- 0L
   .self$logFileFolder <<- Sys.getenv("R_USER")
@@ -127,8 +126,8 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
 
 
 #------getToken-----------------------------------------------------------------------
-#' @importFrom rjson fromJSON
-#' @importFrom RCurl getURL
+#' @importFrom httr GET status_code http_error http_status parsed_content
+#'
 dsws$methods(.getToken = function(){
   "Internal function:
    Returns a Token from the the dsws server that
@@ -153,64 +152,67 @@ dsws$methods(.getToken = function(){
     nLoop <- 0
     .self$errorlist <- NULL
 
-    handleCurlError <- function(e){
-      message("Error requesting token...")
-      message(as.character(e))
-      .self$errorlist <- c(.self$errorlist, list(list(request = "Token request", error = e)))
-      return(NULL)}
 
     repeat{
-      myTokenResponse <- tryCatch(RCurl::getURL(url = myTokenURL),
+      myTokenResponse <- tryCatch(httr::GET(myTokenURL),
                                   error = function(e) e)
 
-      # Success so leave loop
-      if(!is.null(myTokenResponse) &&
-         !("error" %in% class(myTokenResponse)) &&
-         !("list" %in% class(myTokenResponse))) break
+      # Break if an error or null
+      if(is.null(myTokenResponse)) break
+      if("error" %in% class(myTokenResponse)) break
 
+      # If did not get a time out then break
+      if(httr::status_code(myTokenResponse) != 408) break
 
-      # write out error message and store it
-      message("Error requesting token...")
-      message(as.character(myTokenResponse))
-      .self$errorlist <- c(.self$errorlist, list(list(request = "Token request", error = myTokenResponse)))
-
-
-      # Only retry timeouts
-      if(!("GenericCurlError" %in% class(myTokenResponse) &&
-           str_detect(myTokenResponse$message, "Timed out"))) break
-
-
-      # Too many tries
+      # We have got a time out so check if we have had too many tries
       if(nLoop >= maxLoop) break
 
       message("...retrying")
       Sys.sleep(waitTimeBase ^ nLoop)
       nLoop <- nLoop + 1
+
     }
 
 
     if(is.null(myTokenResponse)){
+      .self$tokenList <- list(TokenValue = NULL,
+                              TokenExpiry = NULL)
       stop("Could not request access Token - response from server was NULL")
     }
 
-    myTokenList <- rjson::fromJSON(myTokenResponse)
+    if("error" %in% class(myTokenResponse)){
+      .self$tokenList <- list(TokenValue = NULL,
+                              TokenExpiry = NULL)
+      stop(paste0("Error requesting access Token.  Error message was:\n",
+                  myTokenList$message))
+    }
 
-    #Error check response
-    if(!is.null(myTokenList$Code)){
+    if(httr::http_error(myTokenResponse)){
       .self$tokenList <- list(TokenValue = NULL,
                               TokenExpiry = NULL)
 
-      stop(paste0("Error requesting access Token.  Message was:\n",
-                  myTokenList$Code, "\n",
-                  myTokenList$Message))
+      stop(paste0("Error requesting access Token.  HTTP message was: ",
+                  paste0(httr::http_status(myTokenResponse, collapse = " : "))))
+
+    }
+
+    myTokenList <- httr::content(myTokenResponse, as = "parsed")
+
+    #Error check response
+    if(is.null(myTokenList$TokenValue) || is.null(myTokenList$TokenExpiry)){
+      .self$tokenList <- list(TokenValue = NULL,
+                              TokenExpiry = NULL)
+
+      stop(paste0("Error requesting access Token.  Valid fields were not returned: ",
+                  paste0(myTokenList, collapse = " : ")))
     } else {
       .self$tokenList <- list(TokenValue = myTokenList$TokenValue,
                               TokenExpiry = .convert_JSON_Datetime(myTokenList$TokenExpiry))
     }
   }
 
-
   return(invisible(.self$tokenList$TokenValue))
+
 })
 
 
@@ -234,8 +236,8 @@ dsws$methods(.tokenExpired = function(thisToken = NULL, myTime = Sys.time()){
 
 
 #-----------------------------------------------------------------------------
-#' @importFrom rjson toJSON fromJSON
-#' @importFrom stringr str_detect
+#' @importFrom jsonlite fromJSON toJSON
+#' @importFrom httr POST status_code http_error http_type parsed_content
 dsws$methods(.makeRequest = function(bundle = FALSE){
   "Internal function: make a request from the DSWS server.
   The request  (in a R list form) is taken from .self$requestList,
@@ -265,15 +267,10 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     .self$.getToken()
   }
 
-  myRequestJSON <- rjson::toJSON(.self$requestList)
-
-  httpheader <- c(Accept="application/json; charset=UTF-8",
-                  "Content-Type"="application/json")
-
 
   if(.self$logging >=5 ){
-    message("JSON request to DSWS server response is:\n")
-    message(myRequestJSON)
+    message("JSON request to DSWS server is:\n")
+    message(jsonlite::toJSON(.self$requestList))
     message("--------------------------------------------------")
   }
 
@@ -284,74 +281,65 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   nLoop <- 0
   .self$errorlist <- NULL
   repeat{
-    myDataResponse <- tryCatch({
-      RCurl::postForm(myDataURL,
-                      .opts=list(httpheader=httpheader
-                                 ,postfields=myRequestJSON))
-    },
-    error = function(e) e)
 
-    # Success so leave loop
-    if(!is.null(myDataResponse) &&
-       !("error" %in% class(myDataResponse)) &&
-       !("list" %in% class(myDataResponse))) break
+    myDataResponse <- tryCatch(httr::POST(myDataURL, body = .self$requestList, encode = "json"),
+                                error = function(e) e)
 
+    # Break if an error or null
+    if(is.null(myDataResponse)) break
+    if("error" %in% class(myDataResponse)) break
 
-    # write out error message and store it
-    message("Error requesting json...")
-    message(as.character(myDataResponse))
-    .self$errorlist <- c(.self$errorlist, list(list(request = myRequestJSON, error = myDataResponse)))
+    # If did not get a time out then break
+    if(httr::status_code(myDataResponse) != 408) break
 
-
-    # Only retry timeouts
-    if(!("GenericCurlError" %in% class(myDataResponse) &&
-         str_detect(myDataResponse$message, "Timed out"))) {
-      message("GenericCurlError:")
-      message(myDataResponse$message, "\n")
-      message(class(myDataResponse), "\n")
-      break
-    }
-    # Too many tries
+    # We have got a time out so check if we have had too many tries
     if(nLoop >= maxLoop) break
 
     message("...retrying")
     Sys.sleep(waitTimeBase ^ nLoop)
     nLoop <- nLoop + 1
+
   }
 
-  if(.self$logging >=5 ){
-    message("DSWS server response is:\n")
-    message(myDataResponse, "\n")
-    message("--------------------------------------------------")
+
+  if(is.null(myDataResponse)){
+    .self$dataResponse <-  NULL
+    message("Response is not able to be parsed: response from server was NULL")
   }
 
+  if("error" %in% class(myDataResponse)){
+    .self$dataResponse <-  NULL
+    message(paste0("Response is not able to be parsed: Error message was:\n",
+                myTokenList$message))
+  }
+
+  if("list" %in% class(myDataResponse)) {
+    .self$dataResponse <-  NULL
+    message("Response is not able to be parsed: response is a list")
+  }
+
+  if(httr::http_error(myDataResponse)){
+    .self$dataResponse <-  NULL
+    message(paste0("Error requesting data.  HTTP message was: ",
+                paste0(httr::http_status(myDataResponse, collapse = " : "))))
+
+  }
+
+  if(httr::http_type(myDataResponse) != "application/json"){
+    .self$dataResponse <-  NULL
+    message("Response is not able to be parsed: response is not json")
+  }
 
   if(!is.null(.self$jsonResponseSaveFile)){
     if(!is.null(myDataResponse)){
-      writeChar(object = myDataResponse, con = .self$jsonResponseSaveFile)
+      writeChar(object = httr::content(myDataResponse, as = "text", encoding = "UTF-8"), con = .self$jsonResponseSaveFile)
     }
   }
 
 
-  if(is.null(myDataResponse)) {
-    message("Response is not able to be parsed: response is null")
-    .self$dataResponse <-  NULL
-
-  } else if("list" %in% class(myDataResponse)) {
-    message("Response is not able to be parsed: response is a list")
-    .self$dataResponse <-  NULL
-
-  } else if("error" %in% class(myDataResponse)){
-    message("Response is not able to be parsed: response is an error")
-    message(myDataResponse$message)
-    .self$dataResponse <-  NULL
-
-  } else {
-    .self$dataResponse <- tryCatch({
-      rjson::fromJSON(json_str = myDataResponse)
-    },
+  .self$dataResponse <- tryCatch(httr::content(myDataResponse, as = "parsed"),
     error = function(e) e)
-  }
+
 
   if(("error" %in% class(.self$dataResponse))){
     message("Error parsing response: ", .self$dataResponse$message)

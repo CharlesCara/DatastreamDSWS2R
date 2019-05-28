@@ -62,3 +62,5 @@ with
     require(DatastreamDSWS2R)
 
 
+## Update 1.5.1
+With this update we have switched from using the RCurl/rjson to using the httr/jsonlite packages for communicating with the Datastream server 

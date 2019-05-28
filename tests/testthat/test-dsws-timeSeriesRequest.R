@@ -2,10 +2,10 @@
 
 context("classConstructor.R : test of timeSeriesRequest method")
 
-suppressPackageStartupMessages(require(xts))
+suppressWarnings(suppressPackageStartupMessages(require(xts)))
 
-#testDataFolder <- "tests/testthat/testData/"
-testDataFolder <- "./testData/"
+
+testDataFolder <- file.path(testthat::test_path(), "testData")
 ##############################################################################################
 
 test_that("test of simple timeseries request with relative dates", {
@@ -205,7 +205,7 @@ test_that("test of download worldscope data - this data is numeric", {
                                       frequency = "D")
 
   expect_is(xtsData, "xts")
-  myValues <- coredata(xtsData)
+  myValues <- zoo::coredata(xtsData)
   colnames(myValues) <- NULL
   expect_equal(myValues[1:2,1], c(28237000, NA) )
   rm(mydsws, xtsData)
@@ -231,7 +231,7 @@ test_that("test of download worldscope data - this data is Dates", {
 
   expect_is(xtsData, "xts")
 
-  myValues <- coredata(xtsData)
+  myValues <- zoo::coredata(xtsData)
   colnames(myValues) <- NULL
   expect_is(myValues[1,1], "character")
   expect_equal(myValues[1:2,1], c("2011-10-18", NA) )  # Date to be decoded

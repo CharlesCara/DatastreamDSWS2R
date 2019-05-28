@@ -1,8 +1,8 @@
 Package: DatastreamDSWS2R
 Type: Package
 Title: Provides a link between the Thomson Reuters Datastream system and R
-Version: 1.4.8
-Date: 2019-05-23
+Version: 1.5.1
+Date: 2019-05-28
 Author: Charles Cara
 Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
 Description: Provides a set of functions and a class to connect, extract and
@@ -11,9 +11,9 @@ Description: Provides a set of functions and a class to connect, extract and
 License: GPL-3
 LazyData: TRUE
 Imports:
-    RCurl,
+    httr,
+    jsonlite,
     stringi,
-    rjson,
     stringr,
     xts,
     zoo,
