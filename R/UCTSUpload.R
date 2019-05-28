@@ -123,7 +123,7 @@
 #' @export
 #'
 #' @importFrom zoo index
-#' @importFrom RCurl postForm curlPercentEncode
+#' @importFrom httr POST add_headers content
 #' @importFrom xts as.xts first last xtsible
 #'
 UCTSUpload <- function(tsData,
@@ -241,7 +241,7 @@ UCTSUpload <- function(tsData,
                    TSFreqConv = freqConversion[1],              # Add "Frequency Conversion"
                    TSAlignment = Alignment[1],                  # Add "Alignment"
                    TSCarryInd = Carry[1],                       # Add "Carry Indicator"
-                   TSPrimeCurr = PrimeCurr,                  # Add "Prime Currency"
+                   TSPrimeCurr = I(PrimeCurr),                  # Add "Prime Currency"
                    TSULCurr = "",                            # no longer use Underlying Currency, but need to pass up a null value as the mainframe is expecting it
                    ForceUpdateFlag1 = "Y",
                    ForceUpdateFlag2 = "Y",                   # We have ignored some logic in the original UCTS VBA code
@@ -258,29 +258,59 @@ UCTSUpload <- function(tsData,
 
   # Now post the form
   # We will give it three tries
-  iCounter <- 1
+  nLoop <- 1
+  waitTimeBase <- 2
+  maxLoop <- 4
   retValue <- ""
 
-  while(iCounter <3 && retValue != "*OK*"){
-    retValue <- RCurl::postForm(uri = dsURL,
-                                .params = dsParams,
-                                style = "POST",
-                                .encoding = "utf-8",
-                                .contentEncodeFun = RCurl::curlEscape)
-    if(retValue != "*OK*"){
-      # If not succesful then wait 2 seconds before re-submitting, ie give time for the
-      # server/network to recover.
-      Sys.sleep(time = 2)
-    }
-    iCounter <- iCounter + 1
+  while(nLoop < maxLoop){
+    retValue <- tryCatch(httr::POST(url = dsURL,
+                                    body = dsParams,
+                                    config =  add_headers(encoding = "utf-8"),
+                                    encode = "form"),
+                         error = function(e) e)
+
+    # Break if an error or null
+    if(is.null(retValue)) break
+    if("error" %in% class(retValue)) break
+
+    # If did not get a time out then break
+    if(httr::status_code(retValue) != 408) break
+
+    # If not succesful then wait 2 seconds before re-submitting, ie give time for the
+    # server/network to recover.
+    Sys.sleep(waitTimeBase ^ nLoop)
+    nLoop <- nLoop + 1
   }
-  if(retValue[1] == "*OK*"){
+
+  if(is.null(retValue)){
+    return(structure(FALSE,
+                     error = "NULL value returned"))
+  }
+
+  if("error" %in% class(retValue)){
+    return(structure(FALSE,
+                     error = paste("Error ", retValue$message)))
+  }
+
+
+
+  if(httr::http_error(retValue)){
+    return(structure(FALSE,
+                    error = paste("http Error: ", paste0(httr::http_status(retValue,
+                                                                          collapse = " : ")))))
+  }
+
+  myResponse <- content(retValue, as = "text")
+
+  if(myResponse[1] == "*OK*"){
     return(structure(TRUE,
                      error = ""))
   }
   else{
     return(structure(FALSE,
-                     error = paste("*Error* Upload failed after ", iCounter, " attempts with error ", retValue[1])))
+                     error = paste("*Error* Upload failed after ", nLoop,
+                                   " attempts with error ", myResponse[1])))
   }
 }
 
@@ -321,7 +351,6 @@ UCTSUpload <- function(tsData,
 #' @export
 #'
 #' @importFrom zoo index
-#' @importFrom RCurl postForm curlPercentEncode
 #' @importFrom xts as.xts first last xtsible
 #'
 UCTSAppend <- function(tsData,
