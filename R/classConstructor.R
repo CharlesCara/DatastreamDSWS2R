@@ -184,7 +184,7 @@ dsws$methods(.getToken = function(){
       .self$tokenList <- list(TokenValue = NULL,
                               TokenExpiry = NULL)
       stop(paste0("Error requesting access Token.  Error message was:\n",
-                  myTokenList$message))
+                  myTokenResponse$message))
     }
 
     if(httr::http_error(myTokenResponse)){
