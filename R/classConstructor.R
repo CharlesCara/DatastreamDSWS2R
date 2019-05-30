@@ -192,7 +192,7 @@ dsws$methods(.getToken = function(){
                               TokenExpiry = NULL)
 
       stop(paste0("Error requesting access Token.  HTTP message was: ",
-                  paste0(httr::http_status(myTokenResponse, collapse = " : "))))
+                  paste0(httr::http_status(myTokenResponse), collapse = " : ")))
 
     }
 
@@ -321,7 +321,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   if(httr::http_error(myDataResponse)){
     .self$dataResponse <-  NULL
     message(paste0("Error requesting data.  HTTP message was: ",
-                paste0(httr::http_status(myDataResponse, collapse = " : "))))
+                paste0(httr::http_status(myDataResponse), collapse = " : ")))
 
   }
 
