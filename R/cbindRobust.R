@@ -19,7 +19,7 @@ cbindRobust <- function(xts1, xts2) {
     # We need to set the
     if(nrow(xts1) == 0 & nrow(xts2) == 0 ){
       # We need to return a two combine to give a zero row xts
-      xts3 <- xts::xts(matrix(NA, nrow = 1, ncol = ncol(var2) + ncol(var2) ), order.by = as.Date("20170101"))["20180101"]
+      xts3 <- xts::xts(matrix(NA, nrow = 1, ncol = ncol(xts1) + ncol(xts2) ), order.by = as.Date("2017-01-01"))["20180101"]
       colnames(xts3) <- c(colnames(xts1), colnames(xts2))
       return(xts3)
     } else {
