@@ -14,20 +14,27 @@
 #'
 #'
 cbindRobust <- function(xts1, xts2) {
-  # If either are zero row then we
+  # If either are zero row then we need to be careful
   if(nrow(xts1) == 0 | nrow(xts2) == 0 ){
     # We need to set the
     if(nrow(xts1) == 0 & nrow(xts2) == 0 ){
       # We need to return a two combine to give a zero row xts
       xts3 <- xts::xts(matrix(NA, nrow = 1, ncol = ncol(xts1) + ncol(xts2) ), order.by = as.Date("2017-01-01"))["20180101"]
       colnames(xts3) <- c(colnames(xts1), colnames(xts2))
-      return(xts3)
-    } else {
+
+    } else if(nrow(xts1) == 0) {
       # else use zoo to combine
-      xts3 <- zoo::cbind.zoo(xts1, xts2)
+      xts3 <- zoo::cbind.zoo(xts::xts(matrix(NA, nrow = length(index(xts2)), ncol = ncol(xts1)), order.by = index(xts2)), xts2)
+      colnames(xts3) <- c(colnames(xts1), colnames(xts2))
       xts3 <- xts::xts(xts3, order.by = zoo::index(xts3))
-      return(xts3)
+
+    } else {
+      xts3 <- zoo::cbind.zoo(xts1, xts::xts(matrix(NA, nrow = length(index(xts1)), ncol = ncol(xts2)), order.by = index(xts1)))
+      colnames(xts3) <- c(colnames(xts1), colnames(xts2))
+      xts3 <- xts::xts(xts3, order.by = zoo::index(xts3))
+
     }
+    return(xts3)
   }
 
 
