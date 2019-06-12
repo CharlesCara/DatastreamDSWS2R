@@ -123,7 +123,7 @@
 #' @export
 #'
 #' @importFrom zoo index
-#' @importFrom httr POST add_headers content
+#' @importFrom httr POST add_headers content content_type
 #' @importFrom xts as.xts first last xtsible
 #'
 UCTSUpload <- function(tsData,
@@ -266,7 +266,8 @@ UCTSUpload <- function(tsData,
   while(nLoop < maxLoop){
     retValue <- tryCatch(httr::POST(url = dsURL,
                                     body = dsParams,
-                                    config =  add_headers(encoding = "utf-8"),
+                                    config =  httr::add_headers(encoding = "utf-8"),
+                                    httr::content_type("application/x-www-form-urlencoded; charset=utf-8"),
                                     encode = "form"),
                          error = function(e) e)
 

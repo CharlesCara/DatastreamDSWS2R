@@ -168,8 +168,7 @@ test_that("Try uploading a real dataset with GBP isocode currency", {
   skip_on_cran()
 
   require(xts)
-  load("testData/f.RData")
-  #load("tests/testthat/testData/f.RData")
+  load(file.path(testthat::test_path(), "testData", "f.RData"))
   fTest<-head(f$First,10)
 
   # Test getTimeseries for the first 10 points
@@ -190,7 +189,7 @@ test_that("Try uploading a real dataset with GBP isocode currency", {
                       Carry="NO",
                       PrimeCurr="GBP",
                       tsData=f)
-  expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
+  expect_equal(sPost , structure(TRUE, error = ""))
 
   #Now lets download the data
   dwei <- getDataStream(User=Sys.getenv("DatastreamUsername"), Pass=Sys.getenv("DatastreamPassword"))
