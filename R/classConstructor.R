@@ -34,7 +34,8 @@ dsws <- setRefClass(Class="dsws",
 
 #-----Accessors----------------------------------------------------------------
 
-dsws$accessors(c("serverURL",
+dsws$accessors(c("tokenList",
+                 "serverURL",
                  "username",
                  "password",
                  "logging",
@@ -46,7 +47,11 @@ dsws$accessors(c("serverURL",
 
 #------Initialisation-----------------------------------------------------------------------
 
-dsws$methods(initialize = function(dsws.serverURL = "", username = "", password = "", connect = TRUE){
+dsws$methods(initialize = function(dsws.serverURL = "",
+                                   username = "",
+                                   password = "",
+                                   token = NULL,
+                                   connect = TRUE){
   "
   initialises the class.
   Unless noConnect is TRUE also connects to the
@@ -60,6 +65,9 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
     This allows the password to be stored in .Renviron or .RProfile rather
   than in the source code.
 
+  An access token can also be passed into the class on initialisation, so that it can be shared between sessions.
+  'token' is expected to be a list with items 'TokenValue' and 'TokenExpiry'.
+
   There is a difference in the Refinitiv's documentation about the chunk limit and different accounts have
   different limits.  Some users are limited to 50 items while others are limited to 2000L.  The chunk limit
   can be controlled by setting the chunkLimit parameter of the dsws object.  If options()$Datastream.ChunkLimit is
@@ -68,12 +76,18 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
   "
 
   .self$initialised <<- FALSE
+
+  .self$tokenList <<- list(TokenValue = NULL,
+                           TokenExpiry = NULL)
+
   .self$errorlist <<- NULL
+
   if(is.null(options()$Datastream.ChunkLimit)){
     .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
   } else {
     .self$chunkLimit <<- as.integer(options()$Datastream.ChunkLimit)
   }
+
   .self$requestStringLimit <<- 2000L # Max character length of an http request.
   .self$logging <<- 0L
   .self$logFileFolder <<- Sys.getenv("R_USER")
@@ -109,14 +123,23 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
     stop("Either username must be specified or it must be set via options(\"Datastream.Password\", \"Mypassword\"")
   }
 
-
-  .self$tokenList <<- list(TokenValue = NULL,
-                           TokenExpiry = NULL)
   .self$initialised <<- TRUE
 
-  if(connect){
-    .self$.getToken()
+  if(is.null(token)){
+    if(connect){
+      .self$.loadToken()
+    }
+
+  } else {
+    if(FALSE %in% (c("TokenValue", "TokenExpiry") %in% names(token)))
+      stop("Token must contain items TokenValue and TokenExpiry")
+    if(!is.timeBased(token$TokenExpiry))
+      stop("Token$TokenExpiry must be a time based object")
+
+    .self$tokenList <<- list(TokenValue = token$TokenValue,
+                             TokenExpiry = token$TokenExpiry)
   }
+
 
   return(invisible(.self))
 })
@@ -126,9 +149,9 @@ dsws$methods(initialize = function(dsws.serverURL = "", username = "", password 
 
 
 #------getToken-----------------------------------------------------------------------
-#' @importFrom httr GET status_code http_error http_status parsed_content
+#' @importFrom httr GET status_code http_error http_status parsed_content timeout
 #'
-dsws$methods(.getToken = function(){
+dsws$methods(.loadToken = function(){
   "Internal function:
    Returns a Token from the the dsws server that
   gives permission to access data."
@@ -154,7 +177,7 @@ dsws$methods(.getToken = function(){
 
 
     repeat{
-      myTokenResponse <- tryCatch(httr::GET(myTokenURL),
+      myTokenResponse <- tryCatch(httr::GET(myTokenURL, httr::timeout(30)),
                                   error = function(e) e)
 
       # Break if an error or null
@@ -237,7 +260,7 @@ dsws$methods(.tokenExpired = function(thisToken = NULL, myTime = Sys.time()){
 
 #-----------------------------------------------------------------------------
 #' @importFrom jsonlite fromJSON toJSON
-#' @importFrom httr POST status_code http_error http_type parsed_content
+#' @importFrom httr POST status_code http_error http_type parsed_content timeout
 dsws$methods(.makeRequest = function(bundle = FALSE){
   "Internal function: make a request from the DSWS server.
   The request  (in a R list form) is taken from .self$requestList,
@@ -264,7 +287,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   }
 
   if(.self$.tokenExpired()){
-    .self$.getToken()
+    .self$.loadToken()
   }
 
 
@@ -282,7 +305,10 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   .self$errorlist <- NULL
   repeat{
 
-    myDataResponse <- tryCatch(httr::POST(myDataURL, body = .self$requestList, encode = "json"),
+    myDataResponse <- tryCatch(httr::POST(myDataURL,
+                                          body = .self$requestList,
+                                          encode = "json",
+                                          httr::timeout(30)),
                                 error = function(e) e)
 
     # Break if an error or null
@@ -853,7 +879,7 @@ dsws$methods(.basicRequestTSChunk = function(instrument,
                                          startDate = startDate,
                                          endDate = endDate,
                                          kind = kind,
-                                         token = .self$.getToken())
+                                         token = .self$.loadToken())
 
   .self$requestList <- myReq$requestList
   myNumDatatype <- myReq$numDatatype
@@ -1069,7 +1095,7 @@ dsws$methods(.basicRequestSnapshotChunk = function(instrument,
                                    startDate = startDate,
                                    endDate = endDate,
                                    kind = kind,
-                                   token = .self$.getToken())
+                                   token = .self$.loadToken())
 
   .self$requestList <- myReq$requestList
   myNumDatatype <- myReq$numDatatype

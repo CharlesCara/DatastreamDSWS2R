@@ -17,7 +17,7 @@ Creates an R5/RC4 object for accessing the Thomson Reuters
 
 \describe{
 \item{\code{initialize(dsws.serverURL = "", username = "", password = "",
-  connect = TRUE)}}{  initialises the class.
+  token = NULL, connect = TRUE)}}{  initialises the class.
   Unless noConnect is TRUE also connects to the
   Datastream dsws server.  If the username and password are not
   provided, then they are sourced from system enviroment variables (ie Sys.getenv)
@@ -28,6 +28,9 @@ Creates an R5/RC4 object for accessing the Thomson Reuters
 
     This allows the password to be stored in .Renviron or .RProfile rather
   than in the source code.
+
+  An access token can also be passed into the class on initialisation, so that it can be shared between sessions.
+  'token' is expected to be a list with items 'TokenValue' and 'TokenExpiry'.
 
   There is a difference in the Refinitiv's documentation about the chunk limit and different accounts have
   different limits.  Some users are limited to 50 items while others are limited to 2000L.  The chunk limit
