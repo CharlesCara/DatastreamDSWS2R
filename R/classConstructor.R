@@ -1153,7 +1153,13 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
 
   # Process the columns of data
   for(iDatatype in 1:myNumDatatype){
-
+    if(is.null(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType) ||
+       length(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType) == 0) {
+      stopmsg <- paste0("No names to use as column headings in Snapshot.  Items returned for Datatype ", iDatatype,
+                        ".  Items in Datatype ",
+                        paste0(names(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]), sep = " | "))
+      stop(stopmsg)
+    }
     # Put a title on the column
     colnames(.self$myValues)[iDatatype + 1] <-
       make.names(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType)
