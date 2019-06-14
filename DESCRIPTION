@@ -1,7 +1,7 @@
 Package: DatastreamDSWS2R
 Type: Package
 Title: Provides a link between the Thomson Reuters Datastream system and R
-Version: 1.5.8
+Version: 1.5.9
 Date: 2019-06-13
 Author: Charles Cara
 Maintainer: Charles Cara <charles.cara@absolute-strategy.com>

@@ -336,7 +336,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   if("error" %in% class(myDataResponse)){
     .self$dataResponse <-  NULL
     message(paste0("Response is not able to be parsed: Error message was:\n",
-                myTokenList$message))
+                   myDataResponse$message))
   }
 
   if("list" %in% class(myDataResponse)) {
