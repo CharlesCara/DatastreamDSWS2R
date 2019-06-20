@@ -180,12 +180,14 @@ dsws$methods(.loadToken = function(){
       myTokenResponse <- tryCatch(httr::GET(myTokenURL, httr::timeout(30)),
                                   error = function(e) e)
 
-      # Break if an error or null
+      # Break if an error or null and it is not a timeout
       if(is.null(myTokenResponse)) break
-      if("error" %in% class(myTokenResponse)) break
+      if("error" %in% class(myTokenResponse) &&
+         !stringr::str_detect(myTokenResponse$message, "Timeout was reached")) break
 
       # If did not get a time out then break
-      if(httr::status_code(myTokenResponse) != 408) break
+      if("response" %in% class(myTokenResponse) &&
+         httr::status_code(myTokenResponse) != 408) break
 
       # We have got a time out so check if we have had too many tries
       if(nLoop >= maxLoop) break
@@ -313,10 +315,12 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
 
     # Break if an error or null
     if(is.null(myDataResponse)) break
-    if("error" %in% class(myDataResponse)) break
+    if("error" %in% class(myDataResponse) &&
+       !stringr::str_detect(myDataResponse$message, "Timeout was reached")) break
 
     # If did not get a time out then break
-    if(httr::status_code(myDataResponse) != 408) break
+    if("response" %in% class(myDataResponse) &&
+       httr::status_code(myDataResponse) != 408) break
 
     # We have got a time out so check if we have had too many tries
     if(nLoop >= maxLoop) break
