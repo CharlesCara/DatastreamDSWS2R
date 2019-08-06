@@ -1344,7 +1344,6 @@ dsws$methods(.buildRequestList = function (frequency, instrument, datatype, expr
   # Only use expressions if datatype is blank.  Expression has to be substituted into instrument.
   # If bundle is true, then we want to put each expression into an individual entry in DataRequests
   myNumInstrument <- length(instrument)
-  instrument<-toupper(instrument)
 
   if(datatype == "" && expression != ""){
     # We have an expression

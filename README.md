@@ -61,6 +61,8 @@ In addition, this package has been built to be largely backwards compatible with
 with 
     require(DatastreamDSWS2R)
 
+## CRAN
+Thank you to @mbannert for his work making the package ready to be released on CRAN. 
 
 ## Update 1.5.1
 With this update we have switched from using the RCurl/rjson to using the httr/jsonlite packages for communicating with the Datastream server 
