@@ -61,12 +61,12 @@ In addition, this package has been built to be largely backwards compatible with
 with 
     require(DatastreamDSWS2R)
 
-## Static Request
+## Static Requests
 
 DatastreamDSWS2R also allows for what Datastream / Refinitiv calls *static requests*. *Static request* can be used to query data descriptions / meta information. For example, **last update** can be queried like this: 
 
     mydsws <- dsws$new()
-    staticListRequestSet(ds, "SWCNB10",expression = "UPDATE")
+    staticRequest(ds, c("SWCNB10","UKEUSCCIR"), c("MNEM","UPDATE"))
 
 
 
