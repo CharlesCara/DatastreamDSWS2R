@@ -18,7 +18,8 @@ For backwards compatibility we have retained the ability to put credentials into
     options(Datastream.Username = "YOURUSERNAME")
     options(Datastream.Password = "YOURPASSWORD")
 
-Once set up a typical request would be for a snapshot request:
+## Static Requests
+Once set up a typical request would be for a snapshot or *static* request:
 
      mydsws <- dsws$new()
      myData <- mydsws$snapshotRequest(instrument = c("ABF","RIO","WPP"),
@@ -37,7 +38,22 @@ and for a constituent list request (expressions are also supported)
     mydsws <- dsws$new()
     myData <- mydsws$listRequest(instrument = "LFTSE100", datatype = "P", requestDate = "0D")
 
-and for a timeseries request (expressions are also supported)
+We have created a set of functions that hide the reference class structure.
+
+For example, **last update** can be queried either like this: 
+
+    mydsws <- dsws$new()
+    mydsws$snapshotRequest(instrument = c("SWCNB10","UKEUSCCIR"), 
+                         datatype = c("MNEM","UPDATE"), 
+                         requestDate = "0D")
+
+or like this:
+
+    mydsws <- dsws$new()
+    staticRequest(mydsws, c("SWCNB10","UKEUSCCIR"), c("MNEM","UPDATE"), "0D")
+
+## Timeseries requests
+Timeseries request (expressions are also supported) using the timeSeriesRequest and timeSeriesListRequest methods
 
     mydsws <- dsws$new()
     xtsData <- mydsws$timeSeriesRequest(instrument = "MKS",
@@ -46,7 +62,14 @@ and for a timeseries request (expressions are also supported)
                            endDate = "-0D",
                            frequency = "D")
 
+    xtsData <- mydsws$timeSeriesListRequest(instrument = "LFTSE100",
+                           datatype = "MV",
+                           startDate = "-30D",
+                           endDate = "-0D",
+                           frequency = "D")
 
+
+## Other information
 The dsws interface will split large requests down into chunks small enough for the DSWS interface to process.  However, the maximum chunk size varies in the DSWS documentation and is either [2000](https://product.datastream.com/DswsClient/Docs/AboutRestSvc.aspx) or [50](https://developers.refinitiv.com/sites/default/files/DSWS%20for%20Desktop%20-%20User%20stats%20and%20limits_0.pdf).  Different users have different limits.  The default chunkLimit is 2000, but it can be to 50:
 
     mydsws <- dsws$new()
@@ -56,23 +79,19 @@ Alternatively this can be set as an option by adding this line to your .RProfile
 
     options(Datastream.ChunkLimit = 50L)
 
-In addition, this package has been built to be largely backwards compatible with the [Datastream2R](https://github.com/CharlesCara/Datastream2R) package.  You just need to replace 
-    require(Datastream2R) 
-with 
-    require(DatastreamDSWS2R)
-
-## Static Requests
-
-DatastreamDSWS2R also allows for what Datastream / Refinitiv calls *static requests*. *Static request* can be used to query data descriptions / meta information. For example, **last update** can be queried like this: 
-
-    mydsws <- dsws$new()
-    staticRequest(ds, c("SWCNB10","UKEUSCCIR"), c("MNEM","UPDATE"))
-
-
-
 
 ## CRAN
 Thank you to @mbannert for his work making the package ready to be released on CRAN. 
 
 ## Update 1.5.1
 With this update we have switched from using the RCurl/rjson to using the httr/jsonlite packages for communicating with the Datastream server 
+
+## Dattastream DWE
+In addition, this package has been built to be largely backwards compatible with 
+the [Datastream2R](https://github.com/CharlesCara/Datastream2R) package that used the depreciated DWE 
+server from Datastream.  You just need to replace 
+    require(Datastream2R) 
+with 
+    require(DatastreamDSWS2R)
+
+
