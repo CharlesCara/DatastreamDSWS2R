@@ -177,7 +177,7 @@ dsws$methods(.loadToken = function(){
 
 
     repeat{
-      myTokenResponse <- tryCatch(httr::GET(myTokenURL, httr::timeout(30)),
+      myTokenResponse <- tryCatch(httr::GET(myTokenURL, httr::timeout(300)),
                                   error = function(e) e)
 
       # Break if an error or null and it is not a timeout
@@ -310,7 +310,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     myDataResponse <- tryCatch(httr::POST(myDataURL,
                                           body = .self$requestList,
                                           encode = "json",
-                                          httr::timeout(30)),
+                                          httr::timeout(300)),
                                 error = function(e) e)
 
     # Break if an error or null
