@@ -52,6 +52,23 @@ or like this:
     mydsws <- dsws$new()
     staticRequest(mydsws, c("SWCNB10","UKEUSCCIR"), c("MNEM","UPDATE"), "0D")
 
+We can also handle composite datatypes that return multiple values, for instance datatype QTEALL, which returns details of associated stocks.
+
+    mydsws <- dsws$new()
+    mydsws$snapshotRequest(instrument = c("VOD", "HSBA"),
+                           datatype="QTEALL",
+                           requestDate = Sys.Date())
+
+
+Another notable dataitem that returns multiple values is [DS.USERSTATS](https://developers.refinitiv.com/sites/default/files/DSWS%20for%20Desktop%20-%20User%20stats%20and%20limits_0.pdf) which returns information on the user's consumption of Datastream data.
+
+    mydsws <- dsws$new()
+    mydsws$snapshotRequest(instrument = "STATS",
+                           datatype = "DS.USERSTATS",
+                           requestDate = Sys.Date())
+
+
+
 ## Timeseries requests
 Timeseries request (expressions are also supported) using the timeSeriesRequest and timeSeriesListRequest methods
 
@@ -83,8 +100,13 @@ Alternatively this can be set as an option by adding this line to your .RProfile
 ## CRAN
 Thank you to @mbannert for his work making the package ready to be released on CRAN. 
 
+
+## Update 1.6.1
+Added handling of composite datatypes which return multiple values.
+
+
 ## Update 1.5.1
-With this update we have switched from using the RCurl/rjson to using the httr/jsonlite packages for communicating with the Datastream server 
+With this update we have switched from using the RCurl/rjson to using the httr/jsonlite packages for communicating with the Datastream server. 
 
 ## Dattastream DWE
 In addition, this package has been built to be largely backwards compatible with 
