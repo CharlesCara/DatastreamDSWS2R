@@ -219,3 +219,76 @@ test_that("test that if INF is returned then it is not interpreted as Inf", {
 
 })
 
+
+##############################################################################################
+
+test_that("test for multicell dataitems", {
+
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  mydsws <- dsws$new()
+#  mydsws$jsonResponseSaveFile <- "VOD-QTEALL"
+  myData <- mydsws$snapshotRequest(instrument = "VOD",
+                                   datatype="QTEALL",
+                                   requestDate =  as.Date("2019-01-15"))
+
+  expect_false(is.infinite(myData$Instrument[1]))
+  expect_false(is.infinite(myData$CD01[1]))
+
+})
+
+test_that("test for multicell dataitems - multiple stocks", {
+
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  mydsws <- dsws$new()
+#  mydsws$jsonResponseSaveFile <- "VODHSBA-QTEALL"
+  myData <- mydsws$snapshotRequest(instrument = c("VOD", "HSBA"),
+                                   datatype="QTEALL",
+                                   requestDate =  as.Date("2019-01-15"))
+
+  expect_false(is.infinite(myData$Instrument[1]))
+  expect_false(is.infinite(myData$CD01[1]))
+
+})
+
+
+test_that("test for multicell dataitems - multiple stocks across chunks", {
+
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+  inst <- c("ADM", "AAL", "ANTO", "AHT", "ABF", "AZN", "AUTO", "AVV", "AV.",
+            "BA.", "BARC", "BDEV", "BKG", "BHP", "BP.", "BATS", "BLND", "BT.A",
+            "BNZL", "BRBY", "CCL", "CNA", "CCH", "CPG", "CRH", "CRDA", "DCC",
+            "DGE", "EVR", "EXPN", "FERG", "FLTR", "FRES", "GSK", "GLEN",
+            "HLMA", "HL.", "HIK", "HSX", "HSBA", "IMB", "INF", "IHG", "IAG",
+            "ITRK", "ITV", "JD.", "JMAT", "JE.", "KGF", "LAND", "LGEN", "LLOY",
+            "LSE", "MGGT", "MRO", "MNDI", "MRW", "NG.", "NXT", "NMC", "OCDO",
+            "PSON", "PSN", "PHNX", "POLY", "PRU", "RB.", "REL", "RTO", "RMV",
+            "RIO", "RR.", "RBS", "RDSA", "RDSB", "RSA", "SGE", "SBRY", "SDR",
+            "SMT", "SGRO", "SVT", "SN.", "SMDS", "SMIN", "SKG", "SPX", "SSE",
+            "STJ", "STAN", "SLA", "TW.", "TSCO", "TUI", "ULVR", "UU.", "VOD",
+            "WTB", "WPP", "III")
+
+  mydsws <- dsws$new()
+  mydsws$chunkLimit <- 10
+  myData <- mydsws$snapshotRequest(instrument = inst,
+                                   datatype="QTEALL",
+                                   requestDate =  as.Date("2019-01-15"))
+
+  expect_false(is.infinite(myData$Instrument[1]))
+  expect_false(is.infinite(myData$CD01[101]))
+
+})
+
+
+

@@ -311,7 +311,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
                                           body = .self$requestList,
                                           encode = "json",
                                           httr::timeout(300)),
-                                error = function(e) e)
+                               error = function(e) e)
 
     # Break if an error or null
     if(is.null(myDataResponse)) break
@@ -351,7 +351,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   if(httr::http_error(myDataResponse)){
     .self$dataResponse <-  NULL
     message(paste0("Error requesting data.  HTTP message was: ",
-                paste0(httr::http_status(myDataResponse), collapse = " : ")))
+                   paste0(httr::http_status(myDataResponse), collapse = " : ")))
 
   }
 
@@ -368,7 +368,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
 
 
   .self$dataResponse <- tryCatch(httr::content(myDataResponse, as = "parsed"),
-    error = function(e) e)
+                                 error = function(e) e)
 
 
   if(("error" %in% class(.self$dataResponse))){
@@ -1102,11 +1102,27 @@ dsws$methods(.basicRequestSnapshotChunk = function(instrument,
                                    token = .self$.loadToken())
 
   .self$requestList <- myReq$requestList
-  myNumDatatype <- myReq$numDatatype
-  myNumInstrument <- myReq$numInstrument
 
   # Make the request to the server
   ret <- .self$.makeRequest(bundle = FALSE)
+
+  myNumInstrument <- myReq$numInstrument
+
+  # If a multicell datatype is returned then we might have more datatypes than requested
+  # This could be simplified to
+  myNumDatatype <- max(length(.self$dataResponse$DataResponse$DataTypeValues), myReq$numDatatype, na.rm = TRUE)
+
+  if(format == "Snapshot"){
+    if(myNumDatatype > ncol(.self$myValues) - 1 ) {
+      if(.self$logging >=3 ){
+        message("Multicell datatype detected - changing size of return dataframe")
+      }
+
+      if(chunkNumber > 1) stop("Number of dataitems returned varied between chunks")
+      .self$myValues <- data.frame(matrix(NA, nrow =  myNumInstrument, ncol = myNumDatatype + 1))
+    }
+  }
+
 
   if(!ret){
     # There has been an error.  Return NULL.  Error is stored in .self$errorlist
