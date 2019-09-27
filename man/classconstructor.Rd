@@ -240,3 +240,47 @@ requestDate = "-0D")
   }
 }}
 
+\examples{
+
+
+
+     mydsws <- dsws$new()
+     # Snapshot requests
+
+
+     myData <- mydsws$snapshotRequest(instrument = c("ABF","RIO","WPP"),
+                                      datatype = "P",
+                                      requestDate = "0D")
+
+     myData <- mydsws$snapshotRequest(instrument = c("ABF","RIO","WPP"),
+                                      expression = "PCH#(XXXX,3M)",
+                                      requestDate = "0D")
+     myData <- mydsws$listRequest(instrument = "LFTSE100", datatype = "P", requestDate = "0D")
+
+     mydsws$snapshotRequest(instrument = c("SWCNB10","UKEUSCCIR"),
+                            datatype = c("MNEM","UPDATE"),
+                            requestDate = "0D")
+     mydsws$snapshotRequest(instrument = c("VOD", "HSBA"),
+                            datatype="QTEALL",
+                            requestDate = Sys.Date())
+     mydsws$snapshotRequest(instrument = "STATS",
+                            datatype = "DS.USERSTATS",
+                            requestDate = Sys.Date())
+
+
+     # Timeseries requests
+
+
+     xtsData <- mydsws$timeSeriesRequest(instrument = "MKS",
+                                         datatype = "MV",
+                                         startDate = "-30D",
+                                         endDate = "-0D",
+                                         frequency = "D")
+
+     xtsData <- mydsws$timeSeriesListRequest(instrument = "LFTSE100",
+                                             datatype = "MV",
+                                             startDate = "-30D",
+                                             endDate = "-0D",
+                                             frequency = "D")
+
+}
