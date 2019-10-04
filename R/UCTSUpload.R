@@ -10,6 +10,8 @@
 #' @return an encrypted password
 #'
 #'
+#' @keywords internal
+#'
 .EncryptPassword <- function(strPassword=""){
 
 
@@ -45,6 +47,7 @@
 #' @importFrom zoo zoo index
 #' @importFrom xts merge.xts .indexwday
 #' @importFrom stringr str_trim
+#' @keywords internal
 #'
 .getTimeseries <- function(Data, freq, digits, NA_VALUE){
   if(ncol(Data) > 1) {

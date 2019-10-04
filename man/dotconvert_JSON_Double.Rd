@@ -23,3 +23,4 @@ transforming-json-date
 converts a JSON Double object an R
  Double object
 }
+\keyword{internal}

@@ -11,6 +11,8 @@
 #' @param Input_Strings a JSON string (or an array)
 #' @return an array of Dates
 #'
+#' @keywords internal
+#'
 #'
 .convert_JSON_Bool <- function(Input_Strings){
   suppressWarnings({
@@ -33,6 +35,7 @@
 #' @param Input_Strings a JSON Date string (or an array)
 #' @return an array of Dates
 #'
+#' @keywords internal
 #'
 .convert_JSON_Integer <- function(Input_Strings){
   suppressWarnings({
@@ -56,6 +59,7 @@
 #' @param Input_Strings a JSON Date string (or an array)
 #' @return an array of String
 #'
+#' @keywords internal
 #'
 .convert_JSON_String <- function(Input_Strings){
   suppressWarnings({
@@ -78,6 +82,7 @@
 #' @param Input_Strings a JSON Date string (or an array)
 #' @return an array of Dates
 #'
+#' @keywords internal
 #'
 .convert_JSON_Double <- function(Input_Strings){
   suppressWarnings({
@@ -103,6 +108,7 @@
 #' @return an array of Dates
 #' @importFrom stringi stri_locate stri_sub
 #'
+#' @keywords internal
 #'
 .convert_JSON_Date <- function(Input_Strings){
   start <- stringi::stri_locate(Input_Strings, regex = "\\(")[,1]
@@ -138,6 +144,7 @@
 #' @return an array POSIXct/POSIXt object
 #' @importFrom stringi stri_locate stri_sub
 #'
+#' @keywords internal
 #'
 .convert_JSON_Datetime <- function(Input_Strings){
   start <- stringi::stri_locate(Input_Strings, regex = "\\(")[,1]
@@ -168,6 +175,7 @@
 #' @return the parsed result: either Date, String or numeric
 #' @importFrom stringi stri_locate stri_sub
 #'
+#' @keywords internal
 #'
 .convertJSONString <-
   function(x)
@@ -218,6 +226,7 @@
 #'
 #' @param x a list that is expected to have an item 'Value' and item 'Type'
 #' @return the parsed result: either Date, String or numeric
+#' @keywords internal
 #'
 .getValueTyped <- function(x, myType){
   thisValue <- .convertJSONString(x$Value)
@@ -261,6 +270,7 @@
 #' @return the parsed result: either Date, String or numeric
 #'
 #' @importFrom stringr fixed str_detect
+#' @keywords internal
 #'
 .getValue <- function(x){
   if(!("Value" %in% names(x)) | !("Type" %in% names(x))) {
@@ -293,12 +303,20 @@
 #'
 #' @param x a list that is expected to have an item 'Symbol' and 'Type'
 #' @return the parsed result: either Date, String or numeric
+#' @keywords internal
 #'
 .getSymbol <- function(x){
-  if(!("Symbol" %in% names(x)) | !("Type" %in% names(x))) {
-    return(NA)
+
+  if(!("Symbol" %in% names(x) )) {
+    return("")
   } else {
-    return(.getJSONValue(value = x$Symbol, type = .getType(x)))
+    thisValue <- x$Symbol
+    if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
+      #TODO: write the response in the errorList object
+      return("")
+    } else {
+      return(thisValue)
+    }
   }
 }
 #-----------------------------------------------------------------------------
@@ -314,6 +332,7 @@
 #'
 #' @param x a list that is expected to have an item 'Symbol' and 'Type'
 #' @return the parsed result: either Date, String or numeric
+#' @keywords internal
 #'
 .getJSONValue <- function(value, type){
 
@@ -405,6 +424,7 @@
 #'
 #' @param x a list that is expected to have an item 'Type'
 #' @return the parsed result: either Date, String or numeric
+#' @keywords internal
 #'
 .getType <- function(x){
   thisValue <- .convertJSONString(x$Type)

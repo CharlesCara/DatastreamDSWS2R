@@ -23,3 +23,4 @@ transforming-json-date
 converts a JSON Date string (including with Timezone) to a R
  Date object
 }
+\keyword{internal}

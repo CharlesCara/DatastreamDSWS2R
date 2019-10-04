@@ -23,3 +23,4 @@ http://stackoverflow.com/questions/32076957/nas-introduced-when
 converts a JSON string (including with Timezone) into either a
 numeric, string, or a R Date object
 }
+\keyword{internal}

@@ -25,3 +25,4 @@ extracts and converts a JSON string (including with Timezone)
 in the list x.  the item is parsed from JSON into either a numeric,
 string, or a R Date object
 }
+\keyword{internal}

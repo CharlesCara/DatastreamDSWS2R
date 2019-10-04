@@ -23,3 +23,4 @@ http://stackoverflow.com/questions/32076957/nas-introduced-when
 converts a JSON Date string (including with Timezone) to a
  POSIXct/POSIXt object
 }
+\keyword{internal}

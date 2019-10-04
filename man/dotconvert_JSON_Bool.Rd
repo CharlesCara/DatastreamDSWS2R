@@ -23,3 +23,4 @@ transforming-json-date
 converts a JSON Boolean string to an R
  logical object
 }
+\keyword{internal}

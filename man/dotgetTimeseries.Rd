@@ -24,3 +24,4 @@ A string of the core data of Data
 convert xts timeseries into a string that can be sent to
 the Datastream server
 }
+\keyword{internal}

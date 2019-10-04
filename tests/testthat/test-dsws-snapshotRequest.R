@@ -209,7 +209,7 @@ test_that("test that if INF is returned then it is not interpreted as Inf", {
   skip_on_cran()
 
   mydsws <- dsws$new()
-  mydsws$jsonResponseSaveFile <- "INFORMA"
+
   myData <- mydsws$snapshotRequest(instrument = c("INF"),
                                    datatype=c("NAME","MNEM","ISIN","RIC"),
                                    requestDate =  as.Date("2019-01-15"))
