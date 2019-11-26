@@ -101,6 +101,9 @@ Alternatively this can be set as an option by adding this line to your .RProfile
 Thank you to @mbannert for his work making the package ready to be released on CRAN. 
 
 
+## Update 1.6.3
+Handle lower case RIC codes.
+
 ## Update 1.6.2
 Improve documentation and return Instrument column in snapshot requests.
 
@@ -110,7 +113,7 @@ Added handling of composite datatypes which return multiple values.
 ## Update 1.5.1
 With this update we have switched from using the RCurl/rjson to using the httr/jsonlite packages for communicating with the Datastream server. 
 
-## Dattastream DWE
+## Datastream DWE - now decommissioned by Refinitiv
 In addition, this package has been built to be largely backwards compatible with 
 the [Datastream2R](https://github.com/CharlesCara/Datastream2R) package that used the depreciated DWE 
 server from Datastream.  You just need to replace 
