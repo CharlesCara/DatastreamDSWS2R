@@ -1391,7 +1391,7 @@ dsws$methods(.expandExpression = function (instrument, expression){
     myString <- sapply(instrument,
                        FUN=function(x) {if(is.na(x)) {"ABCDEFGH"}
                          else
-                         {gsub(pattern="XXXX", replacement=x, x=expression, fixed=TRUE)}},
+                         {stringr::str_replace_all(expression, stringr::regex("XXXX", ignore_case = TRUE), x)}},
                        USE.NAMES = FALSE)
   }
 
@@ -1418,7 +1418,7 @@ dsws$methods(.buildRequestList = function (frequency, instrument, datatype, expr
     # We have an expression
     myNumDatatype <- 1
     isDatatype <- FALSE
-    if( grepl(pattern="XXXX", x=expression, fixed=TRUE) == FALSE){
+    if( stringr::str_detect(expression,stringr::regex("XXXX", ignore_case = TRUE)) == FALSE){
       # Expression does not contain XXXX so we cannot do a replace
       stop("Expressions must contain XXXX so that they can be inserted into instrument")
     } else {
@@ -1547,12 +1547,11 @@ dsws$methods(.buildRequestListBundle = function (frequency, instrument, datatype
   # Only use expressions if datatype is blank.  Expression has to be substituted into instrument.
   # If bundle is true, then we want to put each expression into an individual entry in DataRequests
   myNumInstrument <- length(instrument)
-  instrument <- toupper(instrument)
 
   if(datatype == "" && expression != ""){
     # We have an expression
     myNumDatatype <- 1L
-    if( grepl(pattern="XXXX", x=expression, fixed=TRUE) == FALSE){
+    if( stringr::str_detect(expression,stringr::regex("XXXX", ignore_case = TRUE)) == FALSE){
       # Expression does not contain XXXX so we cannot do a replace
       stop("Expressions must contain XXXX so that they can be inserted into instrument")
     } else {

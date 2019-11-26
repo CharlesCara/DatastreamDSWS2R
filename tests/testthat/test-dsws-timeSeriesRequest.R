@@ -212,6 +212,29 @@ test_that("test of download worldscope data - this data is numeric", {
 
 })
 
+#############################################################
+test_that("test of lowercase RIC Codes", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+  xtsData <- mydsws$timeSeriesRequest(instrument = c("<WAFGn.DE>"),
+                                      expression = "XXXX",
+                                      startDate = as.Date("31/10/2016", "%d/%m/%Y"),
+                                      endDate = as.Date('24/11/2016', '%d/%m/%Y'),
+                                      frequency = "D")
+
+  expect_is(xtsData, "xts")
+  myValues <- zoo::coredata(xtsData)
+  colnames(myValues) <- NULL
+  expect_equal(myValues[1:2,1], c(32.770, 32.000) )
+  rm(mydsws, xtsData)
+
+})
+
 
 
 #############################################################
