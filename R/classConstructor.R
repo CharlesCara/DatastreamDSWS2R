@@ -176,7 +176,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   } else {
     if(FALSE %in% (c("TokenValue", "TokenExpiry") %in% names(token)))
       stop("Token must contain items TokenValue and TokenExpiry")
-    if(!is.timeBased(token$TokenExpiry))
+    if(!xts::is.timeBased(token$TokenExpiry))
       stop("Token$TokenExpiry must be a time based object")
 
     .self$tokenList <<- list(TokenValue = token$TokenValue,
