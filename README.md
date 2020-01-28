@@ -100,6 +100,8 @@ Alternatively this can be set as an option by adding this line to your .RProfile
 ## CRAN
 Thank you to @mbannert for his work making the package ready to be released on CRAN. 
 
+## Update 1.6.6
+Fix for Issues #26 and #27
 
 ## Update 1.6.3
 Handle lower case RIC codes.
