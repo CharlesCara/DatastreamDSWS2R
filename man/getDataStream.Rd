@@ -4,8 +4,11 @@
 \alias{getDataStream}
 \title{Initialise connection with Datastream DSWS server (Depreciated)}
 \usage{
-getDataStream(dweURLwsdl = "", User = as.character("USERNAME"),
-  Pass = as.character("PASSWORD"))
+getDataStream(
+  dweURLwsdl = "",
+  User = as.character("USERNAME"),
+  Pass = as.character("PASSWORD")
+)
 }
 \arguments{
 \item{dweURLwsdl}{Ignored}

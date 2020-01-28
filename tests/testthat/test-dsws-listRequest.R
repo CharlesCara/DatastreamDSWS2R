@@ -39,7 +39,7 @@ test_that("test of simple snapshot request for price datatype with absolute date
 
   myData <- mydsws$listRequest(instrument = "LFTSE100",
                                datatype = "P",
-                               requestDate = as.Date("2015-10-01"))
+                               requestDate = Sys.Date())
 
   expect_is(myData, "data.frame")
   expect_is(myData[1,2], "numeric")
@@ -110,3 +110,28 @@ test_that("test of simple snapshot request for Date datatype with relative dates
   expect_equal(ncol(myData), 2)
 
 })
+
+
+
+test_that("Expect requests on different dates to give different responses", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+  mydsws <- dsws$new()
+
+  myData <- mydsws$listRequest(instrument = "LFTSE100",
+                               datatype = "TIME",
+                               requestDate = as.Date("2019-10-01"))
+
+  expect_is(myData, "data.frame")
+  expect_is(myData[1,2], "Date")
+  expect_gt(nrow(myData), 99)
+  expect_equal(ncol(myData), 2)
+  expect_equivalent(myData[1,2], as.Date("2019-10-01"))
+
+
+})
+

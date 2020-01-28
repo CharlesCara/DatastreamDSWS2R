@@ -4,8 +4,13 @@
 \alias{myStaticRequestSet}
 \title{myStaticRequestSet (Depreciated)}
 \usage{
-myStaticRequestSet(mydsws = dsws$new(), instrument, iExpression,
-  endDate = Sys.Date(), frequency = "D")
+myStaticRequestSet(
+  mydsws = dsws$new(),
+  instrument,
+  iExpression,
+  endDate = Sys.Date(),
+  frequency = "D"
+)
 }
 \arguments{
 \item{mydsws}{a dsws object, if not provided a new one will be created}

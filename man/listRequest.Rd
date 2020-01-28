@@ -4,9 +4,15 @@
 \alias{listRequest}
 \title{Make a list request for static data (Depreciated)}
 \usage{
-listRequest(dwei = getDataStream(), DSCode, Expression = "",
-  startDate = Sys.Date(), endDate = Sys.Date(), frequency = "D",
-  verbose = FALSE)
+listRequest(
+  dwei = getDataStream(),
+  DSCode,
+  Expression = "",
+  startDate = Sys.Date(),
+  endDate = Sys.Date(),
+  frequency = "D",
+  verbose = FALSE
+)
 }
 \arguments{
 \item{dwei}{- A Datastream Client Interface object created with

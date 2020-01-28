@@ -378,29 +378,33 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   if(is.null(myDataResponse)){
     .self$dataResponse <-  NULL
     message("Response is not able to be parsed: response from server was NULL")
+    return(FALSE)
   }
 
   if("error" %in% class(myDataResponse)){
     .self$dataResponse <-  NULL
     message(paste0("Response is not able to be parsed: Error message was:\n",
                    myDataResponse$message))
+    return(FALSE)
   }
 
   if("list" %in% class(myDataResponse)) {
     .self$dataResponse <-  NULL
     message("Response is not able to be parsed: response is a list")
+    return(FALSE)
   }
 
   if(httr::http_error(myDataResponse)){
     .self$dataResponse <-  NULL
     message(paste0("Error requesting data.  HTTP message was: ",
                    paste0(httr::http_status(myDataResponse), collapse = " : ")))
-
+    return(FALSE)
   }
 
   if(httr::http_type(myDataResponse) != "application/json"){
     .self$dataResponse <-  NULL
     message("Response is not able to be parsed: response is not json")
+    return(FALSE)
   }
 
   if(!is.null(.self$jsonResponseSaveFile)){
@@ -420,6 +424,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     message(paste0("JSON returned by DSWS server response is:\n", myDataResponse), "\n")
     message("------------------")
     .self$dataResponse <- NULL
+    return(FALSE)
   }
 
   if(.self$logging >= 4 ){
@@ -466,7 +471,7 @@ dsws$methods(listRequest = function(instrument,
                              datatype = datatype,
                              expression = expression,
                              isList = TRUE,
-                             startDate = "",
+                             startDate = requestDate,
                              endDate = requestDate,
                              frequency = "D",
                              kind = 0,
@@ -1159,6 +1164,11 @@ dsws$methods(.basicRequestSnapshotChunk = function(instrument,
   # Make the request to the server
   ret <- .self$.makeRequest(bundle = FALSE)
 
+  if(!ret){
+    # There has been an error.  Return NULL.  Error is stored in .self$errorlist
+    return(NULL)
+  }
+
   myNumInstrument <- myReq$numInstrument
 
   # If a multicell datatype is returned then we might have more datatypes than requested
@@ -1177,10 +1187,6 @@ dsws$methods(.basicRequestSnapshotChunk = function(instrument,
   }
 
 
-  if(!ret){
-    # There has been an error.  Return NULL.  Error is stored in .self$errorlist
-    return(NULL)
-  }
 
 
   if(.self$logging >=3 ){

@@ -4,8 +4,13 @@
 \alias{staticListRequestSet}
 \title{staticListRequestSet}
 \usage{
-staticListRequestSet(mydsws = dsws$new(), instrument, expression = "",
-  endDate = Sys.Date(), frequency = "D")
+staticListRequestSet(
+  mydsws = dsws$new(),
+  instrument,
+  expression = "",
+  endDate = Sys.Date(),
+  frequency = "D"
+)
 }
 \arguments{
 \item{mydsws}{a dsws object, if not provided a new one will be created}

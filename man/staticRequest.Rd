@@ -4,9 +4,15 @@
 \alias{staticRequest}
 \title{make a static request (Depreciated)}
 \usage{
-staticRequest(dwei = getDataStream(), DSCode, Expression = "",
-  endDate = Sys.Date(), frequency = "D", verbose = FALSE,
-  noCache = FALSE)
+staticRequest(
+  dwei = getDataStream(),
+  DSCode,
+  Expression = "",
+  endDate = Sys.Date(),
+  frequency = "D",
+  verbose = FALSE,
+  noCache = FALSE
+)
 }
 \arguments{
 \item{dwei}{- A Datastream Client Interface object created with

@@ -16,8 +16,13 @@ Creates an R5/RC4 object for accessing the Thomson Reuters
 \section{Methods}{
 
 \describe{
-\item{\code{initialize(dsws.serverURL = "", username = "", password = "",
-  token = NULL, connect = TRUE)}}{  initialises the class.
+\item{\code{initialize(
+  dsws.serverURL = "",
+  username = "",
+  password = "",
+  token = NULL,
+  connect = TRUE
+)}}{  initialises the class.
   Unless noConnect is TRUE also connects to the
   Datastream dsws server.  If the username and password are not
   provided, then they are sourced from system enviroment variables (ie Sys.getenv)
@@ -101,8 +106,15 @@ requestDate = "-0D")
 
   }
 
-\item{\code{timeSeriesListRequest(instrument, datatype = "", expression = "", startDate,
-  endDate, frequency = "D", format = "ByInstrument")}}{  Make a timeSeriesListRequest from Datastream DSWS.
+\item{\code{timeSeriesListRequest(
+  instrument,
+  datatype = "",
+  expression = "",
+  startDate,
+  endDate,
+  frequency = "D",
+  format = "ByInstrument"
+)}}{  Make a timeSeriesListRequest from Datastream DSWS.
   This is the
   equivalent to the Excel timeseries request for an array of instruments.
   Should request either a datatype or an expression not both.  If a
@@ -164,8 +176,15 @@ requestDate = "-0D")
 }
   }
 
-\item{\code{timeSeriesRequest(instrument, datatype = "", expression = "", startDate,
-  endDate, frequency = "D", format = "ByInstrument")}}{  Return a timeSeriesRequest from Datastream dsws.
+\item{\code{timeSeriesRequest(
+  instrument,
+  datatype = "",
+  expression = "",
+  startDate,
+  endDate,
+  frequency = "D",
+  format = "ByInstrument"
+)}}{  Return a timeSeriesRequest from Datastream dsws.
   Should request either
   a datatype or an expression
   not both.  If a datatype is provided then anythink in Expression
