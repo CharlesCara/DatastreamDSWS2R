@@ -42,7 +42,9 @@ test_that("test of creating a dsws object wrong server location", {
   }
   skip_on_cran()
 
-  expect_error(dsws$new(dsws.serverURL = "http://www.bbc.co.uk"))
+  expect_error(dsws$new(dsws.serverURL = "https://www.bbc.co.uk/",
+                        username = "MickeyMouse",
+                        password = "Goofy2"))
 
 
 })
@@ -64,3 +66,27 @@ test_that("test of creating a dsws object without connecting to dsws server", {
 
 })
 
+##############################################################################################
+test_that("test of creating a dsws object with callback function for getting Token", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+    myTokenFunction <- function(){
+      list(TokenValue = paste0("abc:", Sys.time()),
+           TokenExpiry = Sys.time() + as.difftime(2, units = "mins"))
+    }
+
+  mydsws <- dsws$new(getTokenFunction = myTokenFunction)
+
+  expect_is(mydsws, "dsws")
+  expect_equal(stringi::stri_sub(mydsws$tokenList$TokenValue, to = 3L) ,"abc")
+
+  mydsws$.loadToken()
+
+
+
+  rm(mydsws)
+
+})

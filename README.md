@@ -96,9 +96,27 @@ Alternatively this can be set as an option by adding this line to your .RProfile
 
     options(Datastream.ChunkLimit = 50L)
 
+## Storage of DSWS access token between sessions
+
+The access token that is used to access DSWS can be provided via a callback function.  When the 
+token expires then this function will be called again and needs to provide a refreshed token.
+
+The callback function is used in 
+
+    # Stub of function for returning token
+    myTokenFunc <- function(){
+        return(list(TokenValue = "abc",
+                    TokenExpiry = as.POSIXlt("2020-04-17 12:34")))
+    }
+
+    mydsws <- dsws$new(getTokenFunction = myTokenFunc)
+
+
 
 ## CRAN
 Thank you to @mbannert for his work making the package ready to be released on CRAN. 
+
+
 
 ## Update 1.6.6
 Fix for Issues #26 and #27

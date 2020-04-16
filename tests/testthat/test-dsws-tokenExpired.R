@@ -11,18 +11,22 @@ test_that("test of simple snapshot request for price datatype with relative date
   }
   skip_on_cran()
 
-  mydsws <- dsws$new()
+  mydsws <- dsws$new(connect = FALSE)
 
   myTime <- Sys.time()
 
-  tokenTime <- myTime + 2 * 3600
+  tokenTime <- myTime + as.difftime(120, units = "secs")
 
   myToken <- list(TokenValue = "abc",
                   TokenExpiry = tokenTime)
 
 
-  expect_false(mydsws$.tokenExpired(thisToken = myToken, myTime = myTime))
-  expect_false(mydsws$.tokenExpired(thisToken = myToken, myTime = myTime + 3599))
-  expect_true(mydsws$.tokenExpired(thisToken = myToken, myTime = myTime + 3701))
-  expect_true(mydsws$.tokenExpired(thisToken = myToken, myTime = myTime + 7201))
+  expect_false(mydsws$.tokenExpired(thisToken = myToken,
+                                    myTime = myTime))
+  expect_false(mydsws$.tokenExpired(thisToken = myToken,
+                                    myTime = myTime + as.difftime(58, units = "secs")))
+  expect_true(mydsws$.tokenExpired(thisToken = myToken,
+                                   myTime = myTime + as.difftime(62, units = "secs")))
+  expect_true(mydsws$.tokenExpired(thisToken = myToken,
+                                   myTime = myTime + as.difftime(121, units = "secs")))
 })

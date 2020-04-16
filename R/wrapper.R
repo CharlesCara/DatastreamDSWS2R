@@ -326,7 +326,7 @@ myStaticRequestSet <- function(mydsws = dsws$new(),
 
 
   rownames(idf) <- NULL
-  return(as.data.frame(idf))
+  return(as.data.frame(idf, stringsAsFactors = FALSE))
 }
 
 ##############################################################################################

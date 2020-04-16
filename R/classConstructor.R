@@ -56,6 +56,7 @@
 #' @exportClass dsws
 dsws <- setRefClass(Class="dsws",
                     fields = list(tokenList="ANY",
+                                  tokenSource = "ANY",
                                   serverURL = "character",
                                   username = "character",
                                   password = "character",
@@ -78,6 +79,7 @@ dsws <- setRefClass(Class="dsws",
 #-----Accessors----------------------------------------------------------------
 
 dsws$accessors(c("tokenList",
+                 "tokenSource",
                  "serverURL",
                  "username",
                  "password",
@@ -91,14 +93,24 @@ dsws$accessors(c("tokenList",
 #------Initialisation-----------------------------------------------------------------------
 
 dsws$methods(initialize = function(dsws.serverURL = "",
+                                   getTokenFunction = NULL,
+                                   token = NULL,
                                    username = "",
                                    password = "",
-                                   token = NULL,
                                    connect = TRUE){
   "
   initialises the class.
   Unless noConnect is TRUE also connects to the
-  Datastream dsws server.  If the username and password are not
+  Datastream dsws server.
+
+  Authentication can be set in three ways:
+  1)  If getTokenFunction is not null then that function is called.  It is expected to
+  return a list with items 'TokenValue' and 'TokenExpiry'.
+
+  2)  An access token can also be passed into the class on initialisation, so that it can be shared between sessions.
+  'token' is expected to be a list with items 'TokenValue' and 'TokenExpiry'.
+
+  3) A username and password that are used to fetch a token from the DSWS server.  If the username and password are not
   provided, then they are sourced from system enviroment variables (ie Sys.getenv)
       'DatastreamUsername' and 'DatastreamPassword'
   or alternatively (not preferred) that from
@@ -108,9 +120,6 @@ dsws$methods(initialize = function(dsws.serverURL = "",
     This allows the password to be stored in .Renviron or .RProfile rather
   than in the source code.
 
-  An access token can also be passed into the class on initialisation, so that it can be shared between sessions.
-  'token' is expected to be a list with items 'TokenValue' and 'TokenExpiry'.
-
   There is a difference in the Refinitiv's documentation about the chunk limit and different accounts have
   different limits.  Some users are limited to 50 items while others are limited to 2000L.  The chunk limit
   can be controlled by setting the chunkLimit parameter of the dsws object.  If     \\code{options()$Datastream.ChunkLimit} is
@@ -119,9 +128,6 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   "
 
   .self$initialised <<- FALSE
-
-  .self$tokenList <<- list(TokenValue = NULL,
-                           TokenExpiry = NULL)
 
   .self$errorlist <<- NULL
 
@@ -145,6 +151,40 @@ dsws$methods(initialize = function(dsws.serverURL = "",
     .self$serverURL <<- dsws.serverURL
   }
 
+  # Authenticate and get token
+
+  # Use the token function if provided
+
+  if(!is.null(getTokenFunction) && is.function(getTokenFunction)){
+    .self$tokenSource <- getTokenFunction
+    .self$tokenList <<- .self$tokenSource()
+
+    .self$initialised <<- TRUE
+
+    return(invisible(.self))
+
+  }
+
+
+  # Next option use the token that has been passed
+  if(!is.null(token) && is.list(token)) {
+    if(FALSE %in% (c("TokenValue", "TokenExpiry") %in% names(token)))
+      stop("Token must contain items TokenValue and TokenExpiry")
+    if(!xts::is.timeBased(token$TokenExpiry))
+      stop("Token$TokenExpiry must be a time based object")
+
+    .self$tokenList <<- list(TokenValue = token$TokenValue,
+                             TokenExpiry = token$TokenExpiry)
+
+    .self$initialised <<- TRUE
+
+    .self$tokenSource <- "Provided"
+
+    return(invisible(.self))
+  }
+
+  # If we are passed the username and password then use them, otherwise the system environment
+  # defaults before getting the token from the DSWS server
   if(username != ""){
     .self$username <<- username
   } else if(Sys.getenv("DatastreamUsername") != ""){
@@ -166,35 +206,44 @@ dsws$methods(initialize = function(dsws.serverURL = "",
     stop("Either username must be specified or it must be set via options(\"Datastream.Password\", \"Mypassword\"")
   }
 
+  .self$tokenList <<- list(TokenValue = NULL,
+                           TokenExpiry = NULL)
+
+  .self$tokenSource <- "DSWS"
+
   .self$initialised <<- TRUE
 
-  if(is.null(token)){
-    if(connect){
-      .self$.loadToken()
-    }
-
-  } else {
-    if(FALSE %in% (c("TokenValue", "TokenExpiry") %in% names(token)))
-      stop("Token must contain items TokenValue and TokenExpiry")
-    if(!xts::is.timeBased(token$TokenExpiry))
-      stop("Token$TokenExpiry must be a time based object")
-
-    .self$tokenList <<- list(TokenValue = token$TokenValue,
-                             TokenExpiry = token$TokenExpiry)
+  if(connect){
+    .self$.loadToken()
   }
-
 
   return(invisible(.self))
 })
 
 
 
+#-----getToken---------------------------
+dsws$methods(.loadToken = function(){
+  "Internal function:
+   Choses whether to get token from internal function or from DSWS"
 
+  if(is.function(.self$tokenSource)){
+    .self$tokenList <- .self$tokenSource()
 
-#------getToken-----------------------------------------------------------------------
+  } else if(.self$tokenSource == "DSWS") {
+
+    .self$.requestToken()
+
+  } else {
+    stop("No token reloading method is available.")
+  }
+
+})
+
+#------.requestToken-----------------------------------------------------------------------
 #' @importFrom httr GET status_code http_error http_status parsed_content timeout
 #'
-dsws$methods(.loadToken = function(){
+dsws$methods(.requestToken = function(){
   "Internal function:
    Returns a Token from the the dsws server that
   gives permission to access data."
@@ -297,8 +346,8 @@ dsws$methods(.tokenExpired = function(thisToken = NULL, myTime = Sys.time()){
 
   if(is.null(thisTokenExpiry)) return(TRUE)
 
-  # We want the token to have at least one hour before expiry
-  return( (thisTokenExpiry - myTime) < as.difftime(1, units = "hours") )
+  # We want the token to have at least one minute before expiry
+  return( (thisTokenExpiry - myTime) < as.difftime(60, units = "secs") )
 
 })
 
@@ -657,28 +706,28 @@ dsws$methods(timeSeriesListRequest = function(instrument,
 }
   "
 
-  # First return a list of mnemonics
+# First return a list of mnemonics
 
-  symbolList <<- .self$.basicRequest(instrument = instrument,
-                                     datatype = "MNEM",
-                                     expression = "",
-                                     isList = TRUE,
-                                     startDate = "",
-                                     endDate = endDate,
-                                     frequency = frequency,
-                                     kind = 0,
-                                     format = "SnapshotList")
+symbolList <<- .self$.basicRequest(instrument = instrument,
+                                   datatype = "MNEM",
+                                   expression = "",
+                                   isList = TRUE,
+                                   startDate = "",
+                                   endDate = endDate,
+                                   frequency = frequency,
+                                   kind = 0,
+                                   format = "SnapshotList")
 
 
-  return(.self$.basicRequest(instrument = symbolList[,1],
-                             datatype = datatype,
-                             expression = expression,
-                             isList = FALSE,
-                             startDate = startDate,
-                             endDate = endDate,
-                             frequency = frequency,
-                             kind = 1,
-                             format = format))
+return(.self$.basicRequest(instrument = symbolList[,1],
+                           datatype = datatype,
+                           expression = expression,
+                           isList = FALSE,
+                           startDate = startDate,
+                           endDate = endDate,
+                           frequency = frequency,
+                           kind = 1,
+                           format = format))
 })
 
 #-----------------------------------------------------------------------------
