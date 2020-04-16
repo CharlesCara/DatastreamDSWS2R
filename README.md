@@ -116,6 +116,11 @@ The callback function is used in
 ## CRAN
 Thank you to @mbannert for his work making the package ready to be released on CRAN. 
 
+## Update 1.7.2
+Fix for Issues #20 - requesting token after http 403 response
+
+## Update 1.7.1
+Fix for Issue #28 - callback function for getting token 
 
 
 ## Update 1.6.6

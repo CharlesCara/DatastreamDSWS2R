@@ -410,9 +410,15 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
     if("error" %in% class(myDataResponse) &&
        !stringr::str_detect(myDataResponse$message, "Timeout was reached")) break
 
-    # If did not get a time out then break
-    if("response" %in% class(myDataResponse) &&
-       httr::status_code(myDataResponse) != 408) break
+    # If did not get a time out or authentication then break
+    if("response" %in% class(myDataResponse)){
+      if(httr::status_code(myDataResponse) == 403) {
+        .self$.loadToken()
+      } else if(httr::status_code(myDataResponse) != 408) {
+        break
+      }
+    }
+
 
     # We have got a time out so check if we have had too many tries
     if(nLoop >= maxLoop) break
