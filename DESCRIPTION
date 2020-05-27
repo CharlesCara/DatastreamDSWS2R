@@ -18,10 +18,10 @@ Imports:
     xts,
     zoo,
     methods,
-    foreach
+    foreach,
+    dplyr
 Suggests: testthat
-Roxygen: list(wrap = FALSE)
-RoxygenNote: 7.0.1
+RoxygenNote: 7.1.0
 Collate: 
     'DatastreamDSWS2R.R'
     'common.R'
@@ -29,4 +29,7 @@ Collate:
     'wrapper.R'
     'UCTSUpload.R'
     'cbindRobust.R'
+    'data.R'
 Encoding: UTF-8
+Depends: 
+    R (>= 2.10)

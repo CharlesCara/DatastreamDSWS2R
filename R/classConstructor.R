@@ -9,7 +9,7 @@
 #'   Datastream DSWS service
 #'
 #' @examples
-#'
+#' \dontrun{
 #'
 #'
 #'      mydsws <- dsws$new()
@@ -50,7 +50,7 @@
 #'                                              startDate = "-30D",
 #'                                              endDate = "-0D",
 #'                                              frequency = "D")
-#'
+#'}
 #' @import methods
 #' @export dsws
 #' @exportClass dsws
