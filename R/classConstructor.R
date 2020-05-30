@@ -8,8 +8,30 @@
 #' @details Creates an R5/RC4 object for accessing the Thomson Reuters
 #'   Datastream DSWS service
 #'
-#' @examples
 #'
+#' @field tokenList fieldDescription
+#' @field tokenSource  fieldDescription
+#' @field serverURL fieldDescription
+#' @field username fieldDescription
+#' @field password fieldDescription
+#' @field initialised fieldDescription
+#' @field errorlist fieldDescription
+#' @field requestList fieldDescription
+#' @field jsonResponseSaveFile fieldDescription
+#' @field jsonResponseLoadFile fieldDescription
+#' @field dataResponse fieldDescription
+#' @field symbolList fieldDescription
+#' @field myValues fieldDescription
+#' @field myTypes fieldDescription
+#' @field logging fieldDescription
+#' @field numDatatype fieldDescription
+#' @field numInstrument fieldDescription
+#' @field chunkLimit fieldDescription
+#' @field requestStringLimit fieldDescription
+#' @field logFileFolder fieldDescription
+#'
+#' @examples
+#' \dontrun{
 #'
 #'
 #'      mydsws <- dsws$new()
@@ -50,7 +72,7 @@
 #'                                              startDate = "-30D",
 #'                                              endDate = "-0D",
 #'                                              frequency = "D")
-#'
+#'}
 #' @import methods
 #' @export dsws
 #' @exportClass dsws
