@@ -12,6 +12,7 @@ License: GPL-3
 LazyData: TRUE
 Imports:
     dplyr,
+    rlang (>= 0.4.6),
     httr,
     jsonlite,
     stringi,
