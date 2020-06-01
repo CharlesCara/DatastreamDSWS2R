@@ -14,7 +14,7 @@
 the parsed result: either Date, String or numeric
 }
 \description{
-
+extracts and converts a JSON string from 'Symbol'
 }
 \details{
 extracts and converts a JSON string (including with Timezone)

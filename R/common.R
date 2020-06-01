@@ -299,7 +299,7 @@
 #' in the list x.  the item is parsed from JSON into either a numeric,
 #'  string, or a R Date object
 #'
-#' @description
+#' @description extracts and converts a JSON string from 'Symbol'
 #'
 #' @param x a list that is expected to have an item 'Symbol' and 'Type'
 #' @return the parsed result: either Date, String or numeric
@@ -323,12 +323,12 @@
 #
 #' @name dotgetJSONValue
 #' @title .getSymbol
+#' @description extracts and converts a JSON string
+#'
 #' @details extracts and converts a JSON string (including with Timezone)
 #'  from the item 'Symbol'
 #' in the list x.  the item is parsed from JSON into either a numeric,
 #'  string, or a R Date object
-#'
-#' @description
 #'
 #' @param x a list that is expected to have an item 'Symbol' and 'Type'
 #' @return the parsed result: either Date, String or numeric

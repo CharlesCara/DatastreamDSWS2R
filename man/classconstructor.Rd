@@ -13,6 +13,50 @@ An R5/RC object for accessing the Thomson Reuters Datastream
 Creates an R5/RC4 object for accessing the Thomson Reuters
   Datastream DSWS service
 }
+\section{Fields}{
+
+\describe{
+\item{\code{tokenList}}{fieldDescription}
+
+\item{\code{tokenSource}}{fieldDescription}
+
+\item{\code{serverURL}}{fieldDescription}
+
+\item{\code{username}}{fieldDescription}
+
+\item{\code{password}}{fieldDescription}
+
+\item{\code{initialised}}{fieldDescription}
+
+\item{\code{errorlist}}{fieldDescription}
+
+\item{\code{requestList}}{fieldDescription}
+
+\item{\code{jsonResponseSaveFile}}{fieldDescription}
+
+\item{\code{jsonResponseLoadFile}}{fieldDescription}
+
+\item{\code{dataResponse}}{fieldDescription}
+
+\item{\code{symbolList}}{fieldDescription}
+
+\item{\code{myValues}}{fieldDescription}
+
+\item{\code{myTypes}}{fieldDescription}
+
+\item{\code{logging}}{fieldDescription}
+
+\item{\code{numDatatype}}{fieldDescription}
+
+\item{\code{numInstrument}}{fieldDescription}
+
+\item{\code{chunkLimit}}{fieldDescription}
+
+\item{\code{requestStringLimit}}{fieldDescription}
+
+\item{\code{logFileFolder}}{fieldDescription}
+}}
+
 \section{Methods}{
 
 \describe{
@@ -252,7 +296,7 @@ requestDate = "-0D")
 }}
 
 \examples{
-
+\dontrun{
 
 
      mydsws <- dsws$new()
@@ -293,5 +337,5 @@ requestDate = "-0D")
                                              startDate = "-30D",
                                              endDate = "-0D",
                                              frequency = "D")
-
+}
 }

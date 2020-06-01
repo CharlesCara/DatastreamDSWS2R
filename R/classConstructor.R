@@ -1497,7 +1497,7 @@ dsws$methods(.buildRequestList = function (frequency, instrument, datatype, expr
   # If bundle is true, then we want to put each expression into an individual entry in DataRequests
   myNumInstrument <- length(instrument)
 
-  if(datatype == "" && expression != ""){
+  if(datatype[1] == "" && expression[1] != ""){
     # We have an expression
     myNumDatatype <- 1
     isDatatype <- FALSE
@@ -1631,7 +1631,7 @@ dsws$methods(.buildRequestListBundle = function (frequency, instrument, datatype
   # If bundle is true, then we want to put each expression into an individual entry in DataRequests
   myNumInstrument <- length(instrument)
 
-  if(datatype == "" && expression != ""){
+  if(datatype[1] == "" && expression[1] != ""){
     # We have an expression
     myNumDatatype <- 1L
     if( stringr::str_detect(expression,stringr::regex("XXXX", ignore_case = TRUE)) == FALSE){

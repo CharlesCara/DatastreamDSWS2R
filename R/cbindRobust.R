@@ -39,7 +39,7 @@ cbindRobust <- function(xts1, xts2) {
 
 
   # If neither of the two series are empty NA series, then we combine them as normal in order to save time.
-  if(!is.na(unique(xts1)) && !is.na(unique(xts2))){
+  if(!is.na(unique(xts1)[1]) && !is.na(unique(xts2)[1])){
 
     xts3 <- cbind(xts1, xts2)
     return(xts3)
@@ -47,7 +47,8 @@ cbindRobust <- function(xts1, xts2) {
   }
 
   # If the non-empty time series is not class character, then we combine as normal in order to save time
-  if(unique(apply(xts1, MARGIN = 1, FUN = class)) != "character" && unique(apply(xts2, MARGIN = 1, FUN = class)) != "character") {
+  if(unique(apply(xts1, MARGIN = 1, FUN = class))[1] != "character" &&
+     unique(apply(xts2, MARGIN = 1, FUN = class))[1] != "character") {
 
     xts3 <- cbind(xts1, xts2)
     return(xts3)
