@@ -355,7 +355,7 @@
   }
   if(type == 2){
     # Value is Bool
-    return(.convert_JSON_Boolean(value))
+    return(.convert_JSON_Bool(value))
   }
   if(type == 3){
     # Value is Integer

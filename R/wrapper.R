@@ -190,7 +190,7 @@ listRequest <- function (dwei=getDataStream(),
                              expression = "",
                              requestDate = endDate)
 
-  return(myData[ ,2:ncol(myData)])
+  return(myData[ , 2:ncol(myData)])
 }
 
 
@@ -322,11 +322,12 @@ myStaticRequestSet <- function(mydsws = dsws$new(),
 
   } else {
     idf <- idf[,2]
-  }
 
+  }
 
   rownames(idf) <- NULL
   return(as.data.frame(idf, stringsAsFactors = FALSE))
+
 }
 
 ##############################################################################################
@@ -357,6 +358,7 @@ staticRequestSet <- function(mydsws = dsws$new(),
                              frequency = "D",
                              verbose = FALSE){
 
+  iExpression <- NULL
 
   ldf <- foreach(iExpression = expression) %do%
   {
@@ -433,6 +435,8 @@ staticListRequestSet <- function(mydsws = dsws$new(),
                                  expression = "",
                                  endDate = Sys.Date(),
                                  frequency = "D"){
+
+  iExpression <- NULL
 
   ldf <- foreach(iExpression = expression) %do%
   {

@@ -424,11 +424,11 @@ UCTSAppend <- function(tsData,
 
     if(overwrite){
       # append with new data overwriting the old
-      tsData <- make.index.unique(rbind(tsData, tsExisting), drop = TRUE)
+      tsData <- xts::make.index.unique(rbind(tsData, tsExisting), drop = TRUE)
 
     } else {
       # append with old data being kept
-      tsData <- make.index.unique(rbind(tsExisting, tsData), drop = TRUE)
+      tsData <- xts::make.index.unique(rbind(tsExisting, tsData), drop = TRUE)
     }
 
   }
