@@ -6,7 +6,7 @@ test_that("jsonConvertdatetime is works for simple, single date", {
   jsonDate <- "/Date(1449218172199)/"
   rDate <- DatastreamDSWS2R:::.convert_JSON_Datetime(jsonDate)
 
-  expect_equal(rDate, as.POSIXlt("2015-12-04 08:36:12 GMT"), tolerance = 0.5)
+  expect_equal(rDate, as.POSIXlt("2015-12-04 08:36:12.199", tz = "GMT"), tolerance = 0.5)
 
 })
 
@@ -15,7 +15,7 @@ test_that("jsonConvertdate is works for simple, single date", {
   jsonDate <- "/Date(1449218172199)/"
   rDate <- DatastreamDSWS2R:::.convert_JSON_Date(jsonDate)
 
-  expect_equal(rDate, as.Date("2015-12-04"), tolerance = 0.5)
+  expect_equal(rDate, as.Date("2015-12-04"), tolerance = 0.01)
 
 })
 

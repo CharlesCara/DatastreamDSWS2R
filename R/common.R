@@ -157,7 +157,7 @@
   # shift 1 position from the start and end to get the string between the parentheses
   JSON_Date <- stringi::stri_sub(Input_Strings, start+1, end-1)
 
-  return(structure(as.numeric(JSON_Date)/1000, class = c("POSIXct", "POSIXt")))
+  return(structure(as.numeric(JSON_Date)/1000, class = c("POSIXct", "POSIXt"), tzone = "GMT"))
 }
 
 
