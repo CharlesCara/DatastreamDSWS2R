@@ -75,7 +75,7 @@
 #'}
 #' @import methods
 #' @export dsws
-#' @exportClass dsws
+#'
 dsws <- setRefClass(Class="dsws",
                     fields = list(tokenList="ANY",
                                   tokenSource = "ANY",

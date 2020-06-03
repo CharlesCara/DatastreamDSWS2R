@@ -3,6 +3,7 @@
 #' \describe{
 #'   \item{dsCode}{the datastream code}
 #'   \item{isoCode}{the ISO code for the currency}
+#'   \item{primeCode}{primaryCode for currency or alternative}
 #'   \item{Multiplier}{the units of the currency}
 #' }
 "currencyDS2ISO"
