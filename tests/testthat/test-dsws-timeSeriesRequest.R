@@ -602,6 +602,10 @@ test_that("test of chunked timeSeriesRequests with an expression", {
 # This is a test of setting chunkLimit via options()
 #
 test_that("test of setting chunkLimit via options()", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   myChunkLimit <- 123L
   options(Datastream.ChunkLimit = myChunkLimit)
@@ -618,6 +622,10 @@ test_that("test of setting chunkLimit via options()", {
 # This is a test that if a chunk returns all NA it does not 'poison' the other chunks
 #
 test_that("test of single chunk returning NA", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
 endDate = as.Date("2019-04-26")
 expression = "HIDE#(XXXX(NERI0YR))"
@@ -759,6 +767,10 @@ test_that("test of chunking timeSeriesRequests due to request string length", {
 #
 
 test_that("test of handling mainframe timeouts", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   mydsws <- dsws$new()
 

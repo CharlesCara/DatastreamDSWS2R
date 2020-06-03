@@ -1,7 +1,12 @@
 context("wrapper.R : staticListRequestSet function")
 
 test_that("test of myStaticRequestSet with a date returned", {
-  expect_silent(
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+    expect_silent(
     adf <- DatastreamDSWS2R:::myStaticRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
                                                  instrument = "U:SNAP",
                                                  iExpression = "BDATE",
@@ -12,6 +17,10 @@ test_that("test of myStaticRequestSet with a date returned", {
 })
 
 test_that("test of staticListRequestSet with a date", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   adf <- DatastreamDSWS2R::staticListRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
                                                 instrument = "U:SNAP", expression = "BDATE",
@@ -21,6 +30,10 @@ test_that("test of staticListRequestSet with a date", {
 
 
 test_that("test of staticListRequestSet with a character and a date", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   adf <- DatastreamDSWS2R::staticListRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
                                                 instrument = "U:SNAP", expression = c("NAME", "BDATE"),
@@ -31,6 +44,10 @@ test_that("test of staticListRequestSet with a character and a date", {
 
 
 test_that("test of staticListRequestSet with a number and a date", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   adf <- DatastreamDSWS2R::staticListRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
                                                 instrument = "U:SNAP", expression = c("P", "BDATE"),
@@ -41,6 +58,10 @@ test_that("test of staticListRequestSet with a number and a date", {
 
 
 test_that("test of staticRequestSet with a two timeseries requests", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   Expressions <- c("PCH#(X,+1D)",
                    "PCH#(X,-1W)")
@@ -58,6 +79,10 @@ test_that("test of staticRequestSet with a two timeseries requests", {
 
 
 test_that("test of staticRequestSet with a static and  timeseries requests", {
+  if(Sys.getenv("DatastreamUsername") == ""){
+    skip("Username not available")
+  }
+  skip_on_cran()
 
   Expressions <- c("NAME",
                    "PCH#(X,+1D)",
