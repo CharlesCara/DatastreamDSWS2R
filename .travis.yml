@@ -1,1 +1,7 @@
 language: r
+
+script:
+- R CMD build .
+- R CMD check *tar.gz
+
+
