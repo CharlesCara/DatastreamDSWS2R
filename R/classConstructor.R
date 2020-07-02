@@ -1285,7 +1285,9 @@ dsws$methods(.basicRequestSnapshotChunk = function(instrument,
 
 #-----------------------------------------------------------------------------
 #' @importFrom xts xts
+
 dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunkItems, chunkNumber){
+
   if(format == "SnapshotList") {
     # If a list request then take the number of instruments from the response
     .self$numInstrument <- length(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues)
@@ -1295,14 +1297,14 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
   # Process the column for the instruments
   colnames(.self$myValues)[1] <- "Instrument"
 
+  ss <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues,
+           FUN = .getSymbol)
+
   if(isChunked){
-    .self$myValues[chunkItems, 1] <-
-      sapply(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues,
-             FUN = .getSymbol)
+    .self$myValues[chunkItems, 1] <- ss
   } else {
-    .self$myValues[, 1] <-
-      sapply(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues,
-             FUN = .getSymbol)
+    .self$myValues[, 1] <- ss
+
   }
 
 
@@ -1327,7 +1329,7 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
       myType <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
                        FUN = .getType,
                        simplify = TRUE)
-      .self$myTypes[iDatatype] <- round(median(as.numeric(myType)))
+      .self$myTypes[iDatatype] <- round(median(as.numeric(myType), na.rm = TRUE))
 
       # On the first loop, we need to check what the type of data is, and if a Date
       # then we need to pre-format the column of the data.frame as a Date
@@ -1338,27 +1340,31 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
     }
 
 
-    # Can't use sapply with simplify or unlist directly as they strip any Date attributes.
-    dd <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
-                 FUN = .getValue,
-                 simplify = FALSE)
+    # Now process the column of data and get a vector of the appropriate class
 
     if(myTypes[iDatatype] == 4) {
-      # as we have a date in the column
-      if(isChunked){
-        .self$myValues[chunkItems, iDatatype + 1] <- suppressWarnings(as.Date(do.call("c",dd)))
-      } else {
-        .self$myValues[, iDatatype + 1] <- suppressWarnings(as.Date(do.call("c",dd)))
-      }
+      # as we have a date in the column for all values into dates
+      # Can't use sapply with simplify or unlist directly as they strip any Date attributes.
+
+      dd <- lapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
+                    FUN = .getValueTyped,
+                    myType = 4)
+      dd <- suppressWarnings(zoo::as.Date(do.call("c",dd)))
+
     } else {
-      # as we do not have a Date in this column
-      if(isChunked){
-        .self$myValues[chunkItems, iDatatype + 1] <- unlist(dd)
-      } else {
-        .self$myValues[, iDatatype + 1] <- unlist(dd)
-      }
+      # as we do not have a Date in this column use the generalised conversion
+      dd <- lapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
+                   FUN = .getValue)
+      dd <- unlist(dd)
+
+
     }
 
+    if(isChunked){
+      .self$myValues[chunkItems, iDatatype + 1] <- dd
+    } else {
+      .self$myValues[, iDatatype + 1] <- dd
+    }
 
   }
 

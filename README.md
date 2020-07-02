@@ -116,6 +116,9 @@ The callback function is used in
 ## CRAN
 Thank you to @mbannert for his work making the package ready to be released on CRAN. 
 
+## Update 1.7.4
+Fixe for Issues #37 - charToDate error raised when list request had mixture of dates and character "NA""
+
 ## Update 1.7.2
 Fix for Issues #20 - requesting token after http 403 response
 
