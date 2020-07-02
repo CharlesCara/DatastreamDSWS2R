@@ -114,12 +114,12 @@ Creates an R5/RC4 object for accessing the Thomson Reuters
 
   Examples:
 
-    \code{
+    \preformatted{
       mydsws$listRequest(instrument = "LFTSE100",
       datatype = c("NAME","P"), 
 requestDate = "-0D")
     }
-    \code{
+    \preformatted{
       mydsws$listRequest(instrument = "LFTSE100",
       expression = "PCH#(XXXX,3M)", requestDate = Sys.Date())
     }
@@ -144,12 +144,12 @@ requestDate = "-0D")
 
   Examples:
 
-    \code{
+    \preformatted{
   mydsws$snapshotRequest(instrument = c("MKS","@AAPL"), 
 
    datatype = c("NAME","P"), requestDate = "-0D")
     }
-    \code{
+    \preformatted{
   mydsws$snapshotRequest(instrument = c("MKS","@AAPL"), 
 
    expression = "PCH#(XXXX,3M)", requestDate = "-0D")
@@ -197,14 +197,14 @@ requestDate = "-0D")
 
   Examples:
 
-    \code{
+    \preformatted{
   mydsws$timeSeriesListRequest(instrument = "LFTSE100",
 
     datatype = "P", startDate = "-30D",
 
     endDate = "-0D", frequency = "D")
     }
-    \code{
+    \preformatted{
 
   mydsws$timeSeriesListRequest(instrument = "LFTSE100", 
 
@@ -216,7 +216,7 @@ requestDate = "-0D")
 
     frequency = "D")
     }
-    \code{
+    \preformatted{
   mydsws$timeSeriesListRequest(instrument = "LFTSE100", 
 
     datatype = ("P","UP"), startDate = "-30D",
@@ -269,14 +269,14 @@ requestDate = "-0D")
 
   Examples:
 
-    \code{
+    \preformatted{
   mydsws$timeSeriesRequest(instrument = c("MKS","@AAPL"),
 
       datatype = "P", startDate = "-30D",
 
       endDate = "-0D", frequency = "D")
     }
-    \code{
+    \preformatted{
 
   mydsws$timeSeriesRequest(instrument = c("MKS"), 
 
@@ -284,7 +284,7 @@ requestDate = "-0D")
 
       endDate = "-0D", frequency = "D")
     }
-    \code{
+    \preformatted{
   mydsws$timeSeriesRequest(instrument = c("MKS","@AAPL"), 
 
       datatype = ("P","UP"), startDate = "-30D",

@@ -535,11 +535,11 @@ dsws$methods(listRequest = function(instrument,
   Returns a data.frame with the requested data.\n
 
   Examples:\n
-    \\code{
+    \\preformatted{
       mydsws$listRequest(instrument = \"LFTSE100\",
       datatype = c(\"NAME\",\"P\"), \nrequestDate = \"-0D\")
     }
-    \\code{
+    \\preformatted{
       mydsws$listRequest(instrument = \"LFTSE100\",
       expression = \"PCH#(XXXX,3M)\", requestDate = Sys.Date())
     }
@@ -578,11 +578,11 @@ dsws$methods(snapshotRequest = function(instrument,
   Returns a data.frame with the requested data.\n
 
   Examples:\n
-    \\code{
+    \\preformatted{
   mydsws$snapshotRequest(instrument = c(\"MKS\",\"@AAPL\"), \n
    datatype = c(\"NAME\",\"P\"), requestDate = \"-0D\")
     }
-    \\code{
+    \\preformatted{
   mydsws$snapshotRequest(instrument = c(\"MKS\",\"@AAPL\"), \n
    expression = \"PCH#(XXXX,3M)\", requestDate = \"-0D\")
     }
@@ -643,18 +643,18 @@ dsws$methods(timeSeriesRequest = function(instrument,
   is more compatible with the quantmod package.
 
   Examples:\n
-    \\code{
+    \\preformatted{
   mydsws$timeSeriesRequest(instrument = c(\"MKS\",\"@AAPL\"),\n
       datatype = \"P\", startDate = \"-30D\",\n
       endDate = \"-0D\", frequency = \"D\")
     }
-    \\code{
+    \\preformatted{
 
   mydsws$timeSeriesRequest(instrument = c(\"MKS\"), \n
       expression = \"PCH#(XXXX,3M)\", startDate = \"-30D\",\n
       endDate = \"-0D\", frequency = \"D\")
     }
-    \\code{
+    \\preformatted{
   mydsws$timeSeriesRequest(instrument = c(\"MKS\",\"@AAPL\"), \n
       datatype = (\"P\",\"UP\"), startDate = \"-30D\",\n
       endDate = \"-0D\", frequency = \"D\", format = \"ByDatatype\")
@@ -713,12 +713,12 @@ dsws$methods(timeSeriesListRequest = function(instrument,
   with the quantmod package.
 
   Examples:\n
-    \\code{
+    \\preformatted{
   mydsws$timeSeriesListRequest(instrument = \"LFTSE100\",\n
     datatype = \"P\", startDate = \"-30D\",\n
     endDate = \"-0D\", frequency = \"D\")
     }
-    \\code{
+    \\preformatted{
 
   mydsws$timeSeriesListRequest(instrument = \"LFTSE100\", \n
     expression = \"PCH#(XXXX,3M)\", \n
@@ -726,7 +726,7 @@ dsws$methods(timeSeriesListRequest = function(instrument,
     endDate = \"-0D\", \n
     frequency = \"D\")
     }
-    \\code{
+    \\preformatted{
   mydsws$timeSeriesListRequest(instrument = \"LFTSE100\", \n
     datatype = (\"P\",\"UP\"), startDate = \"-30D\",\n
     endDate = \"-0D\", \n
