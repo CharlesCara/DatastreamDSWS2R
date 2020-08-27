@@ -174,14 +174,18 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   }
 
   # Authenticate and get token
+  # Set default value of Null for tokenList
+  .self$tokenList <- list(TokenValue = NULL,
+                           TokenExpiry = NULL)
 
   # Use the token function if provided
 
   if(!is.null(getTokenFunction) && is.function(getTokenFunction)){
+    .self$initialised <<- TRUE
     .self$tokenSource <- getTokenFunction
     .self$tokenList <<- .self$tokenSource()
 
-    .self$initialised <<- TRUE
+
 
     return(invisible(.self))
 
@@ -249,16 +253,22 @@ dsws$methods(.loadToken = function(){
   "Internal function:
    Choses whether to get token from internal function or from DSWS"
 
-  if(is.function(.self$tokenSource)){
-    .self$tokenList <- .self$tokenSource()
+  if(.self$.tokenExpired()){
 
-  } else if(.self$tokenSource == "DSWS") {
+    if(is.function(.self$tokenSource)){
+      .self$tokenList <- .self$tokenSource()
 
-    .self$.requestToken()
+    } else if(.self$tokenSource == "DSWS") {
 
-  } else {
-    stop("No token reloading method is available.")
+      .self$tokenList <- .self$.requestToken()
+
+    }  else {
+      stop("No token reloading method is available.")
+    }
+
   }
+  tv <-  .self$tokenList$TokenValue
+  return(tv)
 
 })
 
@@ -350,7 +360,7 @@ dsws$methods(.requestToken = function(){
     }
   }
 
-  return(invisible(.self$tokenList$TokenValue))
+  return(invisible(.self$tokenList))
 
 })
 
@@ -401,11 +411,6 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
   }else{
     myDataURL <- paste0(.self$serverURL , "GetData")
   }
-
-  if(.self$.tokenExpired()){
-    .self$.loadToken()
-  }
-
 
   if(.self$logging >=5 ){
     message("JSON request to DSWS server is:\n")
@@ -1298,7 +1303,7 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
   colnames(.self$myValues)[1] <- "Instrument"
 
   ss <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[1]]$SymbolValues,
-           FUN = .getSymbol)
+               FUN = .getSymbol)
 
   if(isChunked){
     .self$myValues[chunkItems, 1] <- ss
@@ -1347,8 +1352,8 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
       # Can't use sapply with simplify or unlist directly as they strip any Date attributes.
 
       dd <- lapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
-                    FUN = .getValueTyped,
-                    myType = 4)
+                   FUN = .getValueTyped,
+                   myType = 4)
       dd <- suppressWarnings(zoo::as.Date(do.call("c",dd)))
 
     } else {
