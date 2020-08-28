@@ -98,12 +98,14 @@ Alternatively this can be set as an option by adding this line to your .RProfile
 
 ## Storage of DSWS access token between sessions
 
-The access token that is used to access DSWS can be provided via a callback function.  When the 
-token expires then this function will be called again and needs to provide a refreshed token.
+The access token that is used to access DSWS can be provided via a callback function. This allows
+the callback function to cache the token between sessions and so reducing the number of calls on the DSWS server.
+
+When the token expires then this function will be called again and needs to provide a refreshed token.  
 
 The callback function is used in 
 
-    # Stub of function for returning token
+    # Stub of function for returning token from user's cache
     myTokenFunc <- function(){
         return(list(TokenValue = "abc",
                     TokenExpiry = as.POSIXlt("2020-04-17 12:34")))
@@ -113,11 +115,11 @@ The callback function is used in
 
 
 
-## CRAN
-Thank you to @mbannert for his work making the package ready to be released on CRAN. 
+## Update 1.7.5
+Improvement in handling of Token Callback function.
 
 ## Update 1.7.4
-Fixe for Issues #37 - charToDate error raised when list request had mixture of dates and character "NA""
+Fix for Issues #37 - charToDate error raised when list request had mixture of dates and character "NA""
 
 ## Update 1.7.2
 Fix for Issues #20 - requesting token after http 403 response
@@ -148,5 +150,8 @@ server from Datastream.  You just need to replace
     require(Datastream2R) 
 with 
     require(DatastreamDSWS2R)
+
+## CRAN
+Thank you to @mbannert for his work making the package ready to be released on CRAN. 
 
 
