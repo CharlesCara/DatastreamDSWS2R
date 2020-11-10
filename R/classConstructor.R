@@ -2,10 +2,10 @@
 #' @name classconstructor
 #' @title dsws
 #'
-#' @description An R5/RC object for accessing the Thomson Reuters Datastream
+#' @description An R5/RC object for accessing the Refinitiv Datastream
 #'   DSWS service.
 #'
-#' @details Creates an R5/RC4 object for accessing the Thomson Reuters
+#' @details Creates an R5/RC4 object for accessing the Refinitiv
 #'   Datastream DSWS service
 #'
 #'

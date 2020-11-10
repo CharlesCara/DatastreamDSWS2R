@@ -6,11 +6,11 @@
 \alias{dsws}
 \title{dsws}
 \description{
-An R5/RC object for accessing the Thomson Reuters Datastream
+An R5/RC object for accessing the Refinitiv Datastream
   DSWS service.
 }
 \details{
-Creates an R5/RC4 object for accessing the Thomson Reuters
+Creates an R5/RC4 object for accessing the Refinitiv
   Datastream DSWS service
 }
 \section{Fields}{

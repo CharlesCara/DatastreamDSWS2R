@@ -5,6 +5,6 @@
 \alias{DatastreamDSWS2R}
 \title{DatastreamDSWS2R}
 \description{
-A package to manage access to the Thomson Reuters Datastream
+A package to manage access to the Refinitiv Datastream
  DSWS webservice
 }

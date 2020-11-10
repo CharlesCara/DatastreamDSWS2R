@@ -53,7 +53,7 @@ test_that(" Test the post string generation code", {
 
 #------------------------------------------------------------------------------
 test_that("Test a dataset with an NaN in it", {
-
+  skip_on_cran()
 
   testData <- xts::xts(x=c(4.445, 4.121, -30754.896, 0.0001, NaN, NA, "TEXT"),
                   order.by = as.Date(c("2013-01-01", "2013-02-01", "2013-03-01", "2013-04-01", "2013-05-01", "2013-06-01", "2013-07-01")))

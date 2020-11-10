@@ -1,12 +1,12 @@
 # DatastreamDSWS2R
-Functions and a R5 class that allows data to be downloaded and uploaded to the Thomson Reuters Datastream database via the DSWS server.  Thomson Reuters Datastream is a rich database of financial information.  You need to have a Datastream subscription and a username/password to use this package.
+Functions and a R5 class that allows data to be downloaded and uploaded to the Refinitiv Datastream database via the DSWS server.  Refinitiv Datastream is a rich database of financial information.  You need to have a Datastream subscription and a username/password to use this package.
 
 The package can be installed using:
 
     require(devtools)
     install_github(“CharlesCara/DatastreamDSWS2R”)
 
-Your Thomson Reuters Datastream username and password are best stored in environment variables by adding to your .Renviron file the following
+Your Refinitiv Datastream username and password are best stored in environment variables by adding to your .Renviron file the following
 lines.  This approach makes DatastreamDSWS2R able to be run securely in Docker containers by passing the credentials into the container at
 runtime.
 
