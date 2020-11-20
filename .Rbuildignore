@@ -1,6 +1,8 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\data-raw\*
+data-raw\*
 ^data-raw$
+^\tools\*
+^\tools$
 .travis.yml
-
+README.md
