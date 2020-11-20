@@ -632,7 +632,7 @@ expression = "HIDE#(XXXX(NERI0YR))"
 frequency = "D"
 startDate = as.Date("2019-04-26")
 
-stocks <- readRDS(file.path(testthat::test_path(),"testData", "Europe600Codes.rds"))
+stocks <- readRDS(file.path(testDataFolder, "Europe600Codes.rds"))
 
 mydsws <- dsws$new()
 #mydsws$logging <- 60L
@@ -745,8 +745,7 @@ test_that("test of chunking timeSeriesRequests due to request string length", {
 
   mydsws <- dsws$new()
 
-  symbolList <- readRDS("testData/G100DSCodes.rds")
-  #symbolList <- readRDS("tests/testthat/testData/G100DSCodes.rds")
+  symbolList <- readRDS(file.path(testDataFolder, "G100DSCodes.rds"))
 
   # Get the unchunked data
 
@@ -774,8 +773,7 @@ test_that("test of handling mainframe timeouts", {
 
   mydsws <- dsws$new()
 
-  mydsws$jsonResponseLoadFile <- "./testData/TimeoutResponseFull.json"
-  # mydsws$jsonResponseLoadFile <- "tests/testthat/testData/TimeoutResponseFull.json"
+  mydsws$jsonResponseLoadFile <- file.path(testDataFolder, "TimeoutResponseFull.json")
 
   # Get the unchunked data
 

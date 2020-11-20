@@ -6,3 +6,4 @@ data-raw\*
 ^\tools$
 .travis.yml
 README.md
+cran-comments.md
