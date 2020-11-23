@@ -149,28 +149,28 @@ dsws$methods(initialize = function(dsws.serverURL = "",
 
   "
 
-  .self$initialised <<- FALSE
+  .self$initialised <- FALSE
 
-  .self$errorlist <<- NULL
+  .self$errorlist <- NULL
 
   if(is.null(options()$Datastream.ChunkLimit)){
-    .self$chunkLimit <<- 2000L   # Max number of items that can be in a single request.  Set by Datastream
+    .self$chunkLimit <- 2000L   # Max number of items that can be in a single request.  Set by Datastream
   } else {
-    .self$chunkLimit <<- as.integer(options()$Datastream.ChunkLimit)
+    .self$chunkLimit <- as.integer(options()$Datastream.ChunkLimit)
   }
 
-  .self$requestStringLimit <<- 2000L # Max character length of an http request.
-  .self$logging <<- 0L
-  .self$logFileFolder <<- Sys.getenv("R_USER")
-  .self$jsonResponseLoadFile <<- NULL  # By default is to hit the server
-  .self$jsonResponseSaveFile <<- NULL # Default is not to save JSON response
+  .self$requestStringLimit <- 2000L # Max character length of an http request.
+  .self$logging <- 0L
+  .self$logFileFolder <- Sys.getenv("R_USER")
+  .self$jsonResponseLoadFile <- NULL  # By default is to hit the server
+  .self$jsonResponseSaveFile <- NULL # Default is not to save JSON response
 
   if(dsws.serverURL == ""){
     # 07/4/2016 - due to issue with Datastream's load balancers, using a different URL.  This will
     # be changed back when the issue is resolved.
-    .self$serverURL <<- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
+    .self$serverURL <- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
   } else {
-    .self$serverURL <<- dsws.serverURL
+    .self$serverURL <- dsws.serverURL
   }
 
   # Authenticate and get token
@@ -181,9 +181,9 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   # Use the token function if provided
 
   if(!is.null(getTokenFunction) && is.function(getTokenFunction)){
-    .self$initialised <<- TRUE
+    .self$initialised <- TRUE
     .self$tokenSource <- getTokenFunction
-    .self$tokenList <<- .self$tokenSource()
+    .self$tokenList <- .self$tokenSource()
 
 
 
@@ -199,10 +199,10 @@ dsws$methods(initialize = function(dsws.serverURL = "",
     if(!xts::is.timeBased(token$TokenExpiry))
       stop("Token$TokenExpiry must be a time based object")
 
-    .self$tokenList <<- list(TokenValue = token$TokenValue,
+    .self$tokenList <- list(TokenValue = token$TokenValue,
                              TokenExpiry = token$TokenExpiry)
 
-    .self$initialised <<- TRUE
+    .self$initialised <- TRUE
 
     .self$tokenSource <- "Provided"
 
@@ -212,32 +212,32 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   # If we are passed the username and password then use them, otherwise the system environment
   # defaults before getting the token from the DSWS server
   if(username != ""){
-    .self$username <<- username
+    .self$username <- username
   } else if(Sys.getenv("DatastreamUsername") != ""){
-    .self$username <<- Sys.getenv("DatastreamUsername")
+    .self$username <- Sys.getenv("DatastreamUsername")
   } else if(!is.null(options()$Datastream.Username)){
-    .self$username <<- options()$Datastream.Username
+    .self$username <- options()$Datastream.Username
   } else {
     stop("Either username must be specified or it must be set via options(\"Datastream.Username\", \"Myusername\"")
   }
 
 
   if(password != ""){
-    .self$password <<- password
+    .self$password <- password
   } else if(Sys.getenv("DatastreamPassword") != ""){
-    .self$password <<- Sys.getenv("DatastreamPassword")
+    .self$password <- Sys.getenv("DatastreamPassword")
   } else if(!is.null(options()$Datastream.Password)){
-    .self$password <<- options()$Datastream.Password
+    .self$password <- options()$Datastream.Password
   } else {
     stop("Either username must be specified or it must be set via options(\"Datastream.Password\", \"Mypassword\"")
   }
 
-  .self$tokenList <<- list(TokenValue = NULL,
+  .self$tokenList <- list(TokenValue = NULL,
                            TokenExpiry = NULL)
 
   .self$tokenSource <- "DSWS"
 
-  .self$initialised <<- TRUE
+  .self$initialised <- TRUE
 
   if(connect){
     .self$.loadToken()
@@ -741,7 +741,7 @@ dsws$methods(timeSeriesListRequest = function(instrument,
 
 # First return a list of mnemonics
 
-symbolList <<- .self$.basicRequest(instrument = instrument,
+.self$symbolList <- .self$.basicRequest(instrument = instrument,
                                    datatype = "MNEM",
                                    expression = "",
                                    isList = TRUE,
@@ -752,7 +752,7 @@ symbolList <<- .self$.basicRequest(instrument = instrument,
                                    format = "SnapshotList")
 
 
-return(.self$.basicRequest(instrument = symbolList[,1],
+return(.self$.basicRequest(instrument = .self$symbolList[,1],
                            datatype = datatype,
                            expression = expression,
                            isList = FALSE,

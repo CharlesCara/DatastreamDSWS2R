@@ -5,5 +5,4 @@ data-raw\*
 ^\tools\*
 ^\tools$
 .travis.yml
-README.md
 cran-comments.md
