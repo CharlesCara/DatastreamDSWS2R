@@ -31,7 +31,7 @@ With this update we have switched from using the RCurl/rjson to using the httr/j
 
 ## Datastream DWE - now decommissioned by Refinitiv
 In addition, this package has been built to be largely backwards compatible with 
-the [Datastream2R](https://github.com/CharlesCara/Datastream2R) package that used the depreciated DWE 
+the Datastream2R package that used the depreciated DWE 
 server from Datastream.  You just need to replace 
     require(Datastream2R) 
 with 
