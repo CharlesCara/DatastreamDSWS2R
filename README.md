@@ -1,7 +1,11 @@
 # DatastreamDSWS2R
 Functions and a R5 class that allows data to be downloaded and uploaded to the Refinitiv Datastream database via the DSWS server.  Refinitiv Datastream is a rich database of financial information.  You need to have a Datastream subscription and a username/password to use this package.
 
-The package can be installed using:
+The package is installed using:
+
+    install.packages("DatastreamDSWS2R")
+    
+The development version of the package can be installed using:
 
     require(devtools)
     install_github(“CharlesCara/DatastreamDSWS2R”)
@@ -18,6 +22,15 @@ For backwards compatibility we have retained the ability to put credentials into
     options(Datastream.Username = "YOURUSERNAME")
     options(Datastream.Password = "YOURPASSWORD")
 
+A connection with the 'DSWS' API server is created by initialising the dsws object:
+
+     mydsws <- dsws$new()
+
+The username and password can also be passed in when creating the connection, but the environment variable approach is favoured.
+
+     mydsws <- dsws$new(username = "YOURUSERNAME", password = "YOURPASSWORD")
+     
+     
 ## Static Requests
 Once set up a typical request would be for a snapshot or *static* request:
 
