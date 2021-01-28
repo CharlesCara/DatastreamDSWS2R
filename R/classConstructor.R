@@ -941,7 +941,7 @@ dsws$methods(.basicRequest = function(instrument,
 
       if(length(datatype) == 1){
         # If we have only one datatype then merging is simple
-        if(is.null(xtsValues) || is.na(xtsValues)){
+        if(i == 1 || is.null(xtsValues)){
           xtsValues <- ret
         } else {
           xtsValues <- cbindRobust(xtsValues, ret)
