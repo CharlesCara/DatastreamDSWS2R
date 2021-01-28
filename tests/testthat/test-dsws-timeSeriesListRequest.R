@@ -120,3 +120,13 @@ test_that("test of timeseries list request for user created list that has a mixt
 
 })
 
+
+test_that("Fix issue #50", {
+  library(DatastreamDSWS2R)
+  mydsws <- dsws$new()
+
+  mydsws$chunkLimit <- 50L
+  myData <- mydsws$timeSeriesListRequest(instrument="WSUS1",datatype = c("WC18198","WC01084"),startDate = "-2Y",endDate="0Y",frequency = "Y")
+  expect_equal(length(myData), 2)
+
+})

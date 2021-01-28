@@ -791,6 +791,8 @@ dsws$methods(.basicRequest = function(instrument,
 
   # We have to have at least one instrument
   numCodes <- length(instrument)
+  numDatatypes <- length(datatype)
+
   if(numCodes == 0){
     stop("instruments is empty and has length zero")
   }
@@ -809,28 +811,28 @@ dsws$methods(.basicRequest = function(instrument,
   if(format == "Snapshot"){
     # Set the holder for the results here
     # Process the response into a dataframe, one row per instrument, with a column for each datatype
-    .self$myValues <- data.frame(matrix(NA, nrow = length(instrument), ncol = length(datatype) + 1))
+    .self$myValues <- data.frame(matrix(NA, nrow = length(instrument), ncol = numDatatypes + 1))
   } else if(format == "ByInstrument"){
-    xtsValues <- NULL
+    xtsValues <- as.list(rep(NA, length.out = numDatatypes))
   }
 
 
   # Holder for the type (ie Date, string) for each of the datatypes
-  .self$myTypes <- rep(NA, length(datatype))
+  .self$myTypes <- rep(NA, length.out = numDatatypes)
 
 
   doChunk <- FALSE
   if(datatype[1] != ""){
     # If we are not using a expression, we will just apply the rule that
     # number of instruments * number of datatypes has to be less tha the chunk limit
-    doChunk <- (length(instrument) * length(datatype) >= .self$chunkLimit)
+    doChunk <- (numCodes * numDatatypes >= .self$chunkLimit)
   } else {
     # There appears to be a maximum character limit for a request (or response)
     # We will need to chunk the request if we are using an expression and when we expand the expression
     # it is over this limit.
     expandedInstrument <- paste0(.self$.expandExpression(instrument, expression), collapse=",")
     if((nchar(expandedInstrument) >= .self$requestStringLimit) |
-       (length(instrument) * length(datatype) >= .self$chunkLimit)){
+       (numCodes * numDatatypes >= .self$chunkLimit)){
       doChunk <- TRUE
     }
   }
@@ -869,7 +871,7 @@ dsws$methods(.basicRequest = function(instrument,
   # Work out the number of chunks and the size of each request
 
   if(datatype[1] != ""){
-    numInstrChunk <- floor(.self$chunkLimit / length(datatype))
+    numInstrChunk <- floor(.self$chunkLimit / numDatatypes)
     numChunks <- ceiling(numCodes / numInstrChunk )
 
   } else {
@@ -939,18 +941,19 @@ dsws$methods(.basicRequest = function(instrument,
 
       if(length(datatype) == 1){
         # If we have only one datatype then merging is simple
-        if(is.null(xtsValues)){
+        if(is.null(xtsValues) || is.na(xtsValues)){
           xtsValues <- ret
         } else {
           xtsValues <- cbindRobust(xtsValues, ret)
         }
       } else {
         # If multiple datatypes then the xts for each datatype has to be merged individually
-        for(i in 1: length(datatype)){
-          if(is.null(xtsValues[[i]])){
-            xtsValues[[i]] <- ret[[i]]
+        for(j in 1: numDatatypes){
+          if(i == 1 || is.null(xtsValues[[j]]) || is.na(xtsValues[[j]])){
+            # First run
+            xtsValues[[j]] <- ret[[j]]
           } else {
-            xtsValues[[i]] <- cbindRobust(xtsValues[[i]], ret[[i]])
+            xtsValues[[j]] <- cbindRobust(xtsValues[[j]], ret[[j]])
           }
         }
       }
@@ -971,7 +974,7 @@ dsws$methods(.basicRequest = function(instrument,
 
   if(format[1] == "ByInstrument" | format == "ByDatatype"){
     return(xtsValues)
-  } else if(format == "Snapshot"){
+  } else if(format == "Snapshot" | format == "SnapshotList"){
     return(.self$myValues)
   }
 
