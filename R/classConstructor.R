@@ -1341,7 +1341,12 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
       # If column contains multiple datatypes and at least one of these is of the character type (i.e. type 6),
       # then check if all the character elements are "NA" and, if so, prevent column conversion to character type:
       if(any(myType==6)&length(unique(myType))>1){
-        if(all(sapply(mylist, FUN=function(x) x$Value)[myType==6]=='NA')) myType <- myType[myType!=6]
+
+        charValues <- sapply(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$SymbolValues,
+                             FUN=function(x) x$Value,
+                             simplify=TRUE)[myType==6]
+
+        if(all(charValues=='NA')) myType <- myType[myType!=6]
       }
 
       .self$myTypes[iDatatype] <- round(median(as.numeric(myType), na.rm = TRUE))
