@@ -100,7 +100,7 @@ Timeseries request (expressions are also supported) using the timeSeriesRequest 
 
 
 ## Other information
-The dsws interface will split large requests down into chunks small enough for the DSWS interface to process.  However, the maximum chunk size varies in the DSWS documentation and is either [2000](https://product.datastream.com/DswsClient/Docs/AboutRestSvc.aspx) or [50](https://developers.refinitiv.com/sites/default/files/DSWS%20for%20Desktop%20-%20User%20stats%20and%20limits_0.pdf).  Different users have different limits.  The default chunkLimit is 2000, but it can be to 50:
+The dsws interface will split large requests down into chunks small enough for the DSWS interface to process.  However, the maximum chunk size varies in the DSWS documentation and is either [2000](https://product.datastream.com/DswsClient/Docs/AboutRestSvc.aspx) or [50](https://developers.refinitiv.com/sites/default/files/DSWS%20for%20Desktop%20-%20User%20stats%20and%20limits_0.pdf).  Different users have different limits, depending on whether they have Enterprise or Individual subscriptions.  The default chunkLimit is 2000, but it can be set to 50 after initialisation.
 
     mydsws <- dsws$new()
     mydsws$chunkLimit <- 50L
@@ -126,7 +126,11 @@ The callback function is used in
 
     mydsws <- dsws$new(getTokenFunction = myTokenFunc)
 
+## Username and Password - ChildId
+The correct username is the 'childId' comprising 4 characters and 3 digits.  If you get a http 403 response 'Forbidden', then this might be because the Eikon username and password was used. 
 
+## Update 1.7.10
+Better handling of missing dates.
 
 ## Update 1.7.5
 Improvement in handling of Token Callback function.
