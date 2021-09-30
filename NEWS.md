@@ -1,3 +1,6 @@
+## Update 1.8.1
+Change server URLs to https.  Fix issue # 39
+
 ## Update 1.7.9
 Internal changes to package to make it pass CRAN checks and policies.
 

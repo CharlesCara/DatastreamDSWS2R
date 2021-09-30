@@ -168,7 +168,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   if(dsws.serverURL == ""){
     # 07/4/2016 - due to issue with Datastream's load balancers, using a different URL.  This will
     # be changed back when the issue is resolved.
-    .self$serverURL <- "http://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
+    .self$serverURL <- "https://product.datastream.com/DSWSClient/V1/DSService.svc/rest/"
   } else {
     .self$serverURL <- dsws.serverURL
   }

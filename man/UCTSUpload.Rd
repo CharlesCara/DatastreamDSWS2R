@@ -21,7 +21,7 @@ UCTSUpload(
     Sys.getenv("DatastreamUsername"), options()$Datastream.Username),
   strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
     Sys.getenv("DatastreamPassword"), options()$Datastream.Password),
-  strServerName = "http://product.datastream.com",
+  strServerName = "https://product.datastream.com",
   strServerPage = "/UCTS/UCTSMaint.asp"
 )
 }

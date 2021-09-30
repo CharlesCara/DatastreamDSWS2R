@@ -129,6 +129,10 @@ The callback function is used in
 ## Username and Password - ChildId
 The correct username is the 'childId' comprising 4 characters and 3 digits.  If you get a http 403 response 'Forbidden', then this might be because the Eikon username and password was used. 
 
+## Affiliation and Warranty
+This package is not provided by Refinitiv or an affiliate. I have written this package to help my work at Absolute Strategy 
+Research.  We are happy to make it available for others to use, but we offer or imply no warranty. 
+
 ## Update 1.7.10
 Better handling of missing dates.
 

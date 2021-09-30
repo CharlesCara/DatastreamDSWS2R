@@ -147,7 +147,7 @@ UCTSUpload <- function(tsData,
                        strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
                                             Sys.getenv("DatastreamPassword"),
                                             options()$Datastream.Password),
-                       strServerName="http://product.datastream.com",
+                       strServerName="https://product.datastream.com",
                        strServerPage="/UCTS/UCTSMaint.asp"){
 
   #Check inputs are valid
@@ -376,7 +376,7 @@ UCTSAppend <- function(tsData,
                        strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
                                             Sys.getenv("DatastreamPassword"),
                                             options()$Datastream.Password),
-                       strServerName = "http://product.datastream.com",
+                       strServerName = "https://product.datastream.com",
                        strServerPage = "/UCTS/UCTSMaint.asp"){
 
   #Check inputs are valid - we can also rely on checks in UCTSUpload later
