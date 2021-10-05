@@ -398,7 +398,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE){
 
   if(!is.null(.self$jsonResponseLoadFile)){
     if(file.exists(.self$jsonResponseLoadFile)) {
-      .self$dataResponse <- rjson::fromJSON(file = .self$jsonResponseLoadFile)
+      .self$dataResponse <- rjson::fromJSON(file =  .self$jsonResponseLoadFile)
       return(TRUE)
     } else {
       stop("File specified by dsws$jsonResponseLoadFile does not exist")

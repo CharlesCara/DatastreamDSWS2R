@@ -73,7 +73,7 @@ We can also handle composite datatypes that return multiple values, for instance
                            requestDate = Sys.Date())
 
 
-Another notable dataitem that returns multiple values is [DS.USERSTATS](https://developers.refinitiv.com/sites/default/files/DSWS%20for%20Desktop%20-%20User%20stats%20and%20limits_0.pdf) which returns information on the user's consumption of Datastream data.
+Another notable dataitem that returns multiple values is [DS.USERSTATS](https://developers.refinitiv.com/en) which returns information on the user's consumption of Datastream data.
 
     mydsws <- dsws$new()
     mydsws$snapshotRequest(instrument = "STATS",
@@ -100,7 +100,7 @@ Timeseries request (expressions are also supported) using the timeSeriesRequest 
 
 
 ## Other information
-The dsws interface will split large requests down into chunks small enough for the DSWS interface to process.  However, the maximum chunk size varies in the DSWS documentation and is either [2000](https://product.datastream.com/DswsClient/Docs/AboutRestSvc.aspx) or [50](https://developers.refinitiv.com/sites/default/files/DSWS%20for%20Desktop%20-%20User%20stats%20and%20limits_0.pdf).  Different users have different limits, depending on whether they have Enterprise or Individual subscriptions.  The default chunkLimit is 2000, but it can be set to 50 after initialisation.
+The dsws interface will split large requests down into chunks small enough for the DSWS interface to process.  However, the maximum chunk size varies in the DSWS documentation and is either 2000 or 50, depending on whether they have Enterprise or Individual subscriptions.  The default chunkLimit is 2000, but it can be set to 50 after initialisation. 
 
     mydsws <- dsws$new()
     mydsws$chunkLimit <- 50L
