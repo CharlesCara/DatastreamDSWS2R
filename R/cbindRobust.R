@@ -15,14 +15,14 @@
 #'
 cbindRobust <- function(xts1, xts2) {
   # If either are zero row then we need to be careful
-  if(nrow(xts1) == 0 | nrow(xts2) == 0 ){
+  if (nrow(xts1) == 0 | nrow(xts2) == 0 ) {
     # We need to set the
-    if(nrow(xts1) == 0 & nrow(xts2) == 0 ){
+    if (nrow(xts1) == 0 & nrow(xts2) == 0 ) {
       # We need to return a two combine to give a zero row xts
       xts3 <- xts::xts(matrix(NA, nrow = 1, ncol = ncol(xts1) + ncol(xts2) ), order.by = as.Date("2017-01-01"))["20180101"]
       colnames(xts3) <- c(colnames(xts1), colnames(xts2))
 
-    } else if(nrow(xts1) == 0) {
+    } else if (nrow(xts1) == 0) {
       # else use zoo to combine
       xts3 <- zoo::cbind.zoo(xts::xts(matrix(NA, nrow = length(index(xts2)), ncol = ncol(xts1)), order.by = index(xts2)), xts2)
       colnames(xts3) <- c(colnames(xts1), colnames(xts2))
@@ -39,7 +39,7 @@ cbindRobust <- function(xts1, xts2) {
 
 
   # If neither of the two series are empty NA series, then we combine them as normal in order to save time.
-  if(!is.na(unique(xts1)[1]) && !is.na(unique(xts2)[1])){
+  if (!is.na(unique(xts1)[1]) && !is.na(unique(xts2)[1])) {
 
     xts3 <- cbind(xts1, xts2)
     return(xts3)
@@ -47,7 +47,7 @@ cbindRobust <- function(xts1, xts2) {
   }
 
   # If the non-empty time series is not class character, then we combine as normal in order to save time
-  if(unique(apply(xts1, MARGIN = 1, FUN = class))[1] != "character" &&
+  if (unique(apply(xts1, MARGIN = 1, FUN = class))[1] != "character" &&
      unique(apply(xts2, MARGIN = 1, FUN = class))[1] != "character") {
 
     xts3 <- cbind(xts1, xts2)

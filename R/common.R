@@ -14,7 +14,7 @@
 #' @keywords internal
 #'
 #'
-.convert_JSON_Bool <- function(Input_Strings){
+.convert_JSON_Bool <- function(Input_Strings) {
   suppressWarnings({
     ret <- sapply(X = Input_Strings, FUN = as.logical)
   })
@@ -37,7 +37,7 @@
 #'
 #' @keywords internal
 #'
-.convert_JSON_Integer <- function(Input_Strings){
+.convert_JSON_Integer <- function(Input_Strings) {
   suppressWarnings({
     ret <- sapply(X = Input_Strings, FUN = as.integer)
   })
@@ -61,7 +61,7 @@
 #'
 #' @keywords internal
 #'
-.convert_JSON_String <- function(Input_Strings){
+.convert_JSON_String <- function(Input_Strings) {
   suppressWarnings({
     ret <- sapply(X = Input_Strings, FUN = as.character)
   })
@@ -84,7 +84,7 @@
 #'
 #' @keywords internal
 #'
-.convert_JSON_Double <- function(Input_Strings){
+.convert_JSON_Double <- function(Input_Strings) {
   suppressWarnings({
     ret <- sapply(X = Input_Strings, FUN = as.numeric)
   })
@@ -110,7 +110,7 @@
 #'
 #' @keywords internal
 #'
-.convert_JSON_Date <- function(Input_Strings){
+.convert_JSON_Date <- function(Input_Strings) {
   start <- stringi::stri_locate(Input_Strings, regex = "\\(")[,1]
   endPlus <- stringi::stri_locate_first(Input_Strings, regex = "\\+")[,1]
   endBracket <- stringi::stri_locate_first(Input_Strings, regex = "\\)")[,1]
@@ -119,7 +119,7 @@
   end[which(overwrites)] <- endBracket[which(overwrites)]
 
   # shift 1 position from the start and end to get the string between the parentheses
-  JSON_Date <- stringi::stri_sub(Input_Strings, start+1, end-1)
+  JSON_Date <- stringi::stri_sub(Input_Strings, start + 1, end - 1)
 
   # Not interested in time element - return just the date
   JSON_Date <- as.Date(structure(as.numeric(JSON_Date)/1000, class = c("POSIXct", "POSIXt")))
@@ -146,7 +146,7 @@
 #'
 #' @keywords internal
 #'
-.convert_JSON_Datetime <- function(Input_Strings){
+.convert_JSON_Datetime <- function(Input_Strings) {
   start <- stringi::stri_locate(Input_Strings, regex = "\\(")[,1]
   endPlus <- stringi::stri_locate_first(Input_Strings, regex = "\\+")[,1]
   endBracket <- stringi::stri_locate_first(Input_Strings, regex = "\\)")[,1]
@@ -155,7 +155,7 @@
   end[which(overwrites)] <- endBracket[which(overwrites)]
 
   # shift 1 position from the start and end to get the string between the parentheses
-  JSON_Date <- stringi::stri_sub(Input_Strings, start+1, end-1)
+  JSON_Date <- stringi::stri_sub(Input_Strings, start + 1, end - 1)
 
   return(structure(as.numeric(JSON_Date)/1000, class = c("POSIXct", "POSIXt"), tzone = "GMT"))
 }
@@ -180,14 +180,14 @@
 .convertJSONString <-
   function(x)
   {
-    if(is.null(x)) return(NA)
-    if(grepl("/?(new )?Date\\(", x)) {
+    if (is.null(x)) return(NA)
+    if (grepl("/?(new )?Date\\(", x)) {
       # date
       start <- stringi::stri_locate(x, fixed = "/Date(")[,1] + 6
       endPlus <- stringi::stri_locate_first(x, fixed = "+")[,1] - 1
       endBracket <- stringi::stri_locate_first(x, fixed = ")")[,1] - 1
 
-      if((endBracket < endPlus) | is.na(endPlus)) {
+      if ((endBracket < endPlus) | is.na(endPlus)) {
         end <- endBracket
       } else {
         end <- endPlus
@@ -198,7 +198,7 @@
 
       return(JSON_Date)
     } else {
-      if(!is.na(suppressWarnings(as.numeric(x)))){
+      if (!is.na(suppressWarnings(as.numeric(x)))) {
         return(as.numeric(x))
       } else{
         return(x)
@@ -228,15 +228,15 @@
 #' @return the parsed result: either Date, String or numeric
 #' @keywords internal
 #'
-.getValueTyped <- function(x, myType){
+.getValueTyped <- function(x, myType) {
   thisValue <- .convertJSONString(x$Value)
 
-  if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
+  if (TRUE %in% grepl("\\$\\$ER:", thisValue)) {
     #TODO: write the response in the errorList object
     return(NA)
   } else {
-    if(myType == 4){
-      if(class(thisValue) != "Date" && thisValue == "NA"){
+    if (myType == 4) {
+      if (class(thisValue) != "Date" && thisValue == "NA") {
         return(as.Date(NA))
       } else {
         return(as.Date(thisValue))
@@ -272,11 +272,11 @@
 #' @importFrom stringr fixed str_detect
 #' @keywords internal
 #'
-.getValue <- function(x){
-  if(!("Value" %in% names(x)) | !("Type" %in% names(x))) {
+.getValue <- function(x) {
+  if (!("Value" %in% names(x)) | !("Type" %in% names(x))) {
     return(NA)
   } else {
-    if(TRUE %in% str_detect(string = x$Value, pattern = fixed("$$\"ER"))){
+    if (TRUE %in% str_detect(string = x$Value, pattern = fixed("$$\"ER"))) {
       #TODO: write the response in the errorList object
       return(x$Value)
     } else {
@@ -305,13 +305,13 @@
 #' @return the parsed result: either Date, String or numeric
 #' @keywords internal
 #'
-.getSymbol <- function(x){
+.getSymbol <- function(x) {
 
-  if(!("Symbol" %in% names(x) )) {
+  if (!("Symbol" %in% names(x) )) {
     return("")
   } else {
     thisValue <- x$Symbol
-    if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
+    if (TRUE %in% grepl("\\$\\$ER:", thisValue)) {
       #TODO: write the response in the errorList object
       return("")
     } else {
@@ -334,71 +334,71 @@
 #' @return the parsed result: either Date, String or numeric
 #' @keywords internal
 #'
-.getJSONValue <- function(value, type){
+.getJSONValue <- function(value, type) {
 
-  if(length(type) == 0) {
+  if (length(type) == 0) {
     # Type was missing
     return(NA)
   }
 
-  if(TRUE %in% grepl("\\$\\$ER:", value)){
+  if (TRUE %in% grepl("\\$\\$ER:", value)) {
     return(NA)
   }
 
-  if(type == 0){
+  if (type == 0) {
     # Value is error
     return(NA)
   }
-  if(type == 1){
+  if (type == 1) {
     # Value is empty
     return(NA)
   }
-  if(type == 2){
+  if (type == 2) {
     # Value is Bool
     return(.convert_JSON_Bool(value))
   }
-  if(type == 3){
+  if (type == 3) {
     # Value is Integer
     return(.convert_JSON_Integer(value))
   }
-  if(type == 4){
+  if (type == 4) {
     # Value is DateTime
     return(.convert_JSON_Date(value))
   }
-  if(type == 5){
+  if (type == 5) {
     # Value is Double
     return(.convert_JSON_Double(value))
   }
-  if(type == 6){
+  if (type == 6) {
     # Value is String
     return(.convert_JSON_String(value))
   }
-  if(type == 7){
+  if (type == 7) {
     # Value is BoolArray
     # TODO: Not handled
     return(NA)
   }
-  if(type == 8){
+  if (type == 8) {
     # Value is IntegerArray
     # TODO: Not handled
     return(NA)
   }
-  if(type == 9){
+  if (type == 9) {
     # Value is DateTimeArray
     # TODO: Not handled
     return(NA)
   }
-  if(type == 10){
+  if (type == 10) {
     # Value is DoubleArray
     # TODO: Not handled
     return(NA)
   }
-  if(type == 11){
+  if (type == 11) {
     # Value is String Array
     # TODO: Not handled
     return(NA)
   }
-  if(type == 12){
+  if (type == 12) {
     # Value is Object Array
     # TODO: Not handled
     return(NA)
@@ -426,9 +426,9 @@
 #' @return the parsed result: either Date, String or numeric
 #' @keywords internal
 #'
-.getType <- function(x){
+.getType <- function(x) {
   thisValue <- .convertJSONString(x$Type)
-  if(TRUE %in% grepl("\\$\\$ER:", thisValue)){
+  if (TRUE %in% grepl("\\$\\$ER:", thisValue)) {
     #TODO: write the response in the errorList object
     return(NaN)
   } else {

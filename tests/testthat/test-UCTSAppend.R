@@ -10,7 +10,7 @@ context("UCTSAppend.R : test of appending timeSeries")
 
 #------------------------------------------------------------------------------
 test_that("Try appending a real dataset", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()  # cran is not set up to access Datastream

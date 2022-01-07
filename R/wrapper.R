@@ -37,7 +37,7 @@ NULL
 getDataStream <- function(dweURLwsdl = "",
                           User=as.character("USERNAME"),
                           Pass=as.character("PASSWORD")
-){
+) {
 
   return(dsws$new())
 }
@@ -77,18 +77,18 @@ getDataStream <- function(dweURLwsdl = "",
 #'
 #'
 #' @export
-timeSeriesRequest <- function (dwei=getDataStream(),
-                               DSCodes="",
-                               Instrument="",
-                               startDate=Sys.Date(),
-                               endDate=Sys.Date(),
-                               frequency="D",
-                               sStockList,
-                               aTimeSeries,
-                               myType = "numeric",
-                               verbose=FALSE) {
+timeSeriesRequest <- function(dwei=getDataStream(),
+                              DSCodes="",
+                              Instrument="",
+                              startDate=Sys.Date(),
+                              endDate=Sys.Date(),
+                              frequency="D",
+                              sStockList,
+                              aTimeSeries,
+                              myType = "numeric",
+                              verbose=FALSE) {
 
-  if(grepl(pattern="XXXX", x=Instrument, fixed=TRUE) == FALSE){
+  if (grepl(pattern = "XXXX", x = Instrument, fixed = TRUE) == FALSE) {
     # Instrument is not an expression if it does not contain 'XXXX
     myDataType <- Instrument
     myExpression <- ""
@@ -106,9 +106,9 @@ timeSeriesRequest <- function (dwei=getDataStream(),
                                   frequency = frequency,
                                   format = "ByInstrument")
 
-   myStockMap <- data.frame(displayname = DSCodes, symbol = colnames(myxts))
-   eval.parent(substitute(sStockList <- myStockMap$displayname))
-  eval.parent(suppressWarnings(substitute(aTimeSeries <- myxts)))
+  myStockMap <- data.frame(displayname = DSCodes, symbol = colnames(myxts))
+  eval.parent(substitute({sStockList <- myStockMap$displayname}))
+  eval.parent(suppressWarnings(substitute({aTimeSeries <- myxts})))
 
   return(myStockMap)
 }
@@ -137,7 +137,7 @@ timeSeriesRequest <- function (dwei=getDataStream(),
 #' @return   returns an array of the requested information
 #' @export
 
-staticRequest <- function (dwei=getDataStream(),
+staticRequest <- function(dwei=getDataStream(),
                            DSCode,
                            Expression="",
                            endDate=Sys.Date(),
@@ -177,7 +177,7 @@ staticRequest <- function (dwei=getDataStream(),
 #' @export
 #'
 
-listRequest <- function (dwei=getDataStream(),
+listRequest <- function(dwei=getDataStream(),
                          DSCode,
                          Expression = "",
                          startDate = Sys.Date(),
@@ -222,7 +222,7 @@ listRequest <- function (dwei=getDataStream(),
 #'    in aTimeseries: a list of class xts with the requested
 #'     timeseries information
 #' @export
-timeSeriesListRequest <- function (dwei = getDataStream(),
+timeSeriesListRequest <- function(dwei = getDataStream(),
                                    DSCode,
                                    Instrument,
                                    startDate,
@@ -233,7 +233,7 @@ timeSeriesListRequest <- function (dwei = getDataStream(),
                                    verbose=FALSE) {
 
 
-  if(grepl(pattern="XXXX", x=Instrument, fixed=TRUE) == FALSE){
+  if (grepl(pattern = "XXXX", x = Instrument, fixed = TRUE) == FALSE) {
     # Instrument is not an expression if it does not contain 'XXXX
     myDataType <- Instrument
     myExpression <- ""
@@ -243,17 +243,17 @@ timeSeriesListRequest <- function (dwei = getDataStream(),
   }
 
   myxts <- dwei$timeSeriesListRequest(instrument = DSCode,
-                                  datatype = myDataType,
-                                  expression = myExpression,
-                                  startDate = startDate,
-                                  endDate = endDate,
-                                  frequency = frequency,
-                                  format = "ByInstrument")
+                                      datatype = myDataType,
+                                      expression = myExpression,
+                                      startDate = startDate,
+                                      endDate = endDate,
+                                      frequency = frequency,
+                                      format = "ByInstrument")
 
   myStockMap <- dwei$getSymbolList()
   colnames(myStockMap) <- c("displayname", "symbol")
-  eval.parent(substitute(sStockList <- myStockMap$displayname))
-  eval.parent(suppressWarnings(substitute(aTimeSeries <- myxts)))
+  eval.parent(substitute({sStockList <- myStockMap$displayname}))
+  eval.parent(suppressWarnings(substitute({aTimeSeries <- myxts})))
 
   return(myStockMap)
 
@@ -284,9 +284,9 @@ myStaticRequestSet <- function(mydsws = dsws$new(),
                                instrument,
                                iExpression,
                                endDate = Sys.Date(),
-                               frequency = "D"){
+                               frequency = "D") {
 
-  if(grepl(pattern="XXXX", x=iExpression, fixed=TRUE) == FALSE){
+  if (grepl(pattern = "XXXX", x = iExpression, fixed = TRUE) == FALSE) {
     idf <- tryCatch(mydsws$listRequest(instrument = instrument,
                                        datatype = iExpression,
                                        requestDate =  endDate),
@@ -300,10 +300,10 @@ myStaticRequestSet <- function(mydsws = dsws$new(),
 
   }
 
-  if(is.null(idf) || length(idf) == 0 || (is.character(idf[1, 2]) && idf[1,2] == "NA")
-     | grepl(pattern="$$\"ER\"", x= idf[1,2], fixed=TRUE) == TRUE){
+  if (is.null(idf) || length(idf) == 0 || (is.character(idf[1, 2]) && idf[1,2] == "NA")
+     | grepl(pattern = "$$\"ER\"", x = idf[1,2], fixed = TRUE) == TRUE) {
     # Assume a null means this is a timeseries expression
-    if(grepl(pattern="XXXX", x=iExpression, fixed=TRUE) == FALSE){
+    if (grepl(pattern = "XXXX", x = iExpression, fixed = TRUE) == FALSE) {
       # Instrument is not an expression if it does not contain 'XXXX
       aTS <- mydsws$timeSeriesListRequest(instrument = instrument,
                                           datatype = iExpression,
@@ -356,51 +356,51 @@ staticRequestSet <- function(mydsws = dsws$new(),
                              expression = "",
                              endDate = Sys.Date(),
                              frequency = "D",
-                             verbose = FALSE){
+                             verbose = FALSE) {
 
   iExpression <- NULL
 
   ldf <- foreach(iExpression = expression) %do%
-  {
-    if(grepl(pattern="XXXX", x=iExpression, fixed=TRUE) == FALSE){
-      # Instrument is not an expression if it does not contain 'XXXX
-      idf <- mydsws$snapshotRequest(instrument = instrument,
-                                    datatype = iExpression,
-                                    requestDate =  endDate)
-    } else {
-      idf <- mydsws$snapshotRequest(instrument = instrument,
-                                    expression = iExpression,
-                                    requestDate =  endDate)
-    }
-
-    if(length(idf) == 0 | grepl(pattern="$$\"ER\"", x= idf[1,2], fixed=TRUE) == TRUE){
-      #
-      if(grepl(pattern="XXXX", x=iExpression, fixed=TRUE) == FALSE){
+    {
+      if (grepl(pattern = "XXXX", x = iExpression, fixed = TRUE) == FALSE) {
         # Instrument is not an expression if it does not contain 'XXXX
-        aTS <- mydsws$timeSeriesRequest(instrument = instrument,
-                                        datatype = iExpression,
-                                        startDate =  endDate - 7,
-                                        endDate =  endDate,
-                                        frequency = frequency)
+        idf <- mydsws$snapshotRequest(instrument = instrument,
+                                      datatype = iExpression,
+                                      requestDate =  endDate)
       } else {
-        aTS <- mydsws$timeSeriesRequest(instrument = instrument,
-                                        expression = iExpression,
-                                        startDate =  endDate - 7,
-                                        endDate =  endDate,
-                                        frequency = frequency)
+        idf <- mydsws$snapshotRequest(instrument = instrument,
+                                      expression = iExpression,
+                                      requestDate =  endDate)
       }
-      idf <- t(unlist(last(aTS, 1)))
-      if(length(idf) == 0){
-        #If we still do not have anything valid then return a column of NULLs
-        idf <- data.frame(matrix(NA, nrow = length(instrument), ncol = 1))
-        colnames(idf) <- iExpression
-      }
-    } else {
-      idf <- idf[,2]
-    }
 
-    as.data.frame(idf)
-  }
+      if (length(idf) == 0 | grepl(pattern = "$$\"ER\"", x = idf[1,2], fixed = TRUE) == TRUE) {
+        #
+        if (grepl(pattern = "XXXX", x = iExpression, fixed = TRUE) == FALSE) {
+          # Instrument is not an expression if it does not contain 'XXXX
+          aTS <- mydsws$timeSeriesRequest(instrument = instrument,
+                                          datatype = iExpression,
+                                          startDate =  endDate - 7,
+                                          endDate =  endDate,
+                                          frequency = frequency)
+        } else {
+          aTS <- mydsws$timeSeriesRequest(instrument = instrument,
+                                          expression = iExpression,
+                                          startDate =  endDate - 7,
+                                          endDate =  endDate,
+                                          frequency = frequency)
+        }
+        idf <- t(unlist(last(aTS, 1)))
+        if (length(idf) == 0) {
+          #If we still do not have anything valid then return a column of NULLs
+          idf <- data.frame(matrix(NA, nrow = length(instrument), ncol = 1))
+          colnames(idf) <- iExpression
+        }
+      } else {
+        idf <- idf[,2]
+      }
+
+      as.data.frame(idf)
+    }
 
   df <- bind_cols(ldf)
   colnames(df) <- expression
@@ -434,18 +434,18 @@ staticListRequestSet <- function(mydsws = dsws$new(),
                                  instrument,
                                  expression = "",
                                  endDate = Sys.Date(),
-                                 frequency = "D"){
+                                 frequency = "D") {
 
   iExpression <- NULL
 
   ldf <- foreach(iExpression = expression) %do%
-  {
-    myStaticRequestSet(mydsws = mydsws,
-                       instrument = instrument,
-                       iExpression = iExpression,
-                       endDate = endDate,
-                       frequency = frequency)
-  }
+    {
+      myStaticRequestSet(mydsws = mydsws,
+                         instrument = instrument,
+                         iExpression = iExpression,
+                         endDate = endDate,
+                         frequency = frequency)
+    }
 
   df <- bind_cols(ldf)
   rownames(df) <- NULL

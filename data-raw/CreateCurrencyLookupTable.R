@@ -2,7 +2,7 @@
 
 
 currencyDS2ISO <- read.csv("./data-raw/currencyDS2ISO.csv", encoding = "utf-8")
-currencyDS2ISO$dsCode  <- iconv(currencyDS2ISO$dsCode, from="utf-8", to = "latin1")
+currencyDS2ISO$dsCode  <- iconv(currencyDS2ISO$dsCode, from = "utf-8", to = "latin1")
 
 require(devtools)
 devtools::use_data(currencyDS2ISO, overwrite = TRUE)
