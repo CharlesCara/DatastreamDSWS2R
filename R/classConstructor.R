@@ -176,7 +176,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   # Authenticate and get token
   # Set default value of Null for tokenList
   .self$tokenList <- list(TokenValue = NULL,
-                           TokenExpiry = NULL)
+                          TokenExpiry = NULL)
 
   # Use the token function if provided
 
@@ -200,7 +200,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
       stop("Token$TokenExpiry must be a time based object")
 
     .self$tokenList <- list(TokenValue = token$TokenValue,
-                             TokenExpiry = token$TokenExpiry)
+                            TokenExpiry = token$TokenExpiry)
 
     .self$initialised <- TRUE
 
@@ -233,7 +233,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   }
 
   .self$tokenList <- list(TokenValue = NULL,
-                           TokenExpiry = NULL)
+                          TokenExpiry = NULL)
 
   .self$tokenSource <- "DSWS"
 
@@ -307,11 +307,11 @@ dsws$methods(.requestToken = function() {
       # Break if an error or null and it is not a timeout
       if (is.null(myTokenResponse)) break
       if ("error" %in% class(myTokenResponse) &&
-         !stringr::str_detect(myTokenResponse$message, "Timeout was reached")) break
+          !stringr::str_detect(myTokenResponse$message, "Timeout was reached")) break
 
       # If did not get a time out then break
       if ("response" %in% class(myTokenResponse) &&
-         httr::status_code(myTokenResponse) != 408) break
+          httr::status_code(myTokenResponse) != 408) break
 
       # We have got a time out so check if we have had too many tries
       if (nLoop >= maxLoop) break
@@ -435,7 +435,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
     # Break if an error or null
     if (is.null(myDataResponse)) break
     if ("error" %in% class(myDataResponse) &&
-       !stringr::str_detect(myDataResponse$message, "Timeout was reached")) break
+        !stringr::str_detect(myDataResponse$message, "Timeout was reached")) break
 
     # If did not get a time out or authentication then break
     if ("response" %in% class(myDataResponse)) {
@@ -594,15 +594,15 @@ dsws$methods(snapshotRequest = function(instrument,
 
   "
 
-  return(.self$.basicRequest(instrument = instrument,
-                             datatype = datatype,
-                             expression = expression,
-                             isList = FALSE,
-                             startDate = requestDate,
-                             endDate = requestDate,
-                             frequency = "D",
-                             kind = 0,
-                             format = "Snapshot"))
+return(.self$.basicRequest(instrument = instrument,
+                           datatype = datatype,
+                           expression = expression,
+                           isList = FALSE,
+                           startDate = requestDate,
+                           endDate = requestDate,
+                           frequency = "D",
+                           kind = 0,
+                           format = "Snapshot"))
 })
 
 
@@ -667,17 +667,17 @@ dsws$methods(timeSeriesRequest = function(instrument,
 
   "
 
-  myData <- .self$.basicRequest(instrument = instrument,
-                                datatype = datatype,
-                                expression = expression,
-                                isList = FALSE,
-                                startDate = startDate,
-                                endDate = endDate,
-                                frequency = frequency,
-                                kind = 1,
-                                format = format)
+myData <- .self$.basicRequest(instrument = instrument,
+                              datatype = datatype,
+                              expression = expression,
+                              isList = FALSE,
+                              startDate = startDate,
+                              endDate = endDate,
+                              frequency = frequency,
+                              kind = 1,
+                              format = format)
 
-  return(myData)
+return(myData)
 
 })
 
@@ -742,14 +742,14 @@ dsws$methods(timeSeriesListRequest = function(instrument,
 # First return a list of mnemonics
 
 .self$symbolList <- .self$.basicRequest(instrument = instrument,
-                                   datatype = "MNEM",
-                                   expression = "",
-                                   isList = TRUE,
-                                   startDate = "",
-                                   endDate = endDate,
-                                   frequency = frequency,
-                                   kind = 0,
-                                   format = "SnapshotList")
+                                        datatype = "MNEM",
+                                        expression = "",
+                                        isList = TRUE,
+                                        startDate = "",
+                                        endDate = endDate,
+                                        frequency = frequency,
+                                        kind = 0,
+                                        format = "SnapshotList")
 
 
 return(.self$.basicRequest(instrument = .self$symbolList[,1],
@@ -832,7 +832,7 @@ dsws$methods(.basicRequest = function(instrument,
     # it is over this limit.
     expandedInstrument <- paste0(.self$.expandExpression(instrument, expression), collapse = ",")
     if ((nchar(expandedInstrument) >= .self$requestStringLimit) |
-       (numCodes * numDatatypes >= .self$chunkLimit)) {
+        (numCodes * numDatatypes >= .self$chunkLimit)) {
       doChunk <- TRUE
     }
   }
@@ -1320,7 +1320,7 @@ dsws$methods(.processSnapshot = function(format, myNumDatatype, isChunked, chunk
   # Process the columns of data
   for (iDatatype in 1:myNumDatatype) {
     if (is.null(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType) ||
-       length(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType) == 0) {
+        length(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]$DataType) == 0) {
       stopmsg <- paste0("No names to use as column headings in Snapshot.  Items returned for Datatype ", iDatatype,
                         ".  Items in Datatype ",
                         paste0(names(.self$dataResponse$DataResponse$DataTypeValues[[iDatatype]]), sep = " | "))
@@ -1404,7 +1404,7 @@ dsws$methods(.parseBranch = function(iInstrument, iDatatype, formatType) {
   myValuesList[sapply(myValuesList, is.null)] <- NA
 
   if (!(TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("$$ER:")) |
-       TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("MainframeAccessPoint error")))) {
+        TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("MainframeAccessPoint error")))) {
     # We only process if we have not got an error message
 
     .self$myValues[,iInstrument] <- t(data.frame(lapply(myValuesList, FUN = .convertJSONString)))
@@ -1446,7 +1446,7 @@ dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType) {
   myDates <- .convert_JSON_Date(.self$dataResponse$DataResponses[[iDRs]]$Dates)
 
   if (!(TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("$$ER:")) |
-       TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("MainframeAccessPoint error")))) {
+        TRUE %in% str_detect(string = myValuesList[[1]], pattern = coll("MainframeAccessPoint error")))) {
     # We only process if we have not got an error message
     # match up the rows with the existing tables
 
@@ -1480,7 +1480,10 @@ dsws$methods(.parseDatesBundle = function() {
       myDates <- .convert_JSON_Date(.self$dataResponse$DataResponses[[i]]$Dates)
 
     } else {
-      myDates <- c(myDates, .convert_JSON_Date(.self$dataResponse$DataResponses[[i]]$Dates))
+      myDate <- .convert_JSON_Date(.self$dataResponse$DataResponses[[i]]$Dates)
+      if (length(myDate) != 0  | length(myDates) != 0) {
+        myDates <- c(myDates, myDate)
+      }
     }
   }
 
