@@ -133,6 +133,10 @@ The correct username is the 'childId' comprising 4 characters and 3 digits.  If 
 This package is not provided by Refinitiv or an affiliate. I have written this package to help my work at Absolute Strategy 
 Research.  We are happy to make it available for others to use, but we offer or imply no warranty. 
 
+
+### Update 1.9.1
+Change to use httr::RETRY when requesting data
+
 ### Update 1.8.1
 Change URL to https
 

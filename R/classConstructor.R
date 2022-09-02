@@ -299,28 +299,34 @@ dsws$methods(.requestToken = function() {
     nLoop <- 0
     .self$errorlist <- NULL
 
+    myTokenResponse <- httr::RETRY(
+      "GET",
+      url = myTokenURL,
+      encode = "json",
+      config = httr::timeout(60)
+    )
 
-    repeat {
-      myTokenResponse <- tryCatch(httr::GET(myTokenURL, httr::timeout(300)),
-                                  error = function(e) e)
-
-      # Break if an error or null and it is not a timeout
-      if (is.null(myTokenResponse)) break
-      if ("error" %in% class(myTokenResponse) &&
-          !stringr::str_detect(myTokenResponse$message, "Timeout was reached")) break
-
-      # If did not get a time out then break
-      if ("response" %in% class(myTokenResponse) &&
-          httr::status_code(myTokenResponse) != 408) break
-
-      # We have got a time out so check if we have had too many tries
-      if (nLoop >= maxLoop) break
-
-      message("...Token Request Timeout (http code 408) - retrying in ", waitTimeBase ^ nLoop, " seconds")
-      Sys.sleep(waitTimeBase ^ nLoop)
-      nLoop <- nLoop + 1
-
-    }
+    # repeat {
+    #   myTokenResponse <- tryCatch(httr::GET(myTokenURL, httr::timeout(300)),
+    #                               error = function(e) e)
+    #
+    #   # Break if an error or null and it is not a timeout
+    #   if (is.null(myTokenResponse)) break
+    #   if ("error" %in% class(myTokenResponse) &&
+    #       !stringr::str_detect(myTokenResponse$message, "Timeout was reached")) break
+    #
+    #   # If did not get a time out then break
+    #   if ("response" %in% class(myTokenResponse) &&
+    #       httr::status_code(myTokenResponse) != 408) break
+    #
+    #   # We have got a time out so check if we have had too many tries
+    #   if (nLoop >= maxLoop) break
+    #
+    #   message("...Token Request Timeout (http code 408) - retrying in ", waitTimeBase ^ nLoop, " seconds")
+    #   Sys.sleep(waitTimeBase ^ nLoop)
+    #   nLoop <- nLoop + 1
+    #
+    # }
 
 
     if (is.null(myTokenResponse)) {
@@ -424,68 +430,91 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
   waitTimeBase <- 2
   nLoop <- 0
   .self$errorlist <- NULL
-  repeat {
 
-    myDataResponse <- tryCatch(httr::POST(myDataURL,
-                                          body = .self$requestList,
-                                          encode = "json",
-                                          httr::timeout(300)),
-                               error = function(e) e)
-
-    # Break if an error or null
-    if (is.null(myDataResponse)) break
-    if ("error" %in% class(myDataResponse) &&
-        !stringr::str_detect(myDataResponse$message, "Timeout was reached")) break
-
-    # If did not get a time out or authentication then break
-    if ("response" %in% class(myDataResponse)) {
-      if (httr::status_code(myDataResponse) == 403) {
-        .self$.loadToken()
-      } else if (httr::status_code(myDataResponse) != 408) {
-        break
-      }
-    }
-
-
-    # We have got a time out so check if we have had too many tries
-    if (nLoop >= maxLoop) break
-
-    message("...Data Request Timeout (http code 408) - retrying in ", waitTimeBase ^ nLoop, " seconds")
-    Sys.sleep(waitTimeBase ^ nLoop)
-    nLoop <- nLoop + 1
-
-  }
+  myDataResponse <- httr::RETRY(
+    "POST",
+    url = myDataURL,
+    body = .self$requestList,
+    encode = "json",
+    config = httr::timeout(60)
+  )
+  # repeat {
+  #
+  #   myDataResponse <- tryCatch(httr::POST(myDataURL,
+  #                                         body = .self$requestList,
+  #                                         encode = "json",
+  #                                         httr::timeout(300)),
+  #                              error = function(e) e)
+  #
+  #   # Break if an error or null
+  #   if (is.null(myDataResponse)) break
+  #   if ("error" %in% class(myDataResponse) &&
+  #       !stringr::str_detect(myDataResponse$message, "Timeout was reached")) break
+  #
+  #   # If did not get a time out or authentication then break
+  #   if ("response" %in% class(myDataResponse)) {
+  #     if (httr::status_code(myDataResponse) == 403) {
+  #       .self$.loadToken()
+  #     } else if (httr::status_code(myDataResponse) != 408) {
+  #       break
+  #     }
+  #   }
+  #
+  #
+  #   # We have got a time out so check if we have had too many tries
+  #   if (nLoop >= maxLoop) break
+  #
+  #   message("...Data Request Timeout (http code 408) - retrying in ", waitTimeBase ^ nLoop, " seconds")
+  #   Sys.sleep(waitTimeBase ^ nLoop)
+  #   nLoop <- nLoop + 1
+  #
+  # }
 
 
   if (is.null(myDataResponse)) {
     .self$dataResponse <-  NULL
-    message("Response is not able to be parsed: response from server was NULL")
+    mm <- "Response is not able to be parsed: response from server was NULL"
+    .self$setErrorlist(c(.self$getErrorlist(),
+                         list(message = mm)))
+    message(mm)
     return(FALSE)
   }
 
   if ("error" %in% class(myDataResponse)) {
     .self$dataResponse <-  NULL
-    message(paste0("Response is not able to be parsed: Error message was:\n",
-                   myDataResponse$message))
+    mm <- paste0("Response is not able to be parsed: Error message was:\n",
+                 myDataResponse$message)
+    .self$setErrorlist(c(.self$getErrorlist(),
+                         list(message = mm)))
+    message(mm)
     return(FALSE)
   }
 
   if ("list" %in% class(myDataResponse)) {
     .self$dataResponse <-  NULL
-    message("Response is not able to be parsed: response is a list")
+    mm <- "Response is not able to be parsed: response is a list"
+    .self$setErrorlist(c(.self$getErrorlist(),
+                         list(message = mm)))
+    message(mm)
     return(FALSE)
   }
 
   if (httr::http_error(myDataResponse)) {
     .self$dataResponse <-  NULL
-    message(paste0("Error requesting data.  HTTP message was: ",
-                   paste0(httr::http_status(myDataResponse), collapse = " : ")))
+    mm <- paste0("Error requesting data.  HTTP message was: ",
+                 paste0(httr::http_status(myDataResponse), collapse = " : "))
+    .self$setErrorlist(c(.self$getErrorlist(),
+                         list(message = mm)))
+    message(mm)
     return(FALSE)
   }
 
   if (httr::http_type(myDataResponse) != "application/json") {
     .self$dataResponse <-  NULL
-    message("Response is not able to be parsed: response is not json")
+    mm <- "Response is not able to be parsed: response is not json"
+    .self$setErrorlist(c(.self$getErrorlist(),
+                         list(message = mm)))
+    message(mm)
     return(FALSE)
   }
 
@@ -501,7 +530,10 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
 
 
   if (("error" %in% class(.self$dataResponse))) {
-    message("Error parsing response: ", .self$dataResponse$message)
+    mm <- paste0("Error parsing response: ", .self$dataResponse$message)
+    .self$setErrorlist(c(.self$getErrorlist(),
+                         list(message = mm)))
+    message(mm)
     message("Class of response", class(myDataResponse))
     message(paste0("JSON returned by DSWS server response is:\n", myDataResponse), "\n")
     message("------------------")
