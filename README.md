@@ -109,6 +109,9 @@ Alternatively this can be set as an option by adding this line to your .RProfile
 
     options(Datastream.ChunkLimit = 50L)
 
+After each data request the number of chunks and actual requests made to DSWS is saved in properties 'numChunks' and 'numRequests'.  This might 
+help for data usage monitoring.
+
 ## Storage of DSWS access token between sessions
 
 The access token that is used to access DSWS can be provided via a callback function. This allows

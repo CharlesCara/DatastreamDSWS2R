@@ -26,6 +26,8 @@
 #' @field logging fieldDescription
 #' @field numDatatype fieldDescription
 #' @field numInstrument fieldDescription
+#' @field numRequests fieldDescription
+#' @field numChunks fieldDescription
 #' @field chunkLimit fieldDescription
 #' @field requestStringLimit fieldDescription
 #' @field logFileFolder fieldDescription
@@ -94,6 +96,8 @@ dsws <- setRefClass(Class = "dsws",
                                   logging = "numeric",
                                   numDatatype = "numeric",
                                   numInstrument = "numeric",
+                                  numRequests = "numeric",
+                                  numChunks = "numeric",
                                   chunkLimit = "numeric",
                                   requestStringLimit = "integer",
                                   logFileFolder = "character"))
@@ -135,7 +139,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   3) A username and password that are used to fetch a token from the DSWS server.  If the username and password are not
   provided, then they are sourced from system enviroment variables (ie Sys.getenv)
       'DatastreamUsername' and 'DatastreamPassword'
-  or alternatively (not preferred) that from
+  or alternatively (not preferred) then from
           \\code{options()$Datastream.Username} and
           \\code{options()$Datastream.Password}
 
@@ -158,6 +162,9 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   } else {
     .self$chunkLimit <- as.integer(options()$Datastream.ChunkLimit)
   }
+
+  .self$numChunks <- 0L
+  .self$numRequests <- 0L
 
   .self$requestStringLimit <- 2000L # Max character length of an http request.
   .self$logging <- 0L
@@ -306,29 +313,6 @@ dsws$methods(.requestToken = function() {
       config = httr::timeout(60)
     )
 
-    # repeat {
-    #   myTokenResponse <- tryCatch(httr::GET(myTokenURL, httr::timeout(300)),
-    #                               error = function(e) e)
-    #
-    #   # Break if an error or null and it is not a timeout
-    #   if (is.null(myTokenResponse)) break
-    #   if ("error" %in% class(myTokenResponse) &&
-    #       !stringr::str_detect(myTokenResponse$message, "Timeout was reached")) break
-    #
-    #   # If did not get a time out then break
-    #   if ("response" %in% class(myTokenResponse) &&
-    #       httr::status_code(myTokenResponse) != 408) break
-    #
-    #   # We have got a time out so check if we have had too many tries
-    #   if (nLoop >= maxLoop) break
-    #
-    #   message("...Token Request Timeout (http code 408) - retrying in ", waitTimeBase ^ nLoop, " seconds")
-    #   Sys.sleep(waitTimeBase ^ nLoop)
-    #   nLoop <- nLoop + 1
-    #
-    # }
-
-
     if (is.null(myTokenResponse)) {
       .self$tokenList <- list(TokenValue = NULL,
                               TokenExpiry = NULL)
@@ -424,13 +408,11 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
     message("--------------------------------------------------")
   }
 
-  # We are going to handle timeouts by
-  # waiting incrementally up to 16 sec and repeating the request
   maxLoop <- 4L
   waitTimeBase <- 2
   nLoop <- 0
   .self$errorlist <- NULL
-
+  .self$numRequests <- .self$numRequests + 1
   myDataResponse <- httr::RETRY(
     "POST",
     url = myDataURL,
@@ -438,38 +420,6 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
     encode = "json",
     config = httr::timeout(60)
   )
-  # repeat {
-  #
-  #   myDataResponse <- tryCatch(httr::POST(myDataURL,
-  #                                         body = .self$requestList,
-  #                                         encode = "json",
-  #                                         httr::timeout(300)),
-  #                              error = function(e) e)
-  #
-  #   # Break if an error or null
-  #   if (is.null(myDataResponse)) break
-  #   if ("error" %in% class(myDataResponse) &&
-  #       !stringr::str_detect(myDataResponse$message, "Timeout was reached")) break
-  #
-  #   # If did not get a time out or authentication then break
-  #   if ("response" %in% class(myDataResponse)) {
-  #     if (httr::status_code(myDataResponse) == 403) {
-  #       .self$.loadToken()
-  #     } else if (httr::status_code(myDataResponse) != 408) {
-  #       break
-  #     }
-  #   }
-  #
-  #
-  #   # We have got a time out so check if we have had too many tries
-  #   if (nLoop >= maxLoop) break
-  #
-  #   message("...Data Request Timeout (http code 408) - retrying in ", waitTimeBase ^ nLoop, " seconds")
-  #   Sys.sleep(waitTimeBase ^ nLoop)
-  #   nLoop <- nLoop + 1
-  #
-  # }
-
 
   if (is.null(myDataResponse)) {
     .self$dataResponse <-  NULL
@@ -581,6 +531,9 @@ dsws$methods(listRequest = function(instrument,
       expression = \"PCH#(XXXX,3M)\", requestDate = Sys.Date())
     }
   "
+  .self$numChunks <- 0
+  .self$numRequests <- 0
+
   return(.self$.basicRequest(instrument = instrument,
                              datatype = datatype,
                              expression = expression,
@@ -625,16 +578,18 @@ dsws$methods(snapshotRequest = function(instrument,
     }
 
   "
+  .self$numChunks <- 0
+  .self$numRequests <- 0
 
-return(.self$.basicRequest(instrument = instrument,
-                           datatype = datatype,
-                           expression = expression,
-                           isList = FALSE,
-                           startDate = requestDate,
-                           endDate = requestDate,
-                           frequency = "D",
-                           kind = 0,
-                           format = "Snapshot"))
+  return(.self$.basicRequest(instrument = instrument,
+                             datatype = datatype,
+                             expression = expression,
+                             isList = FALSE,
+                             startDate = requestDate,
+                             endDate = requestDate,
+                             frequency = "D",
+                             kind = 0,
+                             format = "Snapshot"))
 })
 
 
@@ -699,17 +654,20 @@ dsws$methods(timeSeriesRequest = function(instrument,
 
   "
 
-myData <- .self$.basicRequest(instrument = instrument,
-                              datatype = datatype,
-                              expression = expression,
-                              isList = FALSE,
-                              startDate = startDate,
-                              endDate = endDate,
-                              frequency = frequency,
-                              kind = 1,
-                              format = format)
+  .self$numChunks <- 0
+  .self$numRequests <- 0
 
-return(myData)
+  myData <- .self$.basicRequest(instrument = instrument,
+                                datatype = datatype,
+                                expression = expression,
+                                isList = FALSE,
+                                startDate = startDate,
+                                endDate = endDate,
+                                frequency = frequency,
+                                kind = 1,
+                                format = format)
+
+  return(myData)
 
 })
 
@@ -741,7 +699,7 @@ dsws$methods(timeSeriesListRequest = function(instrument,
     eg '-0D'}
   \\item{frequency}{one of the standard Datastream frequencies - D, W, M, Q, or Y }
   \\item{format}{can be either  \"ByInstrument\" or \"ByDatatype\". }
-}
+  }
   Returns either a single xts or a list of xts a data.frame with
   the requested data.  If \"ByInstrument\" then the data is returned as
   one or more (ie a list) wide xts with one column per instrument.
@@ -771,28 +729,30 @@ dsws$methods(timeSeriesListRequest = function(instrument,
 }
   "
 
-# First return a list of mnemonics
+  # First return a list of mnemonics
+  .self$numChunks <- 0
+  .self$numRequests <- 0
 
-.self$symbolList <- .self$.basicRequest(instrument = instrument,
-                                        datatype = "MNEM",
-                                        expression = "",
-                                        isList = TRUE,
-                                        startDate = "",
-                                        endDate = endDate,
-                                        frequency = frequency,
-                                        kind = 0,
-                                        format = "SnapshotList")
+  .self$symbolList <- .self$.basicRequest(instrument = instrument,
+                                          datatype = "MNEM",
+                                          expression = "",
+                                          isList = TRUE,
+                                          startDate = "",
+                                          endDate = endDate,
+                                          frequency = frequency,
+                                          kind = 0,
+                                          format = "SnapshotList")
 
 
-return(.self$.basicRequest(instrument = .self$symbolList[,1],
-                           datatype = datatype,
-                           expression = expression,
-                           isList = FALSE,
-                           startDate = startDate,
-                           endDate = endDate,
-                           frequency = frequency,
-                           kind = 1,
-                           format = format))
+  return(.self$.basicRequest(instrument = .self$symbolList[,1],
+                             datatype = datatype,
+                             expression = expression,
+                             isList = FALSE,
+                             startDate = startDate,
+                             endDate = endDate,
+                             frequency = frequency,
+                             kind = 1,
+                             format = format))
 })
 
 #-----------------------------------------------------------------------------
@@ -872,6 +832,7 @@ dsws$methods(.basicRequest = function(instrument,
   # if we are using expressions then length(datatype) will be 1L and so will not affect the test
   if (!doChunk) {
     # Chunking not required so just pass through the request
+    .self$numChunks <- 1
     if (format == "Snapshot" | format == "SnapshotList") {
       return(.self$.basicRequestSnapshotChunk(instrument = instrument,
                                               datatype = datatype,
@@ -904,7 +865,7 @@ dsws$methods(.basicRequest = function(instrument,
 
   if (datatype[1] != "") {
     numInstrChunk <- floor(.self$chunkLimit / numDatatypes)
-    numChunks <- ceiling(numCodes / numInstrChunk )
+    nChunks <- ceiling(numCodes / numInstrChunk )
 
   } else {
     # If we are using expressions then we have to choose our number of chunks as the larger
@@ -916,20 +877,21 @@ dsws$methods(.basicRequest = function(instrument,
     numChunksString <-  ceiling(nchar(expandedInstrument) / .self$requestStringLimit)
 
     numInstrChunk <- floor(numCodes / max(numChunksInst, numChunksString))
-    numChunks <- ceiling(numCodes / numInstrChunk )
+    nChunks <- ceiling(numCodes / numInstrChunk )
 
 
   }
 
 
 
-  for (i in 1:numChunks) {
+  for (i in 1:nChunks) {
     # get the the list of instruments for each request
     startIndex <- ((i - 1) * numInstrChunk) + 1
     endIndex <- ifelse((i * numInstrChunk) < numCodes, (i * numInstrChunk), numCodes )
     chunkInstrument <- instrument[startIndex:endIndex]
     resRows <- seq(from = startIndex, to = endIndex)
 
+    .self$numChunks <-   .self$numChunks + 1
     # make a request for the chunk of instruments
     if (format == "Snapshot" | format == "SnapshotList") {
       ret <- .self$.basicRequestSnapshotChunk(instrument = chunkInstrument,

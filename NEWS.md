@@ -1,3 +1,6 @@
+## Update 1.9.3
+Hold the number of DSWS requests and chunks after each data request
+
 ## Update 1.8.1
 Change server URLs to https.  Fix issue # 39
 

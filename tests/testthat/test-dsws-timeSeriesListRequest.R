@@ -6,7 +6,7 @@ context("classConstructor.R : test of timeSeriesListRequest method")
 ##############################################################################################
 
 test_that("test of timeseries list request for price datatype with relative dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -29,7 +29,7 @@ test_that("test of timeseries list request for price datatype with relative date
 })
 
 test_that("test of timeseries list request for default datatype with relative dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -53,7 +53,7 @@ test_that("test of timeseries list request for default datatype with relative da
 
 
 test_that("test of timeseries list request for price datatype with absolute dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -77,7 +77,7 @@ test_that("test of timeseries list request for price datatype with absolute date
 
 
 test_that("test of timeseries list request for expression with relative date", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -100,7 +100,7 @@ test_that("test of timeseries list request for expression with relative date", {
 
 
 test_that("test of timeseries list request for user created list that has a mixture of indices and expressions", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -122,7 +122,7 @@ test_that("test of timeseries list request for user created list that has a mixt
 
 
 test_that("Fix issue #50", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()

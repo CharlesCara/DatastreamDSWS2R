@@ -50,6 +50,10 @@ Creates an R5/RC4 object for accessing the Refinitiv
 
 \item{\code{numInstrument}}{fieldDescription}
 
+\item{\code{numRequests}}{fieldDescription}
+
+\item{\code{numChunks}}{fieldDescription}
+
 \item{\code{chunkLimit}}{fieldDescription}
 
 \item{\code{requestStringLimit}}{fieldDescription}
@@ -81,7 +85,7 @@ Creates an R5/RC4 object for accessing the Refinitiv
   3) A username and password that are used to fetch a token from the DSWS server.  If the username and password are not
   provided, then they are sourced from system enviroment variables (ie Sys.getenv)
       'DatastreamUsername' and 'DatastreamPassword'
-  or alternatively (not preferred) that from
+  or alternatively (not preferred) then from
           \code{options()$Datastream.Username} and
           \code{options()$Datastream.Password}
 
@@ -187,7 +191,7 @@ requestDate = "-0D")
     eg '-0D'}
   \item{frequency}{one of the standard Datastream frequencies - D, W, M, Q, or Y }
   \item{format}{can be either  "ByInstrument" or "ByDatatype". }
-}
+  }
   Returns either a single xts or a list of xts a data.frame with
   the requested data.  If "ByInstrument" then the data is returned as
   one or more (ie a list) wide xts with one column per instrument.
