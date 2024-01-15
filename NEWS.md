@@ -40,7 +40,5 @@ Added handling of composite datatypes which return multiple values.
 ## Update 1.5.1
 With this update we have switched from using the RCurl/rjson to using the httr/jsonlite packages for communicating with the Datastream server. 
 
-## CRAN
-Thank you to @mbannert for his work making the package ready to be released on CRAN. 
 
 
