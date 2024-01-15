@@ -1,5 +1,5 @@
 # DatastreamDSWS2R
-Functions and a R5 class that allows data to be downloaded and uploaded to the Refinitiv Datastream database via the DSWS server.  Refinitiv Datastream is a rich database of financial information.  You need to have a Datastream subscription and a username/password to use this package.
+Functions and a R5 class that allows data to be downloaded and uploaded to the LSEG Datastream database via the DSWS server.  LSEG Datastream is a rich database of financial information.  You need to have a LSEG Datastream subscription and a username/password to use this package.
 
 The package is installed using:
 
@@ -10,7 +10,7 @@ The development version of the package can be installed using:
     require(devtools)
     install_github(“CharlesCara/DatastreamDSWS2R”)
 
-Your Refinitiv Datastream username and password are best stored in environment variables by adding to your .Renviron file the following
+Your LSEG Datastream username and password are best stored in environment variables by adding to your .Renviron file the following
 lines.  This approach makes DatastreamDSWS2R able to be run securely in Docker containers by passing the credentials into the container at
 runtime.
 
@@ -73,7 +73,7 @@ We can also handle composite datatypes that return multiple values, for instance
                            requestDate = Sys.Date())
 
 
-Another notable dataitem that returns multiple values is [DS.USERSTATS](https://developers.refinitiv.com/en) which returns information on the user's consumption of Datastream data.
+Another notable dataitem that returns multiple values is [DS.USERSTATS](https://developers.lseg.com/en) which returns information on the user's consumption of Datastream data.
 
     mydsws <- dsws$new()
     mydsws$snapshotRequest(instrument = "STATS",
@@ -133,7 +133,7 @@ The callback function is used in
 The correct username is the 'childId' comprising 4 characters and 3 digits.  If you get a http 403 response 'Forbidden', then this might be because the Eikon username and password was used. 
 
 ## Affiliation and Warranty
-This package is not provided by Refinitiv or an affiliate. I have written this package to help my work at Absolute Strategy 
+This package is not provided by LSEG or an affiliate. I have written this package to help my work at Absolute Strategy 
 Research.  We are happy to make it available for others to use, but we offer or imply no warranty. 
 
 

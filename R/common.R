@@ -12,6 +12,7 @@
 #' @return an array of Dates
 #'
 #' @keywords internal
+#' @noRd
 #'
 #'
 .convert_JSON_Bool <- function(Input_Strings) {
@@ -36,6 +37,7 @@
 #' @return an array of Dates
 #'
 #' @keywords internal
+#' @noRd
 #'
 .convert_JSON_Integer <- function(Input_Strings) {
   suppressWarnings({
@@ -60,6 +62,7 @@
 #' @return an array of String
 #'
 #' @keywords internal
+#' @noRd
 #'
 .convert_JSON_String <- function(Input_Strings) {
   suppressWarnings({
@@ -83,6 +86,7 @@
 #' @return an array of Dates
 #'
 #' @keywords internal
+#' @noRd
 #'
 .convert_JSON_Double <- function(Input_Strings) {
   suppressWarnings({
@@ -109,6 +113,7 @@
 #' @importFrom stringi stri_locate stri_sub
 #'
 #' @keywords internal
+#' @noRd
 #'
 .convert_JSON_Date <- function(Input_Strings) {
   start <- stringi::stri_locate(Input_Strings, regex = "\\(")[,1]
@@ -145,6 +150,7 @@
 #' @importFrom stringi stri_locate stri_sub
 #'
 #' @keywords internal
+#' @noRd
 #'
 .convert_JSON_Datetime <- function(Input_Strings) {
   start <- stringi::stri_locate(Input_Strings, regex = "\\(")[,1]
@@ -176,6 +182,7 @@
 #' @importFrom stringi stri_locate stri_sub
 #'
 #' @keywords internal
+#' @noRd
 #'
 .convertJSONString <-
   function(x)
@@ -227,6 +234,7 @@
 #' @param x a list that is expected to have an item 'Value' and item 'Type'
 #' @return the parsed result: either Date, String or numeric
 #' @keywords internal
+#' @noRd
 #'
 .getValueTyped <- function(x, myType) {
   thisValue <- .convertJSONString(x$Value)
@@ -236,7 +244,7 @@
     return(NA)
   } else {
     if (myType == 4) {
-      if (class(thisValue) != "Date" && thisValue == "NA") {
+      if (!inherits(thisValue, "Date") && thisValue == "NA") {
         return(as.Date(NA))
       } else {
         return(as.Date(thisValue))
@@ -271,6 +279,7 @@
 #'
 #' @importFrom stringr fixed str_detect
 #' @keywords internal
+#' @noRd
 #'
 .getValue <- function(x) {
   if (!("Value" %in% names(x)) | !("Type" %in% names(x))) {
@@ -304,6 +313,7 @@
 #' @param x a list that is expected to have an item 'Symbol' and 'Type'
 #' @return the parsed result: either Date, String or numeric
 #' @keywords internal
+#' @noRd
 #'
 .getSymbol <- function(x) {
 
@@ -326,13 +336,14 @@
 #' @description extracts and converts a JSON string
 #'
 #' @details extracts and converts a JSON string (including with Timezone)
-#'  from the item 'Symbol'
-#' in the list x.  the item is parsed from JSON into either a numeric,
+#'  The item is parsed from JSON into either a numeric,
 #'  string, or a R Date object
 #'
-#' @param x a list that is expected to have an item 'Symbol' and 'Type'
+#' @param value the string in JSON to be parsed
+#' @param type the json type of the value (integer)
 #' @return the parsed result: either Date, String or numeric
 #' @keywords internal
+#' @noRd
 #'
 .getJSONValue <- function(value, type) {
 
@@ -425,6 +436,7 @@
 #' @param x a list that is expected to have an item 'Type'
 #' @return the parsed result: either Date, String or numeric
 #' @keywords internal
+#' @noRd
 #'
 .getType <- function(x) {
   thisValue <- .convertJSONString(x$Type)

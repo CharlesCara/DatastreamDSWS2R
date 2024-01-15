@@ -11,6 +11,7 @@
 #'
 #'
 #' @keywords internal
+#' @noRd
 #'
 .EncryptPassword <- function(strPassword="") {
 
@@ -48,6 +49,7 @@
 #' @importFrom xts merge.xts .indexwday
 #' @importFrom stringr str_trim
 #' @keywords internal
+#' @noRd
 #'
 .getTimeseries <- function(Data, freq, digits, NA_VALUE) {
   if (ncol(Data) > 1) {
@@ -212,15 +214,26 @@ UCTSUpload <- function(tsData,
     }
   }
 
-
   # At the moment everything will be a full update, and a hard coded NA value
   NA_VALUE <- "NA"
 
+  # convert to xts object
+  myXtsData <- xts::as.xts(tsData)
+
+
+  # If we are using Daily data and the first day falls on a weekend then move that date to Friday
+
+  if (freq[1] == "D") {
+    startDay <- xts::.indexwday(myXtsData[1,])
+    if (startDay == 6) {
+      zoo::index(myXtsData)[1] <- zoo::index(myXtsData)[1] - 1
+    } else if (startDay == 0) {
+      zoo::index(myXtsData)[1] <- zoo::index(myXtsData)[1] - 2
+    }
+  }
 
   # Add Start Date for values - make sure it is in DD/MM/YY format
   #CMC actually the function returns a dd/MM/yyyy format post Y2K
-  # convert to xts object
-  myXtsData <- as.xts(tsData)
   startDate <- zoo::index(first(myXtsData))
   endDate <- zoo::index(last(myXtsData))
 
@@ -276,7 +289,7 @@ UCTSUpload <- function(tsData,
 
     # Break if an error or null
     if (is.null(retValue)) break
-    if ("error" %in% class(retValue)) break
+    if (inherits(retValue, "error")) break
 
     # If did not get a time out then break
     if (httr::status_code(retValue) != 408) break
@@ -292,7 +305,7 @@ UCTSUpload <- function(tsData,
                      error = "NULL value returned"))
   }
 
-  if ("error" %in% class(retValue)) {
+  if (inherits(retValue, "error")) {
     return(structure(FALSE,
                      error = paste("Error ", retValue$message)))
   }
@@ -346,6 +359,8 @@ UCTSUpload <- function(tsData,
 #' @param Carry whether to carry data over missing dates
 #' @param PrimeCurr the currency of the timeseries
 #' @param overwrite if TRUE then existing data in the UCTS will be overwritten
+#' @param mydsws a dsws object that can be passed in.  Use this to avoid creating another dsws
+#' object in the same session.
 #' @param strUsername your Datastream username
 #' @param strPassword your Datastream Password
 #' @param strServerName URL of the Datastream server
@@ -370,6 +385,7 @@ UCTSAppend <- function(tsData,
                        Carry = c("YES","NO","PAD"),
                        PrimeCurr ="",
                        overwrite = TRUE,
+                       mydsws = dsws$new(),
                        strUsername = ifelse(Sys.getenv("DatastreamUsername") != "",
                                             Sys.getenv("DatastreamUsername"),
                                             options()$Datastream.Username),
@@ -391,7 +407,9 @@ UCTSAppend <- function(tsData,
   }
 
   # Get the existing UCTS from Datastream
-  mydsws <- dsws$new()
+  if (is.null(mydsws)) {
+    mydsws <- dsws$new()
+  }
   tsExisting <- mydsws$timeSeriesRequest(instrument = TSCode,
                                          startDate = as.Date("1950-01-01"),
                                          endDate = index(last(tsData)),

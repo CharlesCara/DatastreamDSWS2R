@@ -130,7 +130,11 @@ test_that("Fix issue #50", {
   mydsws <- dsws$new()
 
   mydsws$chunkLimit <- 50L
-  myData <- mydsws$timeSeriesListRequest(instrument="WSUS1",datatype = c("WC18198","WC01084"),startDate = "-2Y",endDate="0Y",frequency = "Y")
+  myData <- mydsws$timeSeriesListRequest(instrument = "WSUS1",
+                                         datatype = c("WC18198","WC01084"),
+                                         startDate = "-2Y",
+                                         endDate = "0Y",
+                                         frequency = "Y")
   expect_equal(length(myData), 2)
   expect_true(ncol(myData[[1]]) > 900)
 

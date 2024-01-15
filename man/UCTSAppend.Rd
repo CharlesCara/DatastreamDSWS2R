@@ -18,6 +18,7 @@ UCTSAppend(
   Carry = c("YES", "NO", "PAD"),
   PrimeCurr = "",
   overwrite = TRUE,
+  mydsws = dsws$new(),
   strUsername = ifelse(Sys.getenv("DatastreamUsername") != "",
     Sys.getenv("DatastreamUsername"), options()$Datastream.Username),
   strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
@@ -57,6 +58,9 @@ numbers ("Y")}
 \item{PrimeCurr}{the currency of the timeseries}
 
 \item{overwrite}{if TRUE then existing data in the UCTS will be overwritten}
+
+\item{mydsws}{a dsws object that can be passed in.  Use this to avoid creating another dsws
+object in the same session.}
 
 \item{strUsername}{your Datastream username}
 

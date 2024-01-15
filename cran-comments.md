@@ -6,8 +6,9 @@ Passes
 * Travis CI
 * devtools::check()
 
-Note Latin-1 strings are necessary as the Refinitiv server can return Latin-1 characters.
+Note Latin-1 strings are necessary as the LSEG server can return Latin-1 characters.
 
 ## NEWS
-Amend URL to https
+Align dates better when uploading UCTS that starts on weekend.
+
 

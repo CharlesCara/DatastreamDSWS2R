@@ -319,7 +319,7 @@ dsws$methods(.requestToken = function() {
       stop("Could not request access Token - response from server was NULL")
     }
 
-    if ("error" %in% class(myTokenResponse)) {
+    if (inherits(myTokenResponse, "error")) {
       .self$tokenList <- list(TokenValue = NULL,
                               TokenExpiry = NULL)
       stop(paste0("Error requesting access Token.  Error message was:\n",
@@ -430,7 +430,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
     return(FALSE)
   }
 
-  if ("error" %in% class(myDataResponse)) {
+  if (inherits(myDataResponse, "error")) {
     .self$dataResponse <-  NULL
     mm <- paste0("Response is not able to be parsed: Error message was:\n",
                  myDataResponse$message)
@@ -440,7 +440,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
     return(FALSE)
   }
 
-  if ("list" %in% class(myDataResponse)) {
+  if (inherits(myDataResponse, "list")) {
     .self$dataResponse <-  NULL
     mm <- "Response is not able to be parsed: response is a list"
     .self$setErrorlist(c(.self$getErrorlist(),
@@ -479,7 +479,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
                                  error = function(e) e)
 
 
-  if (("error" %in% class(.self$dataResponse))) {
+  if (inherits(.self$dataResponse, "error")) {
     mm <- paste0("Error parsing response: ", .self$dataResponse$message)
     .self$setErrorlist(c(.self$getErrorlist(),
                          list(message = mm)))
@@ -943,7 +943,7 @@ dsws$methods(.basicRequest = function(instrument,
       } else {
         # If multiple datatypes then the xts for each datatype has to be merged individually
         for (j in 1:numDatatypes) {
-          if (i == 1 || is.null(xtsValues[[j]]) || is.na(xtsValues[[j]])) {
+          if (i == 1 || is.null(xtsValues[[j]]) || isTRUE(is.na(xtsValues[[j]]))) {
             # First run
             xtsValues[[j]] <- ret[[j]]
           } else {
@@ -1566,17 +1566,17 @@ dsws$methods(.buildRequestList = function(frequency, instrument, datatype, expre
 
 
   # Set up the Date element with type checking
-  if (class(startDate)[1] %in% c("Date", "POSIXct", "POSIXt")) {
+  if (inherits(startDate[1], "Date")) {
     sStartDate <- format(startDate, "%Y-%m-%d")
-  } else if (class(startDate) == "character") {
+  } else if (inherits(startDate, "character")) {
     sStartDate <- startDate
   } else {
     stop("startDate should be either a valid character string or a Date (class either Date, POSIXct, POSIXlt)")
   }
 
-  if (class(endDate)[1] %in% c("Date", "POSIXct", "POSIXt")) {
+  if (inherits(endDate[1], "Date")) {
     sEndDate <- format(endDate, "%Y-%m-%d")
-  } else if (class(endDate) == "character") {
+  } else if (inherits(endDate, "character")) {
     sEndDate <- endDate
   } else {
     stop("startDate should be either a valid character string or a Date (class either Date, POSIXct, POSIXlt)")
@@ -1620,17 +1620,17 @@ dsws$methods(.buildRequestListBundle = function(frequency, instrument, datatype,
   }
 
   # Set up the Date element with type checking
-  if (class(startDate)[1] %in% c("Date", "POSIXct", "POSIXt")) {
+  if (inherits(startDate, "Date")) {
     sStartDate <- format(startDate, "%Y-%m-%d")
-  } else if (class(startDate) == "character") {
+  } else if (inherits(startDate, "character")) {
     sStartDate <- startDate
   } else {
     stop("startDate should be either a valid character string or a Date (class either Date, POSIXct, POSIXlt)")
   }
 
-  if (class(endDate)[1] %in% c("Date", "POSIXct", "POSIXt")) {
+  if (inherits(endDate, "Date")) {
     sEndDate <- format(endDate, "%Y-%m-%d")
-  } else if (class(endDate) == "character") {
+  } else if (inherits(endDate, "character")) {
     sEndDate <- endDate
   } else {
     stop("startDate should be either a valid character string or a Date (class either Date, POSIXct, POSIXlt)")
