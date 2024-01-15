@@ -137,6 +137,16 @@ This package is not provided by LSEG or an affiliate. I have written this packag
 Research.  We are happy to make it available for others to use, but we offer or imply no warranty. 
 
 
+
+## Update 1.9.8
+Change branding from Refinitiv to LSEG
+
+## Update 1.9.5
+Handle upload of daily series that begin on a weekend better
+
+## Update 1.9.3
+Hold the number of DSWS requests and chunks after each data request
+
 ### Update 1.9.1
 Change to use httr::RETRY when requesting data
 

@@ -6,11 +6,11 @@
 \alias{dsws}
 \title{dsws}
 \description{
-An R5/RC object for accessing the Refinitiv Datastream
+An R5/RC object for accessing the LSEG Datastream
   DSWS service.
 }
 \details{
-Creates an R5/RC4 object for accessing the Refinitiv
+Creates an R5/RC4 object for accessing the LSEG
   Datastream DSWS service
 }
 \section{Fields}{
@@ -92,8 +92,8 @@ Creates an R5/RC4 object for accessing the Refinitiv
     This allows the password to be stored in .Renviron or .RProfile rather
   than in the source code.
 
-  There is a difference in the Refinitiv's documentation about the chunk limit and different accounts have
-  different limits.  Some users are limited to 50 items while others are limited to 2000L.  The chunk limit
+  There different accounts have different limits according to their licence.  Most users are limited to 50 items while
+  enterprise users have a limit of 2000L.  The chunk limit
   can be controlled by setting the chunkLimit parameter of the dsws object.  If     \code{options()$Datastream.ChunkLimit} is
   set then the value is taken from there.
 

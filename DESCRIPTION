@@ -1,12 +1,12 @@
 Package: DatastreamDSWS2R
 Type: Package
-Title: Provides a Link Between the 'Refinitiv Datastream' System and R
-Version: 1.9.7
+Title: Provides a Link Between the 'LSEG Datastream' System and R
+Version: 1.9.8
 Date: 2024-01-15
 Author: Charles Cara
 Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
 Description: Provides a set of functions and a class to connect, extract and
-    upload information from the 'Refinitiv Datastream' database. This
+    upload information from the 'LSEG Datastream' database. This
     package uses the 'DSWS' API and server used by the 'Datastream DFO addin'.  
     Details of this API are available at <https://www.lseg.com/en/data-analytics>.
     Please report issues at <https://github.com/CharlesCara/DatastreamDSWS2R/issues>.

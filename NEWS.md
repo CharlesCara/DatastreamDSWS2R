@@ -1,4 +1,5 @@
-# DatastreamDSWS2R 1.9.7
+## Update 1.9.8
+Change branding from Refinitiv to LSEG
 
 ## Update 1.9.5
 Handle upload of daily series that begin on a weekend better
