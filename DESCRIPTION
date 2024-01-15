@@ -1,7 +1,7 @@
 Package: DatastreamDSWS2R
 Type: Package
 Title: Provides a Link Between the 'Refinitiv Datastream' System and R
-Version: 1.9.6
+Version: 1.9.7
 Date: 2024-01-15
 Author: Charles Cara
 Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
