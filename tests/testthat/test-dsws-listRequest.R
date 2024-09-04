@@ -6,7 +6,7 @@ context("classConstructor.R : test of listRequest method")
 
 test_that("test of simple snapshot request for price datatype with relative dates", {
 
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -28,7 +28,7 @@ test_that("test of simple snapshot request for price datatype with relative date
 
 test_that("test of simple snapshot request for price datatype with absolute dates", {
 
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -50,7 +50,7 @@ test_that("test of simple snapshot request for price datatype with absolute date
 
 
 test_that("test of simple snapshot request for price datatype with relative dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -71,7 +71,7 @@ test_that("test of simple snapshot request for price datatype with relative date
 
 
 test_that("test of simple snapshot request for Expression datatype with relative date", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -92,7 +92,7 @@ test_that("test of simple snapshot request for Expression datatype with relative
 
 
 test_that("test of simple snapshot request for Date datatype with relative dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -114,7 +114,7 @@ test_that("test of simple snapshot request for Date datatype with relative dates
 
 
 test_that("Expect requests on different dates to give different responses", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()

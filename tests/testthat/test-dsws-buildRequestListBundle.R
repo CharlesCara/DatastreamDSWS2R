@@ -6,7 +6,7 @@ context("classConstructor.R : test of .buildRequestBundle method")
 ##############################################################################################
 
 test_that("test of two stocks and a single datatype", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -20,7 +20,7 @@ test_that("test of two stocks and a single datatype", {
                                   datatype = "",
                                   expression = "XXXX(PE)",
                                   isList = FALSE,
-                                  startDate= as.Date("2010-01-01"),
+                                  startDate = as.Date("2010-01-01"),
                                   endDate = as.Date("2010-12-31"),
                                   kind = 0,
                                   token = "xyz")
@@ -45,7 +45,7 @@ test_that("test of two stocks and a single datatype", {
                      Tag = NULL))
 
   myReqExpected <- list(DataRequests = myDRExp,
-                        Properties = list(Properties=NULL),
+                        Properties = list(Properties = NULL),
                         TokenValue = "xyz")
 
 
@@ -57,7 +57,7 @@ test_that("test of two stocks and a single datatype", {
 
 
 test_that("test of two stocks and a single expression", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -71,7 +71,7 @@ test_that("test of two stocks and a single expression", {
                                           datatype = "P",
                                           expression = "",
                                           isList = FALSE,
-                                          startDate= as.Date("2010-01-01"),
+                                          startDate = as.Date("2010-01-01"),
                                           endDate = as.Date("2010-12-31"),
                                           kind = 0,
                                           token = "xyz")
@@ -97,7 +97,7 @@ test_that("test of two stocks and a single expression", {
                           Tag = NULL))
 
   myReqExpected <- list(DataRequests = myDRExp,
-                        Properties = list(Properties=NULL),
+                        Properties = list(Properties = NULL),
                         TokenValue = "xyz")
 
 
@@ -109,7 +109,7 @@ test_that("test of two stocks and a single expression", {
 
 
 test_that("test of two stocks and two datatypes", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -123,7 +123,7 @@ test_that("test of two stocks and two datatypes", {
                                           datatype = c("P", "Q"),
                                           expression = "",
                                           isList = FALSE,
-                                          startDate= as.Date("2010-01-01"),
+                                          startDate = as.Date("2010-01-01"),
                                           endDate = as.Date("2010-12-31"),
                                           kind = 0,
                                           token = "xyz")
@@ -151,7 +151,7 @@ test_that("test of two stocks and two datatypes", {
                           Tag = NULL))
 
   myReqExpected <- list(DataRequests = myDRExp,
-                        Properties = list(Properties=NULL),
+                        Properties = list(Properties = NULL),
                         TokenValue = "xyz")
 
 
@@ -164,7 +164,7 @@ test_that("test of two stocks and two datatypes", {
 
 
 test_that("test of two stocks and complex Expression", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -178,7 +178,7 @@ test_that("test of two stocks and complex Expression", {
                                           datatype = "XXXX/XXXX(PE)",
                                           expression = "",
                                           isList = FALSE,
-                                          startDate= as.Date("2010-01-01"),
+                                          startDate = as.Date("2010-01-01"),
                                           endDate = as.Date("2010-12-31"),
                                           kind = 0,
                                           token = "xyz")
@@ -204,7 +204,7 @@ test_that("test of two stocks and complex Expression", {
                           Tag = NULL))
 
   myReqExpected <- list(DataRequests = myDRExp,
-                        Properties = list(Properties=NULL),
+                        Properties = list(Properties = NULL),
                         TokenValue = "xyz")
 
 

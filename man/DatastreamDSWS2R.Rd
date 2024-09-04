@@ -2,6 +2,7 @@
 % Please edit documentation in R/DatastreamDSWS2R.R
 \docType{package}
 \name{DatastreamDSWS2R}
+\alias{DatastreamDSWS2R-package}
 \alias{DatastreamDSWS2R}
 \title{DatastreamDSWS2R}
 \description{

@@ -6,7 +6,7 @@ context("classConstructor.R : test of listRequest method")
 
 test_that("test of simple snapshot request for price datatype with relative dates", {
 
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()

@@ -8,13 +8,13 @@ suppressPackageStartupMessages(require(xts))
 testDataFolder <- file.path(testthat::test_path(), "testData")
 
 # Whether to use the server for the requests
-useServer <-TRUE
+useServer <- TRUE
 
 
 ##############################################################################################
 
 test_that("test of a large timeseries request - long list with expression", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -49,7 +49,7 @@ test_that("test of a large timeseries request - long list with expression", {
   #mydsws$setLogging(3)
   mydsws$chunkLimit <- 50L
 
-  if(!useServer){
+  if (!useServer) {
     mydsws$jsonResponseLoadFile <- file.path(testDataFolder, "test-dsws-timeSeriesRequestChunking-test01.json")
   }
   xtsData <- mydsws$timeSeriesRequest(instrument = longListDSCodes,

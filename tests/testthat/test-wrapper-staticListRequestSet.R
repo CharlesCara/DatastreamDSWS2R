@@ -73,7 +73,7 @@ test_that("test of staticRequestSet with a two timeseries requests", {
   adf <- DatastreamDSWS2R::staticRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
                                             instrument = Codes,
                                             expression = Expressions,
-                                            endDate = Sys.Date()-1, frequency = "D")
+                                            endDate = Sys.Date() - 1, frequency = "D")
   expect_is(adf[1, 1], "numeric")
   expect_is(adf, "data.frame")
 })
@@ -95,7 +95,7 @@ test_that("test of staticRequestSet with a static and  timeseries requests", {
   adf <- DatastreamDSWS2R::staticRequestSet(mydsws = DatastreamDSWS2R::dsws$new(),
                                             instrument = Codes,
                                             expression = Expressions,
-                                            endDate = Sys.Date()-1, frequency = "D")
+                                            endDate = Sys.Date() - 1, frequency = "D")
   expect_equal(adf[1, 1], NA)
   expect_is(adf[1, 2], "numeric")
   expect_is(adf, "data.frame")

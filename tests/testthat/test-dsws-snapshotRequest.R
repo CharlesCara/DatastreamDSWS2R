@@ -5,7 +5,7 @@ context("classConstructor.R : test of snapshotRequest method")
 ##############################################################################################
 
 test_that("test of simple snapshot request for price datatype with relative dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -29,7 +29,7 @@ test_that("test of simple snapshot request for price datatype with relative date
 ##############################################################################################
 
 test_that("test of simple snapshot request for price datatype with absolute dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -51,7 +51,7 @@ test_that("test of simple snapshot request for price datatype with absolute date
 ##############################################################################################
 
 test_that("test of simple snapshot request with single datatypes that return strings", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -73,7 +73,7 @@ test_that("test of simple snapshot request with single datatypes that return str
 ##############################################################################################
 
 test_that("test of simple snapshot request with datatypes that return dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -95,7 +95,7 @@ test_that("test of simple snapshot request with datatypes that return dates", {
 ##############################################################################################
 
 test_that("test of simple snapshot request with two datatypes that return name and dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -119,7 +119,7 @@ test_that("test of simple snapshot request with two datatypes that return name a
 ##############################################################################################
 
 test_that("test of chunked snapshot request with two datatypes that return name and dates", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -149,7 +149,7 @@ test_that("test of chunked snapshot request with two datatypes that return name 
 ##############################################################################################
 
 test_that("test of equity risk premium", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -172,7 +172,7 @@ test_that("test of equity risk premium", {
 
 test_that("test of requesting complex expression", {
 # Actually this request gets a $$"ER","E21B","INVALID CODE..." error from Datastream
-    if(Sys.getenv("DatastreamUsername") == ""){
+    if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -203,7 +203,7 @@ test_that("test of requesting complex expression", {
 
 test_that("test that if INF is returned then it is not interpreted as Inf", {
 
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -211,7 +211,7 @@ test_that("test that if INF is returned then it is not interpreted as Inf", {
   mydsws <- dsws$new()
 
   myData <- mydsws$snapshotRequest(instrument = c("INF"),
-                                   datatype=c("NAME","MNEM","ISIN","RIC"),
+                                   datatype = c("NAME","MNEM","ISIN","RIC"),
                                    requestDate =  as.Date("2019-01-15"))
 
   expect_false(is.infinite(myData$Instrument[1]))
@@ -224,7 +224,7 @@ test_that("test that if INF is returned then it is not interpreted as Inf", {
 
 test_that("test for multicell dataitems", {
 
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -232,7 +232,7 @@ test_that("test for multicell dataitems", {
   mydsws <- dsws$new()
 #  mydsws$jsonResponseSaveFile <- "VOD-QTEALL"
   myData <- mydsws$snapshotRequest(instrument = "VOD",
-                                   datatype="QTEALL",
+                                   datatype = "QTEALL",
                                    requestDate =  as.Date("2019-01-15"))
 
   expect_false(is.infinite(myData$Instrument[1]))
@@ -242,7 +242,7 @@ test_that("test for multicell dataitems", {
 
 test_that("test for multicell dataitems - multiple stocks", {
 
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -250,7 +250,7 @@ test_that("test for multicell dataitems - multiple stocks", {
   mydsws <- dsws$new()
 #  mydsws$jsonResponseSaveFile <- "VODHSBA-QTEALL"
   myData <- mydsws$snapshotRequest(instrument = c("VOD", "HSBA"),
-                                   datatype="QTEALL",
+                                   datatype = "QTEALL",
                                    requestDate =  as.Date("2019-01-15"))
 
   expect_false(is.infinite(myData$Instrument[1]))
@@ -261,7 +261,7 @@ test_that("test for multicell dataitems - multiple stocks", {
 
 test_that("test for multicell dataitems - multiple stocks across chunks", {
 
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -282,7 +282,7 @@ test_that("test for multicell dataitems - multiple stocks across chunks", {
   mydsws <- dsws$new()
   mydsws$chunkLimit <- 10
   myData <- mydsws$snapshotRequest(instrument = inst,
-                                   datatype="QTEALL",
+                                   datatype = "QTEALL",
                                    requestDate =  as.Date("2019-01-15"))
 
   expect_false(is.infinite(myData$Instrument[1]))

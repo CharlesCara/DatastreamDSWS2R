@@ -301,9 +301,6 @@ dsws$methods(.requestToken = function() {
 
     # We are going to handle timeouts by
     # waiting incrementally up to 16 sec and repeating the request
-    maxLoop <- 4L
-    waitTimeBase <- 2
-    nLoop <- 0
     .self$errorlist <- NULL
 
     myTokenResponse <- httr::RETRY(
@@ -408,9 +405,6 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
     message("--------------------------------------------------")
   }
 
-  maxLoop <- 4L
-  waitTimeBase <- 2
-  nLoop <- 0
   .self$errorlist <- NULL
   .self$numRequests <- .self$numRequests + 1
   myDataResponse <- httr::RETRY(

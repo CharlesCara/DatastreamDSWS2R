@@ -3,7 +3,7 @@ context("test-wrapper - tests of wrapper functions")
 ##############################################################################################
 
 test_that("staticListRequestSet - array of instruments", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -23,7 +23,7 @@ test_that("staticListRequestSet - array of instruments", {
 
 
 test_that("staticListRequestSet - array of instruments", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -43,7 +43,7 @@ test_that("staticListRequestSet - array of instruments", {
 ##############################################################################################
 
 test_that("staticListRequestSet - array of instruments", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()

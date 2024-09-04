@@ -1,9 +1,5 @@
 ##############################################################################################
 
-context("classConstructor.R : test of timeSeriesRequest method")
-
-suppressWarnings(suppressPackageStartupMessages(require(xts)))
-
 
 testDataFolder <- file.path(testthat::test_path(), "testData")
 ##############################################################################################
@@ -737,19 +733,19 @@ test_that("test of named instruments, datatypes and expressions", {
 
 
   # Expect
-  expect_silent(xtsTestData <- mydsws$timeSeriesRequest(instrument =  myIns,
+  expect_silent({xtsTestData <- mydsws$timeSeriesRequest(instrument =  myIns,
                                                         expression = myExp,
                                                         startDate = as.Date("2016-01-01"),
                                                         endDate = as.Date("2016-01-10"),
-                                                        frequency = "D"))
+                                                        frequency = "D")})
   expect_is(xtsTestData, "xts")
   expect_true(nrow(xtsTestData) > 1)
 
-  expect_silent(xtsTestData <- mydsws$timeSeriesRequest(instrument =  myIns,
+  expect_silent({xtsTestData <- mydsws$timeSeriesRequest(instrument =  myIns,
                                                         datatype = myDt,
                                                         startDate = as.Date("2016-01-01"),
                                                         endDate = as.Date("2016-01-10"),
-                                                        frequency = "D"))
+                                                        frequency = "D")})
   expect_is(xtsTestData, "xts")
   expect_true(nrow(xtsTestData) > 1)
   rm(mydsws, myIns, myExp, myDt, xtsTestData)

@@ -5,7 +5,7 @@ context("classConstructor.R : test of initialise")
 
 ##############################################################################################
 test_that("test of creating a dsws object with no parameters", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -23,7 +23,7 @@ rm(mydsws)
 
 ##############################################################################################
 test_that("test of creating a dsws object with bad username", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -37,7 +37,7 @@ test_that("test of creating a dsws object with bad username", {
 
 ##############################################################################################
 test_that("test of creating a dsws object wrong server location", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -51,7 +51,7 @@ test_that("test of creating a dsws object wrong server location", {
 
 ##############################################################################################
 test_that("test of creating a dsws object without connecting to dsws server", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()
@@ -68,7 +68,7 @@ test_that("test of creating a dsws object without connecting to dsws server", {
 
 ##############################################################################################
 test_that("test of creating a dsws object with callback function for getting Token", {
-  if(Sys.getenv("DatastreamUsername") == ""){
+  if (Sys.getenv("DatastreamUsername") == "") {
     skip("Username not available")
   }
   skip_on_cran()

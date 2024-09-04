@@ -24,7 +24,7 @@ Imports:
     dplyr
 Suggests: testthat,
     rjson
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.1
 Collate: 
     'DatastreamDSWS2R.R'
     'common.R'

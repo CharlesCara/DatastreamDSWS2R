@@ -189,7 +189,7 @@ test_that("One series is zero width", {
 
 
 test_that("Two series are zero width", {
-  test1 <-structure(logical(0), class = c("xts", "zoo"), .indexCLASS = "Date", tclass = "Date", .indexTZ = "UTC", tzone = "UTC", index = structure(numeric(0), tzone = "UTC", tclass = "Date"), .Dim = 0:1, .Dimnames = list(
+  test1 <- structure(logical(0), class = c("xts", "zoo"), .indexCLASS = "Date", tclass = "Date", .indexTZ = "UTC", tzone = "UTC", index = structure(numeric(0), tzone = "UTC", tclass = "Date"), .Dim = 0:1, .Dimnames = list(
     NULL, "Stock1"))
 
 
