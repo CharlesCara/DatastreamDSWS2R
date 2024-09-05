@@ -2,8 +2,11 @@ Package: DatastreamDSWS2R
 Type: Package
 Title: Provides a Link Between the 'LSEG Datastream' System and R
 Version: 1.9.9
-Date: 2024-01-15
-Author: Charles Cara
+Date: 2024-09-04
+Authors@R: person(given = "Charles",
+                    family = "Cara",
+                    role = c("aut", "cre"),
+                    email = "charles.cara@absolute-strategy.com")
 Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
 Description: Provides a set of functions and a class to connect, extract and
     upload information from the 'LSEG Datastream' database. This

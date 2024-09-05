@@ -9,3 +9,7 @@
 A package to manage access to the LSEG Datastream
  DSWS webservice
 }
+\author{
+\strong{Maintainer}: Charles Cara \email{charles.cara@absolute-strategy.com}
+
+}
