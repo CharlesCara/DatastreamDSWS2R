@@ -1,3 +1,6 @@
+# DatastreamDSWS2R 1.9.12
+Fix issue #46 - error when creating dsws object
+
 # DatastreamDSWS2R 1.9.10
 
 # DatastreamDSWS2R 1.9.9
