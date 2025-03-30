@@ -1,8 +1,8 @@
 Package: DatastreamDSWS2R
 Type: Package
 Title: Provides a Link Between the 'LSEG Datastream' System and R
-Version: 1.9.10
-Date: 2024-09-04
+Version: 1.9.11
+Date: 2025-03-30
 Authors@R: person(given = "Charles",
                     family = "Cara",
                     role = c("aut", "cre"),

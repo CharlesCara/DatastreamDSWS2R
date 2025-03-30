@@ -307,7 +307,8 @@ dsws$methods(.requestToken = function() {
       "GET",
       url = myTokenURL,
       encode = "json",
-      config = httr::timeout(60)
+      config = httr::timeout(60),
+      httr::accept_json()
     )
 
     if (is.null(myTokenResponse)) {
@@ -412,7 +413,8 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
     url = myDataURL,
     body = .self$requestList,
     encode = "json",
-    config = httr::timeout(60)
+    config = httr::timeout(60),
+    httr::accept_json()
   )
 
   if (is.null(myDataResponse)) {
