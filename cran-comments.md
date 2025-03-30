@@ -1,6 +1,6 @@
 ## Resubmission
 
-This is a update of this package.
+This is a update of this package fixing bug #46
 
 ## R CMD check results
 
@@ -14,6 +14,5 @@ This is a update of this package.
 Note Latin-1 strings are necessary as the LSEG server can return Latin-1 characters.
 
 ## NEWS
-Changed branding to reflect company name change
-
+Fixing Bug #46 - error when creating dsws object
 

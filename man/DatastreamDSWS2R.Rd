@@ -9,6 +9,14 @@
 A package to manage access to the LSEG Datastream
  DSWS webservice
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/CharlesCara/DatastreamDSWS2R}
+  \item Report bugs at \url{https://github.com/CharlesCara/DatastreamDSWS2R/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Charles Cara \email{charles.cara@absolute-strategy.com}
 
