@@ -136,7 +136,8 @@ The correct username is the 'childId' comprising 4 characters and 3 digits.  If 
 This package is not provided by LSEG or an affiliate. I have written this package to help my work at Absolute Strategy 
 Research.  We are happy to make it available for others to use, but we offer or imply no warranty. 
 
-
+## Update 1.9.12
+Fixed Expired token error due to change in default response format from DSWS server
 
 ## Update 1.9.8
 Change branding from Refinitiv to LSEG
