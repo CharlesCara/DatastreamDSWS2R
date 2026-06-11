@@ -2,56 +2,24 @@
 #' @include classConstructor.R
 #' @include wrapper.R
 #'
-#' @name dotEncryptPassword
-#' @title Encrypt the Datastream password
-#' @description This is a port of the VBA code
-#'
-#' @param strPassword the password to be encrypted
-#' @return an encrypted password
-#'
-#'
-#' @keywords internal
-#' @noRd
-#'
-.EncryptPassword <- function(strPassword="") {
-
-
-  iSeed <- as.raw(199L) # arbitrary number
-  strCrypted <- ""
-  bBytes <- charToRaw(strPassword)
-
-  for (b in bBytes)
-  {
-    iCryptedByte <- as.raw(xor(b , iSeed))
-    strCrypted <- paste0(strCrypted, formatC(as.integer(iCryptedByte),digits = 3,width = 3,flag = "0"))
-    # add previous byte, XOR with arbitrary value
-    iSeed <- xor(as.raw((as.integer(iSeed) + as.integer(iCryptedByte)) %% 255L), as.raw(67L))
-  }
-
-  return(strCrypted)
-}
-
-
 
 #' @name dotgetTimeseries
 #' @title convert xts timeseries into a string that can be sent to
-#' the Datastream server
+#' the Datastream server.  This strips out weekends from the timeseries
 #'
 #' @param Data the xts timeseries to be converted
 #' @param freq the frequency of the data
 #' @param digits the number of decimal places to round the data to
-#' @param NA_VALUE the string to replace NA data with
 #'
 #' @return A string of the core data of Data
 #'
 #'
 #' @importFrom zoo zoo index
 #' @importFrom xts merge.xts .indexwday
-#' @importFrom stringr str_trim
 #' @keywords internal
 #' @noRd
 #'
-.getTimeseries <- function(Data, freq, digits, NA_VALUE) {
+.getTimeseries <- function(Data, freq, digits) {
   if (ncol(Data) > 1) {
     # Make sure we are only dealing with a single column xts
     Data <- Data[,1]
@@ -80,21 +48,42 @@
     #assumption that they are in the right frequency
   }
 
-  sFormattedData <- suppressWarnings(formatC(wData, digits = digits, mode = "double", format = "f"))
-  sFormattedData <- stringr::str_trim(sFormattedData)
+  # Convert to numeric
+  suppressWarnings({
+    wData <- as.numeric(zoo::coredata(wData)[, 1])
+    wData[which(!is.finite(wData))] <- as.numeric(NA)
+    wData <- round(wData, digits = digits)
 
-  #We need to make sure that any missing data is replaced with the
-  # the correct symbol
-  sFormattedData[which(sFormattedData == "NaN")] <- NA_VALUE
-
-  #Collapse the array into a string
-  sData <- paste0(sFormattedData,collapse = ",")
-  sData <- paste0(sData,",")
-
-  return(sData)
+  })
+  return(wData)
 }
 
 
+
+# UserObjectType values
+USEROBJECTTYPE_LIST <- 1
+USEROBJECTTYPE_INDEX <- 2
+USEROBJECTTYPE_TIMESERIES <- 3
+USEROBJECTTYPE_EXPRESSION <- 4
+
+
+# ShareType Values
+SHARETYPE_DEFAULT <- 0
+
+# CarryIndicator Values
+CARRY_VALUES = c("YES" = 0,"NO" = 1,"PAD" = 2)
+
+# DateAlignment Values
+ALIGNMENT_VALUES = c("FIRST" = 1,"MID" = 2,"END" = 0)
+
+# FrequencyConversion Values
+FREQCONV_VALUES = c("ACT" = 3,"SUM" = 2,"AVG" = 1,"END" = 0)
+
+# Data frequency values
+DATAFREQUENCY_VALUES = c("D" = 0, "W" = 1, "M" = 2, "Q" = 3, "Y" = 4)
+
+# Whether Percentage or not
+ACTPER_VALUES <- c("N" = FALSE, "Y" = TRUE)
 
 #' @title Upload a UCTS timeseries into Datastream
 #'
@@ -108,7 +97,8 @@
 #' @param MGMTGroup Must have managment group.  Only the first
 #' characters will be used.
 #' @param freq The frequency of the data to be uploaded
-#' @param seriesName the name of the series
+#' @param seriesName the name of the series - can be no more than XX characters -
+#'  excess will be trimmed to that length
 #' @param Units Units of the data - can be no more than 12 characters -
 #'  excess will be trimmed to that length
 #' @param Decimals Number of Decimals in the data - a number between 0 and
@@ -119,16 +109,16 @@
 #' @param Alignment Alignment of the data within periods
 #' @param Carry whether to carry data over missing dates
 #' @param PrimeCurr the currency of the timeseries
-#' @param strUsername your Datastream username
-#' @param strPassword your Datastream Password
+#' @param strUsername Deprecated will be removed in a future release - ignored
+#' @param strPassword Deprecated will be removed in a future release - ignored
+#' @param mydsws a dsws connection object
 #' @param strServerName URL of the Datastream server
 #' @param strServerPage page on the datastream server
-#' @return TRUE if the upload has been a success, otherwise an error message
+#' @return TRUE if the upload has been a success, FALSE with attribute error containing the error message
 #'
 #' @export
 #'
 #' @importFrom zoo index
-#' @importFrom httr POST add_headers content content_type
 #' @importFrom xts as.xts first last xtsible
 #'
 UCTSUpload <- function(tsData,
@@ -143,40 +133,36 @@ UCTSUpload <- function(tsData,
                        Alignment=c("1ST","MID","END"),
                        Carry=c("YES","NO","PAD"),
                        PrimeCurr="",
-                       strUsername = ifelse(Sys.getenv("DatastreamUsername") != "",
-                                            Sys.getenv("DatastreamUsername"),
-                                            options()$Datastream.Username),
-                       strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
-                                            Sys.getenv("DatastreamPassword"),
-                                            options()$Datastream.Password),
+                       strUsername = NULL,
+                       strPassword = NULL,
+                       mydsws = dsws$new(),
                        strServerName="https://product.datastream.com",
-                       strServerPage="/UCTS/UCTSMaint.asp") {
+                       strServerPage="/dswsclient/V1/DSUserDataService.svc/rest/UpdateItem") {
 
   #Check inputs are valid
 
   if (!xtsible(tsData)) {
     stop(paste0("tsData must be a time-based object and not of class ",class(tsData)))
-
   }
 
-  if (!freq[1] %in% c("D","W","M","Q","Y")) {
-    stop("freq is not an allowed value")
+  if (!freq[1] %in% names(DATAFREQUENCY_VALUES)) {
+    stop(paste0("freq is not an allowed value. ", freq[1], " must be one of ", paste0(names(DATAFREQUENCY_VALUES), sep = ", ")))
   }
 
-  if (!ActPer[1] %in% c("N","Y")) {
+  if (!ActPer[1] %in% names(ACTPER_VALUES)) {
     stop("ActPer is not an allowed value")
   }
 
-  if (!freqConversion[1] %in% c("ACT","SUM","AVG","END")) {
+  if (!freqConversion[1] %in% names(FREQCONV_VALUES)) {
     stop("freqConversion is not an allowed value")
   }
 
-  if (!Alignment[1] %in% c("1ST","MID","END")) {
+  if (!Alignment[1] %in% names(ALIGNMENT_VALUES)) {
     stop("Alignment is not an allowed value")
   }
 
-  if (!Carry[1] %in% c("YES","NO","PAD")) {
-    stop("Carry is not an allowed value")
+  if (!Carry[1] %in% names(CARRY_VALUES)) {
+    stop(paste0("Carry is not an allowed value. ", Carry[1], " must be one of ", paste0(names(CARRY_VALUES), sep = ", ")))
   }
 
   # Limit decimals a number in range to the range 0-9
@@ -214,12 +200,9 @@ UCTSUpload <- function(tsData,
     }
   }
 
-  # At the moment everything will be a full update, and a hard coded NA value
-  NA_VALUE <- "NA"
 
   # convert to xts object
   myXtsData <- xts::as.xts(tsData)
-
 
   # If we are using Daily data and the first day falls on a weekend then move that date to Friday
 
@@ -232,105 +215,99 @@ UCTSUpload <- function(tsData,
     }
   }
 
-  # Add Start Date for values - make sure it is in DD/MM/YY format
-  #CMC actually the function returns a dd/MM/yyyy format post Y2K
+  # Start and end date for the dataInput item
   startDate <- zoo::index(first(myXtsData))
   endDate <- zoo::index(last(myXtsData))
 
+  dataInputClass <- list(EndDate = .js_date_jsonstring(endDate),
+                         Frequency = unname(DATAFREQUENCY_VALUES[freq[1]]),
+                         StartDate = .js_date_jsonstring(startDate),
+                         Values = .getTimeseries(myXtsData,
+                                                 freq = freq[1],
+                                                 digits = Decimals))
+
+  UserObject = list("__type" = "DSTimeSeriesRequestObject:http://dsws.datastream.com/client/V1/",
+                    Created = .js_date_jsonstring(Sys.time()),
+                    AccessRight = 0,
+                    Description = seriesName,
+                    DisplayName = seriesName,
+                    Id = TSCode,
+                    LastModified = .js_date_jsonstring(Sys.time()),
+                    Mnemonic = TSCode,  # set to be the same as the id
+                    Owner = NULL, # not being set at the moment
+                    ShareType = SHARETYPE_DEFAULT,
+                    AsPercentage = unname(ACTPER_VALUES[ActPer[1]]), # This is a decrepated property
+                    CarryIndicator = unname(CARRY_VALUES[Carry[1]]),
+                    DateAlignment = unname(ALIGNMENT_VALUES[Alignment[1]]),
+                    DecimalPlaces = Decimals,
+                    FrequencyConversion = unname(FREQCONV_VALUES[freqConversion[1]]),
+                    HasPadding = FALSE, # This is a decrepated property
+                    ManagementGroup = MGMTGroup,
+                    PrimeCurrencyCode = PrimeCurr,
+                    UnderCurrencyCode = "", # This is a decrepated property
+                    Units = Units,
+                    DataInput = dataInputClass)
+
   # Now create the URL to post the form to
-  dsURL <- paste0(strServerName , strServerPage , "?UserID=" , strUsername)
+  myDataURL <- paste0(strServerName , strServerPage)
 
-
-  # Create a list of the parameters to be uploaded
-  # We have not included the pair  AmendFlag="Y", so all these will be full updates
-
-  dsParams <- list(CallType = "Upload",
-                   TSMnemonic = toupper(TSCode),
-                   TSMLM = toupper(MGMTGroup),
-                   TSStartDate = format(startDate,format = "%d/%m/%Y"),
-                   TSEndDate = format(endDate,format = "%d/%m/%Y"),
-                   TSFrequency = freq[1],
-                   TSTitle = seriesName,
-                   TSUnits = Units,
-                   TSDecPlaces = Decimals,
-                   TSAsPerc = ActPer[1],
-                   TSFreqConv = freqConversion[1],              # Add "Frequency Conversion"
-                   TSAlignment = Alignment[1],                  # Add "Alignment"
-                   TSCarryInd = Carry[1],                       # Add "Carry Indicator"
-                   TSPrimeCurr = I(PrimeCurr),                  # Add "Prime Currency"
-                   TSULCurr = "",                            # no longer use Underlying Currency, but need to pass up a null value as the mainframe is expecting it
-                   ForceUpdateFlag1 = "Y",
-                   ForceUpdateFlag2 = "Y",                   # We have ignored some logic in the original UCTS VBA code
-                   #                   AmendFlag = "Y",
-                   TSValsStart = format(startDate,format = "%d/%m/%Y"),  #TODO adjust this date according to the frequency of the data VBA function AdjustDateTo1st
-                   NAValue = NA_VALUE,
-                   TSValues = .getTimeseries(myXtsData,
-                                             freq = freq[1],
-                                             digits = Decimals,
-                                             NA_VALUE),           #Now add the datapoints - the date element of the series is discarded here, with obvious risks
-                   UserOption = .EncryptPassword(strPassword)
-  )
-
-
-  # Now post the form
-  # We will give it three tries
-  nLoop <- 1
-  waitTimeBase <- 2
-  maxLoop <- 4
-  retValue <- ""
-
-  while (nLoop < maxLoop) {
-    retValue <- tryCatch(httr::POST(url = dsURL,
-                                    body = dsParams,
-                                    config =  httr::add_headers(encoding = "utf-8"),
-                                    httr::content_type("application/x-www-form-urlencoded; charset=utf-8"),
-                                    encode = "form"),
-                         error = function(e) e)
-
-    # Break if an error or null
-    if (is.null(retValue)) break
-    if (inherits(retValue, "error")) break
-
-    # If did not get a time out then break
-    if (httr::status_code(retValue) != 408) break
-
-    # If not succesful then wait 2 seconds before re-submitting, ie give time for the
-    # server/network to recover.
-    Sys.sleep(waitTimeBase ^ nLoop)
-    nLoop <- nLoop + 1
-  }
-
-  if (is.null(retValue)) {
-    return(structure(FALSE,
-                     error = "NULL value returned"))
-  }
-
-  if (inherits(retValue, "error")) {
-    return(structure(FALSE,
-                     error = paste("Error ", retValue$message)))
-  }
-
-
-
-  if (httr::http_error(retValue)) {
-    return(structure(FALSE,
-                    error = paste("http Error: ", paste0(httr::http_status(retValue),
-                                                                          collapse = " : "))))
-  }
-
-  myResponse <- content(retValue, as = "text")
-
-  if (myResponse[1] == "*OK*") {
-    return(structure(TRUE,
-                     error = ""))
-  }
-  else{
-    return(structure(FALSE,
-                     error = paste("*Error* Upload failed after ", nLoop,
-                                   " attempts with error ", myResponse[1])))
-  }
+  return(processUpload(UserObject = UserObject,
+                       UserObjectType = USEROBJECTTYPE_TIMESERIES,
+                       URL = myDataURL,
+                       mydsws = mydsws))
 }
 
+
+#' Process a user object which might be a timeseries or an index
+#' @importFrom httr2 request req_body_json req_retry req_perform resp_is_error resp_body_json
+processUpload <- function(UserObject, UserObjectType, URL, mydsws) {
+
+  # Get the token from the dsws object or create a new one
+  if (inherits(mydsws, "dsws")) {
+    tokenValue <- mydsws$tokenList$TokenValue
+  } else {
+    tokenValue <- DatastreamDSWS2R::dsws$new()$tokenList$TokenValue
+  }
+
+
+  dsRequest <- list(UserObject = UserObject,
+                    Properties = NULL,
+                    Filters = NULL,
+                    TokenValue = tokenValue,
+                    "UserObjectType" = UserObjectType)
+
+
+  httr2::request(URL) |>
+    httr2::req_headers(accept = "application/json",
+                       encode = "json") |>
+    httr2::req_body_json(dsRequest, na = "null") |>
+    httr2::req_retry(max_tries = 3) |>
+    httr2::req_perform() ->
+    response
+
+  if (httr2::resp_is_error(response)) {
+    return(structure(FALSE,
+                     error = httr2::resp_status_desc(response)))
+  }
+
+  # If we have an invalid request then we need to return the message
+  # returned as a string
+  if (httr2::resp_content_type(response) == "text/html") {
+    return(structure(FALSE,
+                     error = httr2::resp_body_string(response)))
+  }
+
+
+  # Success code
+  if (httr2::resp_body_json(response)$ResponseStatus != 0 ) {
+    return(structure(FALSE,
+                     error = httr2::resp_body_json(response)$ErrorMessage))
+  }
+
+  return(structure(TRUE,
+                   error = ""))
+
+}
 
 
 #' @title Append a xts to an existing UCTS timeseries in Datastream
@@ -386,14 +363,11 @@ UCTSAppend <- function(tsData,
                        PrimeCurr ="",
                        overwrite = TRUE,
                        mydsws = dsws$new(),
-                       strUsername = ifelse(Sys.getenv("DatastreamUsername") != "",
-                                            Sys.getenv("DatastreamUsername"),
-                                            options()$Datastream.Username),
-                       strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
-                                            Sys.getenv("DatastreamPassword"),
-                                            options()$Datastream.Password),
+                       strUsername = NULL,
+                       strPassword = NULL,
                        strServerName = "https://product.datastream.com",
-                       strServerPage = "/UCTS/UCTSMaint.asp") {
+                       strServerPage = "/dswsclient/V1/DSUserDataService.svc/rest/UpdateItem") {
+  .Deprecated("UCTSAppend is deprecated and will be removed in a future release.")
 
   #Check inputs are valid - we can also rely on checks in UCTSUpload later
 
@@ -466,8 +440,7 @@ UCTSAppend <- function(tsData,
                     Alignment = Alignment,
                     Carry = Carry,
                     PrimeCurr = PrimeCurr,
-                    strUsername = strUsername,
-                    strPassword = strPassword,
+                    mydsws = mydsws,
                     strServerName = strServerName,
                     strServerPage = strServerPage))
 }

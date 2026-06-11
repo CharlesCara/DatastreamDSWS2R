@@ -14,7 +14,7 @@ A data frame with 161 rows and 3 variables:
 }
 }
 \usage{
-currencyDS2ISO
+data(currencyDS2ISO)
 }
 \description{
 Conversion table of Datastream to ISO currency codes

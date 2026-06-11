@@ -447,3 +447,31 @@
     return(suppressWarnings(as.integer(thisValue)))
   }
 }
+
+#-----------------------------------------------------------------------------
+#
+#' @name js_date_jsonstring
+#' @title Convert Date or Time to JavaScript Date string
+#' @details Converts x, a Date object, to a JavaScript serialised date string.
+#' If x is not Date or POSIXct then it is serialised as a normal json object.
+#'
+#'
+#' @param x an item that is expected to have an item 'Date' or POSIXct
+#' @return the parsed string
+#' @keywords internal
+#' @noRd
+#'
+.js_date_jsonstring <- function(x) {
+  if (inherits(x, "Date")) x <- as.POSIXct(x)
+  if (inherits(x, "POSIXt")) {
+  if (length(x) == 1) {
+    paste0("/Date(", jsonlite::toJSON(jsonlite::unbox(x), POSIXt = "epoch"), ")/")
+  } else {
+    paste0("/Date(", jsonlite::toJSON(x, POSIXt = "epoch"), ")/")
+
+    }
+  } else {
+      jsonlite::toJSON(x)
+    }
+}
+

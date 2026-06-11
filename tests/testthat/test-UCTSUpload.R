@@ -1,20 +1,3 @@
-##############################################################################################
-
-context("UCTSUpload.R : test of uploading timeSeries")
-
-
-
-#------------------------------------------------------------------------------
-test_that("test the password encryption function", {
-
-  # Test the password encryption function which should return "134060072035020251227029" for "A1B2c3d5"
-
-  expect_equal(DatastreamDSWS2R:::.EncryptPassword("A1B2c3d5"),
-               "134060072035020251227029")
-
-})
-
-
 
 #------------------------------------------------------------------------------
 test_that(" Test the post string generation code", {
@@ -27,6 +10,22 @@ test_that(" Test the post string generation code", {
 
   testData <- xts::xts(x = c(1, 2.2, 3.12345, 4.5), order.by = as.Date(c("2014-04-22","2014-04-23","2014-04-24","2014-04-25")))
 
+  sPost <- UCTSUpload(TSCode = "TSTEST01",
+                      MGMTGroup = "TEST",
+                      freq = "D",
+                      seriesName = "Automatic Upload Test",
+                      Units = "",
+                      Decimals = 2,
+                      ActPer = "Y",
+                      freqConversion = "END",
+                      Alignment = "MID",
+                      Carry = "NO",
+                      PrimeCurr = "",
+                      tsData = testData)
+
+  sExpected <-  structure(TRUE, error = "")
+
+  expect_equal(sPost, sExpected)
 
   #Try uploading a real dataset
   sPost <- UCTSUpload(TSCode = "TSTEST01",
@@ -58,9 +57,9 @@ test_that("Test a dataset with an NaN in it", {
   testData <- xts::xts(x = c(4.445, 4.121, -30754.896, 0.0001, NaN, NA, "TEXT"),
                   order.by = as.Date(c("2013-01-01", "2013-02-01", "2013-03-01", "2013-04-01", "2013-05-01", "2013-06-01", "2013-07-01")))
 
-  sPost <- DatastreamDSWS2R:::.getTimeseries(testData,"M",2,"NA")
+  sPost <- DatastreamDSWS2R:::.getTimeseries(testData,"M",2)
 
-  sExpected <-  "4.45,4.12,-30754.90,0.00,NA,NA,NA,"
+  sExpected <-  c(4.44,4.12,-30754.90,0.00,NA,NA,NA)
 
   expect_equal(sPost , sExpected)
 
@@ -79,9 +78,9 @@ test_that("Test a dataset with an NaN, NA and a large value in it", {
 
   testData <- xts::xts(x = c(1, 2.2, 3.12345, 14.5, NaN), order.by = as.Date(c("2013-01-01","2013-02-01","2013-03-01","2013-04-01","2013-05-01")))
 
-  sPost <- DatastreamDSWS2R:::.getTimeseries(testData,"M",2,"NA")
+  sPost <- DatastreamDSWS2R:::.getTimeseries(testData,"M",2)
 
-  sExpected <- "1.00,2.20,3.12,14.50,NA,"
+  sExpected <- c(1.00,2.20,3.12,14.50,NA)
 
   expect_equal(sPost , sExpected)
 
@@ -114,13 +113,12 @@ test_that("Try uploading a real dataset", {
   skip_on_cran()
 
 
-  load("testData/f.RData")
-  #load("tests/testthat/testData/f.RData")
+  f <- readRDS(file = file.path(testthat::test_path(), "testData/f.RDS"))
   fTest <- head(f$First,10)
 
   # Test getTimeseries for the first 10 points
-  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4, NA_VALUE = "NA")
-  tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
+  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
+  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
   expect_equal(tData , tDataExpected)
 
   #Try a round trip and check if data is the same
@@ -168,12 +166,12 @@ test_that("Try uploading a real dataset with GBP isocode currency", {
   skip_on_cran()
 
 
-  load(file.path(testthat::test_path(), "testData", "f.RData"))
+  f <- readRDS(file = file.path(testthat::test_path(), "testData/f.RDS"))
   fTest <- head(f$First, 10)
 
   # Test getTimeseries for the first 10 points
-  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4, NA_VALUE = "NA")
-  tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
+  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
+  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
   expect_equal(tData , tDataExpected)
 
   #Try a round trip and check if data is the same
@@ -222,13 +220,12 @@ test_that("Error when uploading invalid 4 digit currency", {
   skip_on_cran()
 
 
-  load("testData/f.RData")
-  #load("tests/testthat/testData/f.RData")
+  f <- readRDS(file = file.path(testthat::test_path(), "testData/f.RDS"))
   fTest <- head(f$First,10)
 
   # Test getTimeseries for the first 10 points
-  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4, NA_VALUE = "NA")
-  tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
+  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
+  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
   expect_equal(tData , tDataExpected)
 
 
@@ -256,13 +253,12 @@ test_that("Error when uploading invalid 2 digit currency", {
   }
   skip_on_cran()
 
-  load("testData/f.RData")
-  #load("tests/testthat/testData/f.RData")
+  f <- readRDS(file = file.path(testthat::test_path(), "testData/f.RDS"))
   fTest <- head(f$First,10)
 
   # Test getTimeseries for the first 10 points
-  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4, NA_VALUE = "NA")
-  tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
+  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
+  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
   expect_equal(tData , tDataExpected)
 
   #Try a round trip and check if data is the same
@@ -289,13 +285,12 @@ test_that("Error when uploading invalid 3 digit currency", {
   }
   skip_on_cran()
 
-  load("testData/f.RData")
-  #load("tests/testthat/testData/f.RData")
+  f <- readRDS(file = file.path(testthat::test_path(), "testData/f.RDS"))
   fTest <- head(f$First,10)
 
   # Test getTimeseries for the first 10 points
-  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4, NA_VALUE = "NA")
-  tDataExpected <- "0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444,"
+  tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
+  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
   expect_equal(tData , tDataExpected)
 
 

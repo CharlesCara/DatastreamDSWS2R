@@ -24,7 +24,7 @@ test_that("test of simple timeseries request with relative dates", {
 
   expect_is(xtsData, "xts")
   expect_equal(colnames(xtsData), "MKS")
-
+  expect_true(nrow(xtsData) > 0)
   rm(mydsws, xtsData)
 })
 
@@ -49,6 +49,7 @@ test_that("test of two stock timeseries request with relative dates", {
                                       frequency = "D")
 
   expect_is(xtsData, "xts")
+  expect_true(nrow(xtsData) > 0)
 
   rm(mydsws, xtsData)
 })

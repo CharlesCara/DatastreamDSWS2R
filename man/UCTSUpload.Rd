@@ -17,12 +17,11 @@ UCTSUpload(
   Alignment = c("1ST", "MID", "END"),
   Carry = c("YES", "NO", "PAD"),
   PrimeCurr = "",
-  strUsername = ifelse(Sys.getenv("DatastreamUsername") != "",
-    Sys.getenv("DatastreamUsername"), options()$Datastream.Username),
-  strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
-    Sys.getenv("DatastreamPassword"), options()$Datastream.Password),
+  strUsername = NULL,
+  strPassword = NULL,
+  mydsws = dsws$new(),
   strServerName = "https://product.datastream.com",
-  strServerPage = "/UCTS/UCTSMaint.asp"
+  strServerPage = "/dswsclient/V1/DSUserDataService.svc/rest/UpdateItem"
 )
 }
 \arguments{
@@ -36,7 +35,8 @@ characters will be used.}
 
 \item{freq}{The frequency of the data to be uploaded}
 
-\item{seriesName}{the name of the series}
+\item{seriesName}{the name of the series - can be no more than XX characters -
+excess will be trimmed to that length}
 
 \item{Units}{Units of the data - can be no more than 12 characters -
 excess will be trimmed to that length}
@@ -55,16 +55,18 @@ numbers ("Y")}
 
 \item{PrimeCurr}{the currency of the timeseries}
 
-\item{strUsername}{your Datastream username}
+\item{strUsername}{Deprecated will be removed in a future release - ignored}
 
-\item{strPassword}{your Datastream Password}
+\item{strPassword}{Deprecated will be removed in a future release - ignored}
+
+\item{mydsws}{a dsws connection object}
 
 \item{strServerName}{URL of the Datastream server}
 
 \item{strServerPage}{page on the datastream server}
 }
 \value{
-TRUE if the upload has been a success, otherwise an error message
+TRUE if the upload has been a success, FALSE with attribute error containing the error message
 }
 \description{
 Uploads an xts into a UCTS in the Datastream Database

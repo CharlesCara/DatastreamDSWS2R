@@ -19,12 +19,10 @@ UCTSAppend(
   PrimeCurr = "",
   overwrite = TRUE,
   mydsws = dsws$new(),
-  strUsername = ifelse(Sys.getenv("DatastreamUsername") != "",
-    Sys.getenv("DatastreamUsername"), options()$Datastream.Username),
-  strPassword = ifelse(Sys.getenv("DatastreamPassword") != "",
-    Sys.getenv("DatastreamPassword"), options()$Datastream.Password),
+  strUsername = NULL,
+  strPassword = NULL,
   strServerName = "https://product.datastream.com",
-  strServerPage = "/UCTS/UCTSMaint.asp"
+  strServerPage = "/dswsclient/V1/DSUserDataService.svc/rest/UpdateItem"
 )
 }
 \arguments{

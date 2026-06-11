@@ -3,7 +3,7 @@
 # so we save JSON files of the response from the server and
 # then in the tests load them.
 
-testDataFolder <- "tests/testthat/testData/"
+testDataFolder <- file.path(testthat::test_path(), "testData")
 
 mydsws <- dsws$new()
 

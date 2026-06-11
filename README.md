@@ -138,6 +138,17 @@ Research.  We are happy to make it available for others to use, but we offer or 
 
 
 
+# DatastreamDSWS2R (development version)
+Switch to using UpdateItem endpoint when uploading a timeseries
+
+# DatastreamDSWS2R 1.9.12
+Fix issue #46 - error when creating dsws object
+
+# DatastreamDSWS2R 1.9.10
+
+# DatastreamDSWS2R 1.9.9
+
+
 ## Update 1.9.8
 Change branding from Refinitiv to LSEG
 

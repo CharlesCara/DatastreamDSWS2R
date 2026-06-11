@@ -184,6 +184,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   # Set default value of Null for tokenList
   .self$tokenList <- list(TokenValue = NULL,
                           TokenExpiry = NULL)
+  class(.self$tokenList) <- "tokenList"
 
   # Use the token function if provided
 
@@ -191,7 +192,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
     .self$initialised <- TRUE
     .self$tokenSource <- getTokenFunction
     .self$tokenList <- .self$tokenSource()
-
+    class(.self$tokenList) <- "tokenList"
 
 
     return(invisible(.self))
@@ -208,7 +209,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
 
     .self$tokenList <- list(TokenValue = token$TokenValue,
                             TokenExpiry = token$TokenExpiry)
-
+    class(.self$tokenList) <- "tokenList"
     .self$initialised <- TRUE
 
     .self$tokenSource <- "Provided"
@@ -241,7 +242,7 @@ dsws$methods(initialize = function(dsws.serverURL = "",
 
   .self$tokenList <- list(TokenValue = NULL,
                           TokenExpiry = NULL)
-
+  class(.self$tokenList) <- "tokenList"
   .self$tokenSource <- "DSWS"
 
   .self$initialised <- TRUE
@@ -280,7 +281,7 @@ dsws$methods(.loadToken = function() {
 })
 
 #------.requestToken-----------------------------------------------------------------------
-#' @importFrom httr GET status_code http_error http_status parsed_content timeout
+#' @importFrom httr2 request req_body_json req_retry req_perform resp_is_error resp_body_json
 #'
 dsws$methods(.requestToken = function() {
   "Internal function:
@@ -303,13 +304,13 @@ dsws$methods(.requestToken = function() {
     # waiting incrementally up to 16 sec and repeating the request
     .self$errorlist <- NULL
 
-    myTokenResponse <- httr::RETRY(
-      "GET",
-      url = myTokenURL,
-      encode = "json",
-      config = httr::timeout(60),
-      httr::accept_json()
-    )
+
+    httr2::request(myTokenURL) |>
+      httr2::req_headers(accept = "application/json",
+                         encode = "json") |>
+      httr2::req_retry(max_tries = 3, max_seconds = 60) |>
+      httr2::req_perform() ->
+      myTokenResponse
 
     if (is.null(myTokenResponse)) {
       .self$tokenList <- list(TokenValue = NULL,
@@ -324,16 +325,16 @@ dsws$methods(.requestToken = function() {
                   myTokenResponse$message))
     }
 
-    if (httr::http_error(myTokenResponse)) {
+    if (httr2::resp_is_error(myTokenResponse)) {
       .self$tokenList <- list(TokenValue = NULL,
                               TokenExpiry = NULL)
 
       stop(paste0("Error requesting access Token.  HTTP message was: ",
-                  paste0(httr::http_status(myTokenResponse), collapse = " : ")))
+                  paste0(httr2::resp_status_desc(myTokenResponse), collapse = " : ")))
 
     }
 
-    myTokenList <- httr::content(myTokenResponse, as = "parsed")
+    myTokenList <- httr2::resp_body_json(myTokenResponse)
 
     #Error check response
     if (is.null(myTokenList$TokenValue) || is.null(myTokenList$TokenExpiry)) {
@@ -373,8 +374,8 @@ dsws$methods(.tokenExpired = function(thisToken = NULL, myTime = Sys.time()) {
 
 
 #-----------------------------------------------------------------------------
-#' @importFrom jsonlite fromJSON toJSON
-#' @importFrom httr POST status_code http_error http_type parsed_content timeout
+#' @importFrom httr2 request req_body_json req_retry req_perform resp_is_error resp_body_json
+#' @importFrom jsonlite fromJSON
 dsws$methods(.makeRequest = function(bundle = FALSE) {
   "Internal function: make a request from the DSWS server.
   The request  (in a R list form) is taken from .self$requestList,
@@ -386,7 +387,7 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
 
   if (!is.null(.self$jsonResponseLoadFile)) {
     if (file.exists(.self$jsonResponseLoadFile)) {
-      .self$dataResponse <- rjson::fromJSON(file =  .self$jsonResponseLoadFile)
+      .self$dataResponse <- jsonlite::fromJSON(txt = .self$jsonResponseLoadFile, simplifyDataFrame = FALSE)
       return(TRUE)
     } else {
       stop("File specified by dsws$jsonResponseLoadFile does not exist")
@@ -408,14 +409,14 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
 
   .self$errorlist <- NULL
   .self$numRequests <- .self$numRequests + 1
-  myDataResponse <- httr::RETRY(
-    "POST",
-    url = myDataURL,
-    body = .self$requestList,
-    encode = "json",
-    config = httr::timeout(60),
-    httr::accept_json()
-  )
+
+  httr2::request(myDataURL) |>
+    httr2::req_headers(accept = "application/json",
+                       encode = "json") |>
+    httr2::req_retry(max_tries = 3, max_seconds = 60) |>
+    httr2::req_body_json(.self$requestList) |>
+    httr2::req_perform() ->
+    myDataResponse
 
   if (is.null(myDataResponse)) {
     .self$dataResponse <-  NULL
@@ -445,19 +446,10 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
     return(FALSE)
   }
 
-  if (httr::http_error(myDataResponse)) {
+  if (httr2::resp_is_error(myDataResponse)) {
     .self$dataResponse <-  NULL
     mm <- paste0("Error requesting data.  HTTP message was: ",
-                 paste0(httr::http_status(myDataResponse), collapse = " : "))
-    .self$setErrorlist(c(.self$getErrorlist(),
-                         list(message = mm)))
-    message(mm)
-    return(FALSE)
-  }
-
-  if (httr::http_type(myDataResponse) != "application/json") {
-    .self$dataResponse <-  NULL
-    mm <- "Response is not able to be parsed: response is not json"
+                 paste0(httr2::resp_status_desc(myDataResponse), collapse = " : "))
     .self$setErrorlist(c(.self$getErrorlist(),
                          list(message = mm)))
     message(mm)
@@ -466,12 +458,13 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
 
   if (!is.null(.self$jsonResponseSaveFile)) {
     if (!is.null(myDataResponse)) {
-      writeChar(object = httr::content(myDataResponse, as = "text", encoding = "UTF-8"), con = .self$jsonResponseSaveFile)
+      writeChar(object = httr2::resp_body_string(myDataResponse),
+                con = .self$jsonResponseSaveFile)
     }
   }
 
 
-  .self$dataResponse <- tryCatch(httr::content(myDataResponse, as = "parsed"),
+  .self$dataResponse <- tryCatch(httr2::resp_body_json(myDataResponse),
                                  error = function(e) e)
 
 

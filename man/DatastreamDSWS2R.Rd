@@ -20,4 +20,9 @@ Useful links:
 \author{
 \strong{Maintainer}: Charles Cara \email{charles.cara@absolute-strategy.com}
 
+Authors:
+\itemize{
+  \item Charles Cara \email{charles.cara@absolute-strategy.com}
+}
+
 }

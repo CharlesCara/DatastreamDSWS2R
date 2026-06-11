@@ -1,8 +1,8 @@
 Package: DatastreamDSWS2R
 Type: Package
 Title: Provides a Link Between the 'LSEG Datastream' System and R
-Version: 1.9.12.9000
-Date: 2025-03-30
+Version: 1.10.02.9003
+Date: 2026-06-10
 Authors@R: person(given = "Charles",
                     family = "Cara",
                     role = c("aut", "cre"),
@@ -15,8 +15,8 @@ Description: Provides a set of functions and a class to connect, extract and
     Please report issues at <https://github.com/CharlesCara/DatastreamDSWS2R/issues>.
 License: GPL-3
 LazyData: TRUE
-Imports:
-    httr,
+Requires:
+    httr2,
     jsonlite,
     stringi,
     stringr,
@@ -25,9 +25,7 @@ Imports:
     methods,
     foreach,
     dplyr
-Suggests: testthat,
-    rjson
-RoxygenNote: 7.3.1
+Suggests: testthat
 Collate: 
     'DatastreamDSWS2R.R'
     'common.R'
@@ -42,3 +40,4 @@ Depends:
 Language: en-GB
 URL: https://github.com/CharlesCara/DatastreamDSWS2R
 BugReports: https://github.com/CharlesCara/DatastreamDSWS2R/issues
+Config/roxygen2/version: 8.0.0
