@@ -74,7 +74,7 @@ SHARETYPE_DEFAULT <- 0
 CARRY_VALUES = c("YES" = 0,"NO" = 1,"PAD" = 2)
 
 # DateAlignment Values
-ALIGNMENT_VALUES = c("FIRST" = 1,"MID" = 2,"END" = 0)
+ALIGNMENT_VALUES = c("1ST" = 1, "FIRST" = 1, "MID" = 2,"END" = 0)
 
 # FrequencyConversion Values
 FREQCONV_VALUES = c("ACT" = 3,"SUM" = 2,"AVG" = 1,"END" = 0)
