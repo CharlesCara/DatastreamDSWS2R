@@ -55,7 +55,7 @@
     wData <- round(wData, digits = digits)
 
   })
-  return(wData)
+  return(I(wData))
 }
 
 

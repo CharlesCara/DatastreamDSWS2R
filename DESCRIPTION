@@ -1,8 +1,8 @@
 Package: DatastreamDSWS2R
 Type: Package
 Title: Provides a Link Between the 'LSEG Datastream' System and R
-Version: 1.10.03.9003
-Date: 2026-06-10
+Version: 1.10.03.9004
+Date: 2026-06-18
 Authors@R: person(given = "Charles",
                     family = "Cara",
                     role = c("aut", "cre"),
@@ -10,11 +10,13 @@ Authors@R: person(given = "Charles",
 Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
 Description: Provides a set of functions and a class to connect, extract and
     upload information from the 'LSEG Datastream' database. This
-    package uses the 'DSWS' API and server used by the 'Datastream DFO addin'.  
+    package uses the 'DSWS' API.  
     Details of this API are available at <https://www.lseg.com/en/data-analytics>.
     Please report issues at <https://github.com/CharlesCara/DatastreamDSWS2R/issues>.
 License: GPL-3
 LazyData: TRUE
+Depends: 
+    R (>= 4.1.0)
 Requires:
     httr2,
     jsonlite,
@@ -35,8 +37,6 @@ Collate:
     'cbindRobust.R'
     'data.R'
 Encoding: UTF-8
-Depends: 
-    R (>= 2.10)
 Language: en-GB
 URL: https://github.com/CharlesCara/DatastreamDSWS2R
 BugReports: https://github.com/CharlesCara/DatastreamDSWS2R/issues
