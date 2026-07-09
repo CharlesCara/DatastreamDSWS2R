@@ -1,12 +1,13 @@
 Package: DatastreamDSWS2R
 Type: Package
 Title: Provides a Link Between the 'LSEG Datastream' System and R
-Version: 1.10.03.9004
-Date: 2026-06-18
+Version: 1.11.0
+Date: 2026-07-09
 Authors@R: person(given = "Charles",
                     family = "Cara",
-                    role = c("aut", "cre"),
-                    email = "charles.cara@absolute-strategy.com")
+                    role = c("aut", "cre", "cph"),
+                    email = "charles.cara@absolute-strategy.com",
+                    comment = c(affiliation = "Absolute Strategy Research Ltd"))
 Maintainer: Charles Cara <charles.cara@absolute-strategy.com>
 Description: Provides a set of functions and a class to connect, extract and
     upload information from the 'LSEG Datastream' database. This
@@ -17,7 +18,7 @@ License: GPL-3
 LazyData: TRUE
 Depends: 
     R (>= 4.1.0)
-Requires:
+Imports:
     httr2,
     jsonlite,
     stringi,

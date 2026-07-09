@@ -260,6 +260,7 @@ UCTSUpload <- function(tsData,
 
 #' Process a user object which might be a timeseries or an index
 #' @importFrom httr2 request req_body_json req_retry req_perform resp_is_error resp_body_json
+#' @noRd
 processUpload <- function(UserObject, UserObjectType, URL, mydsws) {
 
   # Get the token from the dsws object or create a new one
@@ -279,7 +280,8 @@ processUpload <- function(UserObject, UserObjectType, URL, mydsws) {
 
   httr2::request(URL) |>
     httr2::req_headers(accept = "application/json",
-                       encode = "json") |>
+                       encode = "json",
+                       `User-Agent` = USER_AGENT_STRING) |>
     httr2::req_body_json(dsRequest, na = "null") |>
     httr2::req_retry(max_tries = 3) |>
     httr2::req_perform() ->

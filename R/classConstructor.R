@@ -74,7 +74,28 @@
 #'                                              startDate = "-30D",
 #'                                              endDate = "-0D",
 #'                                              frequency = "D")
-#'}
+#'
+#'      # UCTS upload
+#'
+#'        testData <- xts::xts(x = c(1, 2.2, 3.12345, 4.5),
+#'        order.by = as.Date(c("2014-04-22","2014-04-23","2014-04-24","2014-04-25")))
+#'
+#'        mydsws <- dsws$new()
+#'
+#'        sPost <- mydsws$UCTSUpload(TSCode = "TSTEST01",
+#'                                   MGMTGroup = "TEST",
+#'                                   freq = "D",
+#'                                   seriesName = "Upload Demonstration",
+#'                                   Units = "",
+#'                                   Decimals = 2,
+#'                                   ActPer = "Y",
+#'                                   freqConversion = "END",
+#'                                   Alignment = "MID",
+#'                                   Carry = "NO",
+#'                                   PrimeCurr = "",
+#'                                   tsData = testData)
+#'
+#' }
 #' @import methods
 #' @export dsws
 #'
@@ -224,9 +245,10 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   } else if (Sys.getenv("DatastreamUsername") != "") {
     .self$username <- Sys.getenv("DatastreamUsername")
   } else if (!is.null(options()$Datastream.Username)) {
+    .Deprecated("Providing credentials via options() is deprecated.  Use environment variables instead")
     .self$username <- options()$Datastream.Username
   } else {
-    stop("Either username must be specified or it must be set via options(\"Datastream.Username\", \"Myusername\"")
+    stop("Either username must be specified or it must be set via environment variable \"DatastreamUsername\"=\"Myusername\"")
   }
 
 
@@ -235,9 +257,10 @@ dsws$methods(initialize = function(dsws.serverURL = "",
   } else if (Sys.getenv("DatastreamPassword") != "") {
     .self$password <- Sys.getenv("DatastreamPassword")
   } else if (!is.null(options()$Datastream.Password)) {
+    .Deprecated("Providing credentials via options() is deprecated.  Use environment variables instead")
     .self$password <- options()$Datastream.Password
   } else {
-    stop("Either username must be specified or it must be set via options(\"Datastream.Password\", \"Mypassword\"")
+    stop("Either username must be specified or it must be set via environment variable \"DatastreamPassword\"=\"Mypassword\"")
   }
 
   .self$tokenList <- list(TokenValue = NULL,
@@ -296,9 +319,10 @@ dsws$methods(.requestToken = function() {
   if (is.null(ts$TokenValue) || is.null(ts$TokenExpiry) || Sys.time() > ts$TokenExpiry ) {
     # Either we do not already have a token, or it has expired, so we need to request one
 
-    myTokenURL <- paste0(.self$serverURL, "Token",
-                         "?username=", .self$username ,
-                         "&password=", .self$password )
+    myTokenURL <- paste0(.self$serverURL, "GetToken")
+    lRequest <- list(UserName = .self$username ,
+                     Properties = NA,
+                     Password = .self$password )
 
     # We are going to handle timeouts by
     # waiting incrementally up to 16 sec and repeating the request
@@ -307,7 +331,9 @@ dsws$methods(.requestToken = function() {
 
     httr2::request(myTokenURL) |>
       httr2::req_headers(accept = "application/json",
-                         encode = "json") |>
+                         encode = "json",
+                         `User-Agent` = USER_AGENT_STRING) |>
+      httr2::req_body_json(lRequest, na = "null") |>
       httr2::req_retry(max_tries = 3, max_seconds = 60) |>
       httr2::req_perform() ->
       myTokenResponse
@@ -412,7 +438,8 @@ dsws$methods(.makeRequest = function(bundle = FALSE) {
 
   httr2::request(myDataURL) |>
     httr2::req_headers(accept = "application/json",
-                       encode = "json") |>
+                       encode = "json",
+                       `User-Agent` = USER_AGENT_STRING) |>
     httr2::req_retry(max_tries = 3, max_seconds = 60) |>
     httr2::req_body_json(.self$requestList) |>
     httr2::req_perform() ->
@@ -596,7 +623,7 @@ dsws$methods(timeSeriesRequest = function(instrument,
   Should request either
   a datatype or an expression
   not both.  If a datatype is provided then anythink in Expression
-  will be ignored
+  will be ignored.
 
   Make a timeSeriesRequest from Datastream DSWS.  This is the equivalent
   to the Excel timeseries request for an array of instruments.\n
@@ -744,6 +771,84 @@ dsws$methods(timeSeriesListRequest = function(instrument,
                              format = format))
 })
 
+
+
+#-----------------------------------------------------------------------------
+dsws$methods(UCTSUpload = function(tsData,
+                                   TSCode="",
+                                   MGMTGroup="MGMTG",
+                                   freq = c("D","W","M","Q","Y"),
+                                   seriesName,
+                                   Units="",
+                                   Decimals=2,
+                                   ActPer=c("N","Y"),
+                                   freqConversion= c("ACT","SUM","AVG","END"),
+                                   Alignment=c("1ST","MID","END"),
+                                   Carry=c("YES","NO","PAD"),
+                                   PrimeCurr="") {
+"
+Uploads an xts into a UCTS in the Datastream Database
+
+Note this function does not check to see if there is
+a pre-existing timeseries already in Datastream.  It will just overwrite
+any existing UCTS.\n
+Parameters are: \\describe{
+  \\item{tsData}{an xts (or timeseries object that can be converted to one) to be uploaded.}
+  \\item{TSCode}{The mnemonic of the target UCTS}
+  \\item{MGMTGroup}{Must have managment group.  Only the first characters will be used.}
+  \\item{freq}{The frequency of the data to be uploaded}
+  \\item{seriesName}{the name of the series - can be no more than XX characters -  excess will be trimmed to that length}
+  \\item{Units}{Units of the data - can be no more than 12 characters - excess will be trimmed to that length}
+  \\item{Decimals}{Number of Decimals in the data - a number between 0 and 9 - if outside that range then trimmed}
+  \\item{ActPer}{Whether the values are percentages (\"N\") or actual numbers (\"Y\")}
+  \\item{freqConversion}{How to do any FX conversions}
+  \\item{Alignment}{Alignment of the data within periods}
+  \\item{Carry}{whether to carry data over missing dates}
+  \\item{PrimeCurr}{the currency of the timeseries}
+}
+Returns TRUE if the upload has been a success, or FALSE with field `errorlist` containing the error message
+
+  Examples:\n
+    \\preformatted{
+    mydsws <- dsws$new()
+
+    sPost <- mydsws$UCTSUpload(tsData = testData,
+                               TSCode = \"TSTEST01\",
+                               MGMTGroup = \"TEST\",
+                               freq = \"D\",
+                               seriesName = \"UCTS Upload Test\",
+                               Units = \"\",
+                               Decimals = 2,
+                               ActPer = \"Y\",
+                               freqConversion = \"END\",
+                               Alignment = \"MID\",
+                               Carry = \"NO\",
+                               PrimeCurr = \"\")
+
+    expect_equal(sPost, TRUE)
+    expect_equal(mydsws$errorlist, NULL)
+}
+  "
+    .self$errorlist <- NULL
+  ret <- DatastreamDSWS2R::UCTSUpload(tsData = tsData,
+             TSCode = TSCode,
+             MGMTGroup = MGMTGroup,
+             freq = freq,
+             seriesName = seriesName,
+             Units = Units,
+             Decimals = Decimals,
+             ActPer = ActPer,
+             freqConversion = freqConversion,
+             Alignment = Alignment,
+             Carry = Carry,
+             PrimeCurr = PrimeCurr,
+             mydsws = .self)
+  if (isFALSE(ret)) {
+    .self$errorlist <- attr(ret, "error")
+    return(FALSE)
+  }
+  TRUE
+})
 #-----------------------------------------------------------------------------
 dsws$methods(.basicRequest = function(instrument,
                                       datatype = "",
@@ -1126,7 +1231,6 @@ dsws$methods(.processTimeSeriesByInstrument = function(myDates, myNumDatatype, m
     }
 
     # Turn it into a xts and if more than one datatype was requested put it into a list
-    # We could in future save the xts into an environment as well  - a la Quantmod package
     if (myNumDatatype == 1) {
       myxtsData <- xts::xts(.self$myValues[ ,2:(myNumInstrument + 1)], order.by = myDates)
       colnames(myxtsData) <- colnames(.self$myValues)[2:(myNumInstrument + 1)]
@@ -1422,8 +1526,8 @@ dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType) {
 
     return(NULL)
   }
-
-  myValuesList <- .self$dataResponse$DataResponses[[iDRs]]$DataTypeValues[[iDTV]]$SymbolValues[[iSV]]$Value
+  thisElement <- .self$dataResponse$DataResponses[[iDRs]]$DataTypeValues[[iDTV]]$SymbolValues[[iSV]]
+  myValuesList <- thisElement$Value
 
   myValuesList[sapply(myValuesList, is.null)] <- NA
   myDates <- .convert_JSON_Date(.self$dataResponse$DataResponses[[iDRs]]$Dates)
@@ -1439,13 +1543,20 @@ dsws$methods(.parseBundleBranch = function(iDRs, iDTV, iSV, iCol,  formatType) {
 
   # Add column names
   colnames(.self$myValues)[iCol] <-
-    make.names(.self$dataResponse$DataResponses[[iDRs]]$DataTypeValues[[iDTV]]$SymbolValues[[iSV]]$Symbol)
+    make.names(thisElement$Symbol)
+  # Add SymbolValues
+  attr(.self$myValues[,iCol], "Currency") <- .getCurrency(thisElement)
+  attr(.self$myValues[,iCol], "Symbol") <- .getSymbol(thisElement)
+  attr(.self$myValues[,iCol], "Type") <- .getType(thisElement)
 
+  if (any(.self$myValues[,iCol] == "$$ER: 0904,NO DATA AVAILABLE", na.rm = TRUE)) {
+    attr(.self$myValues[,iCol], "Error") <- "$$ER: 0904,NO DATA AVAILABLE"
+  } else if (any(.self$myValues[,iCol] == "MainframeAccessPoint error.Timed out waiting for a response from mainframe.", na.rm = TRUE)) {
+    attr(.self$myValues[,iCol], "Error") <- "MainframeAccessPoint error. Timed out"
+  }
   # Replace errors with NA
-  .self$myValues[which(.self$myValues[,iCol] == "$$ER: 0904,NO DATA AVAILABLE"),iCol] <- NA
-  .self$myValues[which(.self$myValues[,iCol] == "MainframeAccessPoint error.Timed out waiting for a response from mainframe."),iCol] <- NA
-
-
+  .self$myValues[which(.self$myValues[,iCol] == "$$ER: 0904,NO DATA AVAILABLE"), iCol] <- NA
+  .self$myValues[which(.self$myValues[,iCol] == "MainframeAccessPoint error.Timed out waiting for a response from mainframe."), iCol] <- NA
 
   return(NULL)
 

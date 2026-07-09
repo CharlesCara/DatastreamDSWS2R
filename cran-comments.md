@@ -1,6 +1,6 @@
 ## Resubmission
 
-This is a update of this package fixing bug #46
+This is a update of this package amending API endpoints
 
 ## R CMD check results
 
@@ -14,5 +14,5 @@ This is a update of this package fixing bug #46
 Note Latin-1 strings are necessary as the LSEG server can return Latin-1 characters.
 
 ## NEWS
-Fixing Bug #46 - error when creating dsws object
+Switch to using UpdateItem endpoint when uploading a timeseries, and add UCTSUpload to the DSWS class
 

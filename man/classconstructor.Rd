@@ -64,6 +64,64 @@ Creates an R5/RC4 object for accessing the LSEG
 \section{Methods}{
 
 \describe{
+\item{\code{UCTSUpload(
+  tsData,
+  TSCode = "",
+  MGMTGroup = "MGMTG",
+  freq = c("D", "W", "M", "Q", "Y"),
+  seriesName,
+  Units = "",
+  Decimals = 2,
+  ActPer = c("N", "Y"),
+  freqConversion = c("ACT", "SUM", "AVG", "END"),
+  Alignment = c("1ST", "MID", "END"),
+  Carry = c("YES", "NO", "PAD"),
+  PrimeCurr = ""
+)}}{Uploads an xts into a UCTS in the Datastream Database
+
+Note this function does not check to see if there is
+a pre-existing timeseries already in Datastream.  It will just overwrite
+any existing UCTS.
+
+Parameters are: \describe{
+  \item{tsData}{an xts (or timeseries object that can be converted to one) to be uploaded.}
+  \item{TSCode}{The mnemonic of the target UCTS}
+  \item{MGMTGroup}{Must have managment group.  Only the first characters will be used.}
+  \item{freq}{The frequency of the data to be uploaded}
+  \item{seriesName}{the name of the series - can be no more than XX characters -  excess will be trimmed to that length}
+  \item{Units}{Units of the data - can be no more than 12 characters - excess will be trimmed to that length}
+  \item{Decimals}{Number of Decimals in the data - a number between 0 and 9 - if outside that range then trimmed}
+  \item{ActPer}{Whether the values are percentages ("N") or actual numbers ("Y")}
+  \item{freqConversion}{How to do any FX conversions}
+  \item{Alignment}{Alignment of the data within periods}
+  \item{Carry}{whether to carry data over missing dates}
+  \item{PrimeCurr}{the currency of the timeseries}
+}
+Returns TRUE if the upload has been a success, or FALSE with field `errorlist` containing the error message
+
+  Examples:
+
+    \preformatted{
+    mydsws <- dsws$new()
+
+    sPost <- mydsws$UCTSUpload(tsData = testData,
+                               TSCode = "TSTEST01",
+                               MGMTGroup = "TEST",
+                               freq = "D",
+                               seriesName = "UCTS Upload Test",
+                               Units = "",
+                               Decimals = 2,
+                               ActPer = "Y",
+                               freqConversion = "END",
+                               Alignment = "MID",
+                               Carry = "NO",
+                               PrimeCurr = "")
+
+    expect_equal(sPost, TRUE)
+    expect_equal(mydsws$errorlist, NULL)
+}
+  }
+
 \item{\code{initialize(
   dsws.serverURL = "",
   getTokenFunction = NULL,
@@ -243,7 +301,7 @@ requestDate = "-0D")
   Should request either
   a datatype or an expression
   not both.  If a datatype is provided then anythink in Expression
-  will be ignored
+  will be ignored.
 
   Make a timeSeriesRequest from Datastream DSWS.  This is the equivalent
   to the Excel timeseries request for an array of instruments.
@@ -341,5 +399,26 @@ requestDate = "-0D")
                                              startDate = "-30D",
                                              endDate = "-0D",
                                              frequency = "D")
+
+     # UCTS upload
+
+       testData <- xts::xts(x = c(1, 2.2, 3.12345, 4.5),
+       order.by = as.Date(c("2014-04-22","2014-04-23","2014-04-24","2014-04-25")))
+
+       mydsws <- dsws$new()
+
+       sPost <- mydsws$UCTSUpload(TSCode = "TSTEST01",
+                                  MGMTGroup = "TEST",
+                                  freq = "D",
+                                  seriesName = "Upload Demonstration",
+                                  Units = "",
+                                  Decimals = 2,
+                                  ActPer = "Y",
+                                  freqConversion = "END",
+                                  Alignment = "MID",
+                                  Carry = "NO",
+                                  PrimeCurr = "",
+                                  tsData = testData)
+
 }
 }

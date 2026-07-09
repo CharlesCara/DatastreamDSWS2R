@@ -17,7 +17,7 @@ runtime.
     DatastreamUsername=YOURUSERNAME
     DatastreamPassword=YOURPASSWORD
 
-For backwards compatibility we have retained the ability to put credentials into options().  In this scenario you would add these lines to your .RProfile file:
+In Version 1.11.0 the use of credentials via options() is deprecated in favour of environment variables.  In this scenario you would add these lines to your .RProfile file:
 
     options(Datastream.Username = "YOURUSERNAME")
     options(Datastream.Password = "YOURPASSWORD")
@@ -98,6 +98,29 @@ Timeseries request (expressions are also supported) using the timeSeriesRequest 
                            endDate = "-0D",
                            frequency = "D")
 
+## Uploading timeseries into UCTS
+A new method has been added for uploading timeseries back into Datastream as User Created Timeseries or UCTS.  The method 
+returns TRUE if successful otherwise FALSE, in which case error messages are available in `mydsws$errorlist`
+
+    testData <- xts::xts(x = c(1, 2.2, 3.12345, 4.5), order.by = as.Date(c("2014-04-22","2014-04-23","2014-04-24","2014-04-25")))
+    
+    mydsws <- dsws$new()
+    
+    sPost <- mydsws$UCTSUpload(TSCode = "TSTEST01",
+                               MGMTGroup = "TEST",
+                               freq = "D",
+                               seriesName = "UCTS Upload Test",
+                               Units = "",
+                               Decimals = 2,
+                               ActPer = "Y",
+                               freqConversion = "END",
+                               Alignment = "MID",
+                               Carry = "NO",
+                               PrimeCurr = "",
+                               tsData = testData)
+    
+    expect_equal(sPost, TRUE)
+    expect_equal(mydsws$errorlist, NULL)
 
 ## Other information
 The dsws interface will split large requests down into chunks small enough for the DSWS interface to process.  However, the maximum chunk size varies in the DSWS documentation and is either 2000 or 50, depending on whether they have Enterprise or Individual subscriptions.  The default chunkLimit is 2000, but it can be set to 50 after initialisation. 

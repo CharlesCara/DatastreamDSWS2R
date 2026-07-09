@@ -51,6 +51,39 @@ test_that(" Test the post string generation code", {
 
 
 #------------------------------------------------------------------------------
+test_that(" Test uploading inside dsws object", {
+  if (Sys.getenv("DatastreamUsername") == "") {
+    skip("Username not available")
+  }
+  skip_on_cran()
+
+
+
+  testData <- xts::xts(x = c(1, 2.2, 3.12345, 4.5), order.by = as.Date(c("2014-04-22","2014-04-23","2014-04-24","2014-04-25")))
+
+  mydsws <- dsws$new()
+
+  sPost <- mydsws$UCTSUpload(TSCode = "TSTEST01",
+                      MGMTGroup = "TEST",
+                      freq = "D",
+                      seriesName = "Automatic Upload Test",
+                      Units = "",
+                      Decimals = 2,
+                      ActPer = "Y",
+                      freqConversion = "END",
+                      Alignment = "MID",
+                      Carry = "NO",
+                      PrimeCurr = "",
+                      tsData = testData)
+
+  expect_equal(sPost, TRUE)
+  expect_equal(mydsws$errorlist, NULL)
+
+
+})
+
+
+#------------------------------------------------------------------------------
 test_that("Test a dataset with an NaN in it", {
   skip_on_cran()
 
@@ -59,7 +92,7 @@ test_that("Test a dataset with an NaN in it", {
 
   sPost <- DatastreamDSWS2R:::.getTimeseries(testData,"M",2)
 
-  sExpected <-  c(4.44,4.12,-30754.90,0.00,NA,NA,NA)
+  sExpected <-  structure(c(4.44, 4.12, -30754.9, 0, NA, NA, NA), class = "AsIs")
 
   expect_equal(sPost , sExpected)
 
@@ -80,7 +113,7 @@ test_that("Test a dataset with an NaN, NA and a large value in it", {
 
   sPost <- DatastreamDSWS2R:::.getTimeseries(testData,"M",2)
 
-  sExpected <- c(1.00,2.20,3.12,14.50,NA)
+  sExpected <- structure(c(1.00,2.20,3.12,14.50,NA), class = "AsIs")
 
   expect_equal(sPost , sExpected)
 
@@ -118,7 +151,7 @@ test_that("Try uploading a real dataset", {
 
   # Test getTimeseries for the first 10 points
   tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
-  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
+  tDataExpected <- structure(c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444), class = "AsIs")
   expect_equal(tData , tDataExpected)
 
   #Try a round trip and check if data is the same
@@ -137,16 +170,12 @@ test_that("Try uploading a real dataset", {
   expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
-  dwei <- getDataStream(User = Sys.getenv("DatastreamUsername"), Pass = Sys.getenv("DatastreamPassword"))
-  sGet <- timeSeriesRequest(dwei = dwei,
-                            DSCodes = "TSTEST01",
-                            Instrument = "",
-                            startDate = index(first(fTest)),
-                            endDate = index(last(fTest)),
-                            frequency = "D",
-                            sStockList = sTest,
-                            aTimeSeries = aTS,
-                            verbose = FALSE)
+  mydsws <- dsws$new()
+  aTS <- mydsws$timeSeriesRequest(instrument = "TSTEST01",
+                            datatype = "",
+                            startDate = zoo::index(xts::first(fTest)),
+                            endDate = zoo::index(xts::last(fTest)),
+                            frequency = "D")
 
   #So success is aTS is the same as f$First
 
@@ -171,7 +200,7 @@ test_that("Try uploading a real dataset with GBP isocode currency", {
 
   # Test getTimeseries for the first 10 points
   tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
-  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
+  tDataExpected <- structure(c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444), class = "AsIs")
   expect_equal(tData , tDataExpected)
 
   #Try a round trip and check if data is the same
@@ -190,17 +219,12 @@ test_that("Try uploading a real dataset with GBP isocode currency", {
   expect_equal(sPost , structure(TRUE, error = ""))
 
   #Now lets download the data
-  dwei <- getDataStream(User = Sys.getenv("DatastreamUsername"),
-                        Pass = Sys.getenv("DatastreamPassword"))
-  sGet <- timeSeriesRequest(dwei = dwei,
-                            DSCodes = "TSTEST01",
-                            Instrument = "",
-                            startDate = index(first(fTest)),
-                            endDate = index(last(fTest)),
-                            frequency = "D",
-                            sStockList = sTest,
-                            aTimeSeries = aTS,
-                            verbose = FALSE)
+  mydsws <- dsws$new()
+  aTS <- mydsws$timeSeriesRequest(instrument = "TSTEST01",
+                                datatype = "",
+                            startDate = zoo::index(xts::first(fTest)),
+                            endDate = zoo::index(xts::last(fTest)),
+                            frequency = "D")
 
   #So success is aTS is the same as f$First
 
@@ -225,7 +249,7 @@ test_that("Error when uploading invalid 4 digit currency", {
 
   # Test getTimeseries for the first 10 points
   tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
-  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
+  tDataExpected <- structure(c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444), class = "AsIs")
   expect_equal(tData , tDataExpected)
 
 
@@ -258,7 +282,7 @@ test_that("Error when uploading invalid 2 digit currency", {
 
   # Test getTimeseries for the first 10 points
   tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
-  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
+  tDataExpected <- structure(c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444), class = "AsIs")
   expect_equal(tData , tDataExpected)
 
   #Try a round trip and check if data is the same
@@ -290,7 +314,7 @@ test_that("Error when uploading invalid 3 digit currency", {
 
   # Test getTimeseries for the first 10 points
   tData <- DatastreamDSWS2R:::.getTimeseries(Data = fTest, freq = "D", digits = 4)
-  tDataExpected <- c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444)
+  tDataExpected <- structure(c(0.8559,NA,NA,NA,0.8579,0.8512,0.8599,NA,NA,0.8596,NA,0.8393,0.8406,0.8274,0.8505,0.8444), class = "AsIs")
   expect_equal(tData , tDataExpected)
 
 
@@ -349,6 +373,7 @@ test_that("Check timing of daily uploads which start on the weekend", {
 
   Sys.sleep(3)
 
+  mydsws <- dsws$new()
   fRet <- mydsws$timeSeriesRequest(instrument = "TSTESTD2",
                     datatype = "",
                     startDate = as.Date("2024-01-09"),

@@ -18,11 +18,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Charles Cara \email{charles.cara@absolute-strategy.com}
+\strong{Maintainer}: Charles Cara \email{charles.cara@absolute-strategy.com} (affiliation: Absolute Strategy Research Ltd) [copyright holder]
 
 Authors:
 \itemize{
-  \item Charles Cara \email{charles.cara@absolute-strategy.com}
+  \item Charles Cara \email{charles.cara@absolute-strategy.com} (affiliation: Absolute Strategy Research Ltd) [copyright holder]
 }
 
 }

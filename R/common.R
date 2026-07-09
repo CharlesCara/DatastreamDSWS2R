@@ -475,3 +475,31 @@
     }
 }
 
+#-----------------------------------------------------------------------------
+#
+#' @name dotgetCurrency
+#' @title .getCurrency
+#' @details extracts the item 'Currency'
+#' in the list x. As a string
+#'
+#' @description extracts and converts a JSON string from 'Currency'
+#'
+#' @param x a list that is expected to have an item 'Currency'
+#' @return the parsed result: String
+#' @keywords internal
+#' @noRd
+#'
+.getCurrency <- function(x) {
+
+  if (!("Currency" %in% names(x) )) {
+    return("")
+  } else {
+    thisValue <- as.character(x$Currency)
+    if (TRUE %in% grepl("\\$\\$ER:", thisValue)) {
+      #TODO: write the response in the errorList object
+      return("")
+    } else {
+      return(thisValue)
+    }
+  }
+}

@@ -12,6 +12,7 @@ test_that("Try appending a real dataset", {
   fTest <- head(f$First,10)
 
   #Try a round trip and check if data is the same
+  expect_warning({
   sPost <- UCTSAppend(TSCode = "TSTEST01",
                       MGMTGroup = "TEST",
                       freq = "D",
@@ -24,7 +25,7 @@ test_that("Try appending a real dataset", {
                       Carry = "NO",
                       PrimeCurr = "",
                       tsData = fTest)
-
+  }, regexp = "UCTSAppend is deprecated and will be removed in a future release.")
   expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 
   #Now lets download the data
@@ -56,7 +57,8 @@ test_that("Appending two more rows to UCTS", {
   fTestAppend <- f$First[11:12,]
   fExpected <- f$First[1:12,]
   #Try a round trip and check if data is the same
-  sPost <- UCTSAppend(TSCode = "TSTEST01",
+  expect_warning({
+    sPost <- UCTSAppend(TSCode = "TSTEST01",
                       MGMTGroup = "TEST",
                       freq = "D",
                       seriesName = "Automatic Upload Test",
@@ -68,6 +70,7 @@ test_that("Appending two more rows to UCTS", {
                       Carry = "NO",
                       PrimeCurr = "",
                       tsData = fTestAppend)
+  }, regexp = "UCTSAppend is deprecated and will be removed in a future release.")
 
   expect_equal(sPost , structure(TRUE, error = ""))  #Failed to upload
 

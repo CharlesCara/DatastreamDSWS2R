@@ -1,5 +1,5 @@
-# DatastreamDSWS2R (development version)
-Switch to using UpdateItem endpoint when uploading a timeseries
+# DatastreamDSWS2R 1.11.0
+Switch to using UpdateItem endpoint when uploading a timeseries, and add UCTSUpload to the DSWS class
 
 # DatastreamDSWS2R 1.9.12
 Fix issue #46 - error when creating dsws object
